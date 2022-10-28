@@ -1,0 +1,45 @@
+{
+	"name": "svitore",
+	"version": "0.0.0",
+	"type": "module",
+	"main": "./dist/index.umd.cjs",
+	"module": "./dist/index.js",
+	"types": "./index.d.ts",
+	"files": [
+		"dist/*"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/core.js",
+			"require": "./dist/core.cjs",
+			"type": "./dist/index.d.ts"
+		},
+		"./operators": {
+			"import": "./dist/operators.js",
+			"require": "./dist/operators.cjs",
+			"type": "./dist/operators/index.d.ts"
+		}
+	},
+	"scripts": {
+		"start": "vite",
+		"build": "vite build && tsc -p tsconfig.build.json",
+		"preview": "vite preview",
+		"lint": "eslint 'src/**/*.ts' 'demo/**/*.ts'",
+		"test": "vitest",
+		"test:coverage": "vitest run --coverage",
+		"preversion": "npm run test:coverage"
+	},
+	"devDependencies": {
+		"@types/node": "^18.11.9",
+		"@typescript-eslint/eslint-plugin": "^5.42.1",
+		"@vitest/coverage-c8": "^0.25.1",
+		"eslint": "^8.27.0",
+		"eslint-config-standard-with-typescript": "^23.0.0",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-n": "^15.3.0",
+		"eslint-plugin-promise": "^6.1.1",
+		"typescript": "^4.8.4",
+		"vite": "^3.2.3",
+		"vitest": "^0.25.1"
+	}
+}
