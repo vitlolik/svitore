@@ -23,7 +23,8 @@
 		"lint": "eslint 'src/**/*.ts' 'demo/**/*.ts'",
 		"test": "vitest",
 		"test:coverage": "vitest run --coverage",
-		"preversion": "npm run test:coverage"
+		"preversion": "npm run test:coverage",
+		"prepublishOnly": "npm run build"
 	},
 	"devDependencies": {
 		"@types/node": "^18.11.9",
