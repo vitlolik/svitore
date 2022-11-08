@@ -2,22 +2,18 @@
 	"name": "svitore",
 	"version": "0.0.1-beta.0",
 	"type": "module",
-	"main": "./dist/index.umd.cjs",
-	"module": "./dist/index.js",
-	"types": "./index.d.ts",
 	"files": [
 		"dist/*"
 	],
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"import": "./dist/core.js",
-			"require": "./dist/core.cjs",
-			"type": "./dist/index.d.ts"
+			"require": "./dist/core.cjs"
 		},
 		"./operators": {
 			"import": "./dist/operators.js",
-			"require": "./dist/operators.cjs",
-			"type": "./dist/operators/index.d.ts"
+			"require": "./dist/operators.cjs"
 		}
 	},
 	"scripts": {
