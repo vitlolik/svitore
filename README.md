@@ -6,15 +6,18 @@
 npm i svitore
 ```
 
-**React**
+<!-- **React**
 
 ```sh
 npm i svitore svitore-react
-```
+``` -->
 
 ## Documentation
 
 ### Entities: [State](#state) | [Event](#event) | [Effect](#effect)
+
+All entity types are extended from a basic abstract [entity](#entityApi) and have its functionality
+See below for a description of the [entity](#entityApi) api.
 
 ### State
 
@@ -218,6 +221,7 @@ submit.direct({
   target,
 });
 
+// called after submit.fire()
 target.subscribe((value) => {
   console.log(value); // { name: 'Alex'; age: 20 }
 });
@@ -238,10 +242,54 @@ Effect is an object for any side effects. It's more complex entity includes [sta
 
 1. `started` - [event](#event) that is triggered when effect function has started
 2. `resolved` - [event](#event) that is triggered when effect function is fulfilled
-3. `rejected` - [event](#event) that is triggered when effect function is executed with any errors
+3. `rejected` - [event](#event) that is triggered when effect function is executed with any errors except `AbortError`
 4. `finished` - [event](#event) that is triggered when effect function finished
 5. `aborted` - [event](#event) that is triggered when effect function has aborted. For example `AbortController.abort()`
 
 6. `$status` - [state](#state) status that shows process
 7. `$pending` - [state](#state) flag that shows whether the effect is in progress
 8. `$runningCount` - [state](#state) that shows count of effect function in progress
+
+#### Example
+
+```ts
+import { Effect } from "svitore";
+
+const effect = new Effect(
+  () =>
+    new Promise<string>((resolve) => {
+      setTimeout(() => resolve("Hello World"), 300);
+    })
+);
+
+// called after effect.run() and when 300 milliseconds have passed
+effect.resolved.subscribe((value) => {
+  console.log(value); // "Hello World"
+});
+
+effect.run();
+```
+
+##### run
+
+Run effect function
+
+```ts
+import { Effect } from "svitore";
+
+const effectFunction = (value: string) =>
+  new Promise<string>((resolve) => {
+    setTimeout(() => resolve(value.toUpperCase()), 300);
+  });
+
+const effect = new Effect(effectFunction);
+
+effect.resolved.subscribe((value) => {
+  console.log(value); // "HELLO WORLD"
+});
+
+const result = await effect.run(); // you can get data here
+console.log(result); // "HELLO WORLD"
+```
+
+### Entity Api
