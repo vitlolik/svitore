@@ -96,10 +96,10 @@ export function merge<TResult, A, B, C, D, E, F, G, H, I, J>(
 ): State<TResult>;
 
 export function merge<TState>(
-	stateLists: State[],
+	stateLists: State<any>[],
 	selector: (...args: any[]) => TState
 ): State<TState> {
-	const getStateData = (stateLists: State[]) =>
+	const getStateData = (stateLists: State<any>[]) =>
 		selector(...stateLists.map((state) => state.get()));
 
 	const newState = new State(getStateData(stateLists));
