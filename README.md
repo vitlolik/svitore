@@ -305,10 +305,82 @@ All entity types: [State](#state), [Event](#event), [Effect](#effect) have it fu
 - For [Event](#event) - with event payload
 - For [Event](#event) - with effect function params
 
-2. [inform](#inform) - receive payload and notifies all subscribers, also:
+2. [inform](#inform) - abstraction:
 
-- For [State](#state) - update state
-- For [Event](#event) - fire event
-- For [Event](#event) - run effect
+- For [State](#state) - update state and notify subscribers
+- For [Event](#event) - fire event and notify subscribers (same as [fire](#fire))
+- For [Event](#event) - run effect and notify subscribers (same as [run](#run))
 
 3. [channel](#channel) - create a connection/channel between entities
+
+#### Example
+
+##### subscribe
+
+Subscribe to entity behavior. Subscriber will be notified.
+
+```ts
+import { State, Event, Effect } from "svitore";
+
+const changeState = new Event<number>();
+const state = new State(0).on(changeState);
+const effect = new Effect(
+  (value: string) =>
+    new Promise<string>((resolve) => {
+      setTimeout(() => resolve(value.toUpperCase()), 300);
+    })
+);
+
+// called after event fired
+changeState.subscribe((value) => {
+  console.log(value); // 10
+});
+
+// called after state changed
+state.subscribe((value) => {
+  console.log(value); // 10
+});
+
+// called immediately after effect.run('hello world') and when 300 milliseconds have passed
+effect.subscribe((value) => {
+  console.log(value); // "HELLO WORLD"
+});
+
+changeState.fire(10);
+effect.run("hello world");
+```
+
+##### channel
+
+Create a connection/channel between entities
+
+```ts
+import { State, Event } from "svitore";
+
+const changeCount = new Event<number>();
+const $count = new State(0);
+
+const target1 = new Event<number>();
+const target2 = new Event<number>();
+
+// when $count going to be equal 2 will execute map and result going to go to target1 and target2
+$count.channel({
+  filter: (count: number) => count % 2 == 0,
+  map: (count: number) => count * 2,
+  target: [target1, target2],
+});
+
+// called only one time
+target1.subscribe((value) => {
+  console.log(value); // 8
+});
+
+// called only one time
+target2.subscribe((value) => {
+  console.log(value); // 8
+});
+
+changeCount.fire(1);
+changeCount.fire(3);
+changeCount.fire(4);
+```
