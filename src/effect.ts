@@ -9,8 +9,8 @@ type EffectFunction<TParams, TResult> = (
 ) => Promise<TResult>;
 
 class Effect<
-	TParams = void,
-	TResult = any,
+	TParams extends any = void,
+	TResult extends any = void,
 	TError extends Error = Error
 > extends Entity<TParams> {
 	started = new Event<TParams>();

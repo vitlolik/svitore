@@ -1,8 +1,8 @@
 import { Effect } from "../effect";
 
 const cancelable = <
-	TParams = void,
-	TResult = any,
+	TParams extends any = void,
+	TResult extends any = void,
 	TError extends Error = Error
 >(
 	targetEffect: Effect<TParams, TResult, TError>

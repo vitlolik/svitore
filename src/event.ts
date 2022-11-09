@@ -4,7 +4,7 @@ import { EventOptions } from "./types";
 
 const noCalled = Symbol("no called");
 
-class Event<TPayload = void, TMeta = any> extends Entity<TPayload> {
+class Event<TPayload extends any = void, TMeta extends any = any> extends Entity<TPayload> {
 	calls = 0;
 	prevPayload: TPayload | typeof noCalled = noCalled;
 	payload: TPayload | typeof noCalled = noCalled;

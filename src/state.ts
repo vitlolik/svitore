@@ -1,7 +1,7 @@
 import { Event } from "./event";
 import { Entity } from "./shared/entity";
 
-class State<TState = any> extends Entity<TState> {
+class State<TState> extends Entity<TState> {
 	protected defaultState: TState;
 	private prevState: TState;
 
