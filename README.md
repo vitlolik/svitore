@@ -341,7 +341,7 @@ state.subscribe((value) => {
   console.log(value); // 10
 });
 
-// called immediately after effect.run('hello world') and when 300 milliseconds have passed
+// called immediately after effect is going to run
 effect.subscribe((value) => {
   console.log(value); // "HELLO WORLD"
 });
