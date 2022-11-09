@@ -299,13 +299,13 @@ All entity types: [State](#state), [Event](#event), [Effect](#effect) have it fu
 
 #### Methods
 
-1. [subscribe](#subscribe) - subscribe to entity behavior. Subscriber will be notified with payload:
+1. [subscribe](#subscribe) - subscribe to entity behavior. Subscriber will be notified:
 
-- For [State](#state) - have updated state
-- For [Event](#event) - have fired event
-- For [Event](#event) - have run effect
+- For [State](#state) - with new state
+- For [Event](#event) - with event payload
+- For [Event](#event) - with effect function params
 
-2. [inform](#inform) - receives payload and notifies all subscribers, also:
+2. [inform](#inform) - receive payload and notifies all subscribers, also:
 
 - For [State](#state) - update state
 - For [Event](#event) - fire event
