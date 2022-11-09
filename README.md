@@ -167,7 +167,7 @@ Event is an object for send any payload to other entities. For example, to updat
 #### Methods
 
 1. [fire](#fire) - trigger event
-2. [direct](#direct) - transfer some data to target by event
+2. [direct](#direct) - transfer [state](#state) data to target by event
 
 #### Fields
 
@@ -175,6 +175,55 @@ Event is an object for send any payload to other entities. For example, to updat
 2. `prevPayload` - previous data with which the event was called
 3. `payload` - data with which the event was last called
 4. `meta` - any data
+
+#### Example
+
+```ts
+import { Event } from "svitore";
+
+const change = new Event<string>();
+```
+
+##### fire
+
+Trigger event
+
+```ts
+import { Event } from "svitore";
+
+const change = new Event<string>();
+
+change.subscribe((name) => {
+  console.log(name); // 'Alex'
+});
+
+change.fire("Alex");
+```
+
+##### direct
+
+Transfer [state](#state) data to target by event
+
+```ts
+import { Event, State } from "svitore";
+
+const submit = new Event<string>();
+const $name = new State("Alex");
+const $age = new State(20);
+const target = new Event<{ name: string; age: number }>();
+
+submit.direct({
+  data: [$name, $age],
+  map: (name, age) => ({ name, age }),
+  target,
+});
+
+target.subscribe((value) => {
+  console.log(value); // { name: 'Alex'; age: 20 }
+});
+
+submit.fire();
+```
 
 ### Effect
 
