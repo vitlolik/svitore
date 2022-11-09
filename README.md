@@ -196,6 +196,7 @@ import { Event } from "svitore";
 
 const change = new Event<string>();
 
+// called after submit.fire("Alex")
 change.subscribe((name) => {
   console.log(name); // 'Alex'
 });
@@ -293,3 +294,21 @@ console.log(result); // "HELLO WORLD"
 ```
 
 ### Entity Api
+
+All entity types: [State](#state), [Event](#event), [Effect](#effect) have it functionality
+
+#### Methods
+
+1. [subscribe](#subscribe) - subscribe to entity behavior. Subscriber will be notified with payload if
+
+- For [State](#state) - have updated state
+- For [Event](#event) - have fired event
+- For [Event](#event) - have run effect
+
+2. [inform](#inform) - receives payload and notifies all subscribers, also
+
+- For [State](#state) - update state
+- For [Event](#event) - fire event
+- For [Event](#event) - run effect
+
+3. [channel](#channel) - create a connection/channel between entities
