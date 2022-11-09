@@ -16,8 +16,8 @@ npm i svitore svitore-react
 
 ### Entities: [State](#state) | [Event](#event) | [Effect](#effect)
 
-All entity types are extended from a basic abstract [entity](#entityApi) and have it functionality.
-See below for a description of the [entity](#entityApi) api.
+All entity types are extended from a basic abstract [entity](#entity-api) and have it functionality.
+See below for a description of the [entity](#entity-api) api.
 
 ### State
 
