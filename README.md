@@ -16,7 +16,7 @@ npm i svitore svitore-react
 
 ### Entities: [State](#state) | [Event](#event) | [Effect](#effect)
 
-All entity types are extended from a basic abstract [entity](#entityApi) and have its functionality
+All entity types are extended from a basic abstract [entity](#entityApi) and have it functionality.
 See below for a description of the [entity](#entityApi) api.
 
 ### State
@@ -299,13 +299,13 @@ All entity types: [State](#state), [Event](#event), [Effect](#effect) have it fu
 
 #### Methods
 
-1. [subscribe](#subscribe) - subscribe to entity behavior. Subscriber will be notified with payload if
+1. [subscribe](#subscribe) - subscribe to entity behavior. Subscriber will be notified with payload:
 
 - For [State](#state) - have updated state
 - For [Event](#event) - have fired event
 - For [Event](#event) - have run effect
 
-2. [inform](#inform) - receives payload and notifies all subscribers, also
+2. [inform](#inform) - receives payload and notifies all subscribers, also:
 
 - For [State](#state) - update state
 - For [Event](#event) - fire event
