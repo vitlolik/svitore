@@ -2,26 +2,30 @@ import { Observable, Observer } from "./observable";
 
 type Subscriber<T> = Observer<T>;
 
+type Unsubscribe = () => void;
+
 abstract class Entity<T> extends Observable<T> {
-	protected dependencies = new Map<Entity<any>, () => void>();
+	protected dependencies = new Map<Entity<any>, Set<Unsubscribe>>();
 
 	protected addDependency<TData>(
 		entity: Entity<TData>,
 		subscriber: Subscriber<TData>
 	) {
-		this.dependencies.set(entity, entity.subscribe(subscriber));
+		const unsubscribeSet = this.dependencies.get(entity);
+		const unsubscribe = entity.subscribe(subscriber);
+
+		if (unsubscribeSet) {
+			unsubscribeSet.add(unsubscribe);
+		} else {
+			this.dependencies.set(entity, new Set([unsubscribe]));
+		}
 	}
 
-	protected deleteDependency(entity: Entity<any>) {
-		const unsubscribe = this.dependencies.get(entity);
-		unsubscribe?.();
+	private deleteDependency(entity: Entity<any>) {
+		const unsubscribeSet = this.dependencies.get(entity);
+		unsubscribeSet?.forEach((unsubscribe) => unsubscribe());
+		unsubscribeSet?.clear();
 		this.dependencies.delete(entity);
-	}
-
-	protected off(entity: Entity<any>) {
-		this.deleteDependency(entity);
-
-		return this;
 	}
 
 	inform(data: T): void {
@@ -30,23 +34,23 @@ abstract class Entity<T> extends Observable<T> {
 
 	channel<TTargetPayload extends T | void>(options: {
 		target: Entity<TTargetPayload> | Entity<TTargetPayload>[];
-	}): () => void;
+	}): void;
 
 	channel<TTargetPayload extends T | void>(options: {
 		target: Entity<TTargetPayload> | Entity<TTargetPayload>[];
 		filter: (payload: T) => boolean;
-	}): () => void;
+	}): void;
 
 	channel<TTargetParams extends any>(options: {
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
 		map: (payload: T) => TTargetParams;
-	}): () => void;
+	}): void;
 
 	channel<TTargetParams extends any>(options: {
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
 		filter: (payload: T) => boolean;
 		map: (payload: T) => TTargetParams;
-	}): () => void;
+	}): void;
 
 	channel({
 		filter,
@@ -56,7 +60,7 @@ abstract class Entity<T> extends Observable<T> {
 		target: Entity<any> | Entity<any>[];
 		map?: (payload: T) => any;
 		filter?: (payload: T) => boolean;
-	}): () => void {
+	}): void {
 		const targetList = Array.isArray(target) ? target : [target];
 
 		targetList.forEach((target) => {
@@ -67,12 +71,6 @@ abstract class Entity<T> extends Observable<T> {
 				target.inform(map?.(payload) ?? payload);
 			});
 		});
-
-		return () => {
-			targetList.forEach((target) => {
-				target.off(this);
-			});
-		};
 	}
 
 	subscribe(subscriber: Subscriber<T>) {

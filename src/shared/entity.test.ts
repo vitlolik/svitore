@@ -11,10 +11,6 @@ describe("entity", () => {
 			return this.dependencies;
 		}
 
-		_deleteDependency(entity: Entity<any>) {
-			this.deleteDependency(entity);
-		}
-
 		_addDependency<T, TResult>(
 			entity: Entity<T>,
 			subscribe: (data: T) => TResult
@@ -51,21 +47,19 @@ describe("entity", () => {
 		expect(subscribe).toHaveBeenCalledTimes(1);
 	});
 
-	it("delete dependency", () => {
+	it("one dependency can have more callbacks", () => {
 		const entity = new TestEntity();
 		const dependencyEvent = new Event();
-		const subscribe = vi.fn();
+		const subscribe1 = vi.fn();
+		const subscribe2 = vi.fn();
+		entity._addDependency(dependencyEvent, subscribe1);
+		entity._addDependency(dependencyEvent, subscribe2);
 
-		entity._addDependency(dependencyEvent, subscribe);
+		dependencyEvent.fire();
+
 		expect(entity.getDependencies().size).toBe(1);
-		dependencyEvent.fire();
-
-		entity._deleteDependency(dependencyEvent);
-		expect(subscribe).toHaveBeenCalledTimes(1);
-		dependencyEvent.fire();
-		dependencyEvent.fire();
-		expect(subscribe).toHaveBeenCalledTimes(1);
-		expect(entity.getDependencies().size).toBe(0);
+		expect(subscribe1).toHaveBeenCalledTimes(1);
+		expect(subscribe2).toHaveBeenCalledTimes(1);
 	});
 
 	it("inform", () => {
@@ -181,24 +175,6 @@ describe("entity", () => {
 			entity.inform("hello world");
 			expect(subscriber).toHaveBeenCalledTimes(1);
 			expect(subscriber).toHaveBeenCalledWith("HELLO WORLD");
-		});
-
-		it("should off listen", () => {
-			const entity = new CleanEntity<string>();
-			const target = new CleanEntity<string>();
-			const subscriber = vi.fn();
-
-			target.subscribe((value) => {
-				subscriber(value);
-			});
-
-			const offChanel = entity.channel({ target });
-			offChanel();
-
-			entity.inform("lol");
-			entity.inform("world");
-			entity.inform("hello world");
-			expect(subscriber).toHaveBeenCalledTimes(0);
 		});
 	});
 

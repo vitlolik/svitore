@@ -4,7 +4,10 @@ import { EventOptions } from "./types";
 
 const noCalled = Symbol("no called");
 
-class Event<TPayload extends any = void, TMeta extends any = any> extends Entity<TPayload> {
+class Event<
+	TPayload extends any = void,
+	TMeta extends any = any
+> extends Entity<TPayload> {
 	calls = 0;
 	prevPayload: TPayload | typeof noCalled = noCalled;
 	payload: TPayload | typeof noCalled = noCalled;
@@ -38,43 +41,43 @@ class Event<TPayload extends any = void, TMeta extends any = any> extends Entity
 		data: State<A>;
 		map: (a: A) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, TTargetParams extends any>(options: {
 		data: [State<A>, State<B>];
 		map: (a: A, b: B) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, TTargetParams extends any>(options: {
 		data: [State<A>, State<B>, State<C>];
 		map: (a: A, b: B, c: C) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, D, TTargetParams extends any>(options: {
 		data: [State<A>, State<B>, State<C>, State<D>];
 		map: (a: A, b: B, c: C, d: D) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, D, E, TTargetParams extends any>(options: {
 		data: [State<A>, State<B>, State<C>, State<D>, State<E>];
 		map: (a: A, b: B, c: C, d: D, e: E) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, D, E, F, TTargetParams extends any>(options: {
 		data: [State<A>, State<B>, State<C>, State<D>, State<E>, State<F>];
 		map: (a: A, b: B, c: C, d: D, e: E, f: F) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, D, E, F, TTargetParams extends any>(options: {
 		data: [State<A>, State<B>, State<C>, State<D>, State<E>, State<F>];
 		map: (a: A, b: B, c: C, d: D, e: E, f: F) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, D, E, F, G, TTargetParams extends any>(options: {
 		data: [
@@ -88,7 +91,7 @@ class Event<TPayload extends any = void, TMeta extends any = any> extends Entity
 		];
 		map: (a: A, b: B, c: C, d: D, e: E, f: F, g: G) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, D, E, F, G, H, TTargetParams extends any>(options: {
 		data: [
@@ -103,7 +106,7 @@ class Event<TPayload extends any = void, TMeta extends any = any> extends Entity
 		];
 		map: (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, D, E, F, G, H, I, TTargetParams extends any>(options: {
 		data: [
@@ -129,7 +132,7 @@ class Event<TPayload extends any = void, TMeta extends any = any> extends Entity
 			i: I
 		) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<A, B, C, D, E, F, G, H, I, J, TTargetParams extends any>(options: {
 		data: [
@@ -158,7 +161,7 @@ class Event<TPayload extends any = void, TMeta extends any = any> extends Entity
 			...rest: any[]
 		) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void;
+	}): void;
 
 	direct<TData extends any, TTargetParams extends any>({
 		data,
@@ -168,7 +171,7 @@ class Event<TPayload extends any = void, TMeta extends any = any> extends Entity
 		data: State<TData> | State<TData>[];
 		map: (...payload: TData[]) => TTargetParams;
 		target: Entity<TTargetParams> | Entity<TTargetParams>[];
-	}): () => void {
+	}): void {
 		const targetList = Array.isArray(target) ? target : [target];
 		const dataList = Array.isArray(data) ? data : [data];
 
