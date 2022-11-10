@@ -1,6 +1,6 @@
 # svitore
 
-State container
+State manager
 
 ## Installation
 
