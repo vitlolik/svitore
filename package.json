@@ -55,5 +55,6 @@
 		"state-manager"
 	],
 	"repository": "https://github.com/vitlolik/svitore",
-	"license": "MIT"
+	"license": "MIT",
+	"sideEffects": false
 }
