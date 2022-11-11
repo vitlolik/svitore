@@ -17,11 +17,8 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run test:coverage
-      - name: Coverage
-        run: |
-          curl -Os https://uploader.codecov.io/latest/linux/codecov
-          chmod +x codecov
-          ./codecov -t 47a8785c-d18d-4dc5-8695-7659f1a7bc18
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
   check-size:
     runs-on: ubuntu-latest
     steps:
