@@ -2,24 +2,23 @@ name: Check size
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   pull_request:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
-  build:
+  check-size:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [16.x, 17.x]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: "npm"
       - run: npm ci
       - run: npm run build
       - run: npm run check-size
