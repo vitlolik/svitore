@@ -1,6 +1,7 @@
 # svitore
 
 ![example branch parameter](https://github.com/vitlolik/svitore/actions/workflows/ci.yml/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/svitore/branch/main/graph/badge.svg)](https://codecov.io/gh/svitore)
 
 State manager
 
