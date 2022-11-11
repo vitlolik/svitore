@@ -1,5 +1,7 @@
 # svitore
 
+![example branch parameter](https://github.com/vitlolik/svitore/actions/workflows/ci.yml/badge.svg?branch=master)
+
 State manager
 
 ## Installation
