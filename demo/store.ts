@@ -1,5 +1,4 @@
-import { Effect, Event, State } from "../src";
-import { merge, reset } from "../src/operators";
+import { Effect, Event, State, merge, reset } from "../src";
 
 const createStore = () => {
 	const changedFirstName = new Event<string>();
@@ -10,7 +9,7 @@ const createStore = () => {
 	const submitEffect = new Effect(
 		(data: { firstName: string; secondName: string; symbolsCount: number }) =>
 			new Promise<void>((resolve) => {
-				alert(JSON.stringify(data, null, 2));
+				console.log(JSON.stringify(data, null, 2));
 				resolve();
 			})
 	);
