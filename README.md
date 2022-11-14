@@ -11,11 +11,9 @@ State manager
 npm i svitore
 ```
 
-<!-- **React**
+## Packages
 
-```sh
-npm i svitore svitore-react
-``` -->
+- [svitore-react](https://github.com/vitlolik/svitore-react)
 
 ## Documentation
 
