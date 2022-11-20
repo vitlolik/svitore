@@ -18,7 +18,7 @@ npm i svitore
 ## Examples
 
 - [Counter](https://codesandbox.io/s/counter-t5k6t3)
-- [Todo app](https://codesandbox.io/s/todo-mnbd1g)
+- [Todo App](https://codesandbox.io/s/todo-mnbd1g)
 
 ## Documentation
 
