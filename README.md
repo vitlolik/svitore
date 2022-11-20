@@ -15,6 +15,10 @@ npm i svitore
 
 - [svitore-react](https://github.com/vitlolik/svitore-react)
 
+## Examples
+
+- [Counter](https://codesandbox.io/s/dank-wave-t5k6t3?file=/src/App.tsx)
+
 ## Documentation
 
 ### Entities: [State](#state) | [Event](#event) | [Effect](#effect)
