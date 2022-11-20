@@ -18,7 +18,8 @@ npm i svitore
 ## Examples
 
 - [Counter](https://codesandbox.io/s/counter-t5k6t3)
-- [Todo App](https://codesandbox.io/s/todo-mnbd1g)
+- [Todo app](https://codesandbox.io/s/todo-mnbd1g)
+- [Abort request](https://codesandbox.io/s/abort-request-ptbi4m)
 
 ## Documentation
 
