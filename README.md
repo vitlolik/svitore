@@ -17,7 +17,8 @@ npm i svitore
 
 ## Examples
 
-- [Counter](https://codesandbox.io/s/dank-wave-t5k6t3?file=/src/App.tsx)
+- [Counter](https://codesandbox.io/s/counter-t5k6t3)
+- [Todo app](https://codesandbox.io/s/todo-mnbd1g)
 
 ## Documentation
 
