@@ -1,14 +1,13 @@
 import { State } from "../state";
-import { Event } from "../event";
-import { debounceEvent } from "./debounceEvent";
+import { DebouncedEvent } from "../debounced-event";
 
 const persistState = <T>(
 	state: State<T>,
 	storageKey: string,
 	storage: Storage = window.localStorage
 ): State<T> => {
-	const changeEvent = debounceEvent(100);
-	state.subscribe(changeEvent.dispatch);
+	const changeEvent = new DebouncedEvent<T>(100);
+	state.subscribe((newState) => changeEvent.dispatch(newState));
 	changeEvent.listen((newState) => {
 		storage.setItem(
 			storageKey,

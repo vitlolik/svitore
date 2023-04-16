@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeState } from "./computeState";
+import { computeState } from "./compute-state";
 import { State } from "../state";
 
 describe("computeState", () => {

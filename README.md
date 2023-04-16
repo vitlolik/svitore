@@ -156,7 +156,7 @@ change.dispatch("Alex");
 
 ##### listen
 
-Trigger event
+Add event listener
 
 ```ts
 import { Event } from "svitore";

@@ -16,6 +16,7 @@
 		"module": "ESNext",
 		"moduleResolution": "Node",
 		"resolveJsonModule": true,
-		"isolatedModules": false
+		"isolatedModules": false,
+		"strictPropertyInitialization": false
 	}
 }

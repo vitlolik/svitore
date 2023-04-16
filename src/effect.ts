@@ -39,7 +39,7 @@ class Effect<
 		this.effectFunctionState = new State(effectFunction);
 
 		this.started.listen(() => {
-			this.runningCountState.set(this.runningCountState.get() + 1);
+			this.runningCountState.change((count) => count + 1);
 			this.statusState.set(EffectStatus.pending);
 		});
 
@@ -52,7 +52,7 @@ class Effect<
 		});
 
 		this.finished.listen(() => {
-			this.runningCountState.set(this.runningCountState.get() - 1);
+			this.runningCountState.change((count) => count - 1);
 		});
 	}
 
@@ -60,10 +60,10 @@ class Effect<
 		this.effectFunctionState.set(effectFunction);
 	};
 
-	run = async (
+	async run(
 		params: TParams,
 		abortController: AbortController = new AbortController()
-	): Promise<TResult> => {
+	): Promise<TResult> {
 		try {
 			this.started.dispatch(params);
 			const result = await this.effectFunctionState.get()(
@@ -85,7 +85,7 @@ class Effect<
 		} finally {
 			this.finished.dispatch(params);
 		}
-	};
+	}
 }
 
 export { Effect, EffectFunction, EffectStatus };

@@ -41,8 +41,8 @@ const createStore = () => {
 		window.sessionStorage
 	);
 
-	changeFirstName.listen(firstNameState.set);
-	changeSecondName.listen(secondNameState.set);
+	changeFirstName.listen((value) => firstNameState.set(value));
+	changeSecondName.listen((value) => secondNameState.set(value));
 
 	const symbolsCountState = computeState(
 		[firstNameState, secondNameState],

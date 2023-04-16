@@ -21,16 +21,20 @@ class Event<
 		return this.options.shouldDispatch?.(this) ?? true;
 	}
 
-	dispatch = (payload: TPayload): void => {
+	protected fire(payload: TPayload): void {
 		if (!this.shouldDispatch()) return;
 
 		this.calls++;
 		this.notify(payload);
-	};
+	}
 
-	listen = (listener: Observer<TPayload>) => {
+	dispatch(payload: TPayload): void {
+		this.fire(payload);
+	}
+
+	listen(listener: Observer<TPayload>) {
 		return this.observe(listener);
-	};
+	}
 }
 
 export { Event, EventOptions };
