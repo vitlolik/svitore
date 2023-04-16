@@ -24,8 +24,8 @@ describe("allEffectsFinished", () => {
 		);
 
 		effect1.run();
-		effect1.resolved.subscribe(() => effect2.run());
-		effect2.resolved.subscribe(() => effect3.run());
+		effect1.resolved.listen(() => effect2.run());
+		effect2.resolved.listen(() => effect3.run());
 
 		await allEffectsFinished();
 

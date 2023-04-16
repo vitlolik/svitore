@@ -1,4 +1,4 @@
-import { Entity } from "./shared/entity";
+import { Entity, Observer } from "./shared";
 
 type EventOptions<TPayload = void, TMeta = any> = {
 	shouldDispatch?: (event: Event<TPayload>) => boolean;
@@ -26,6 +26,10 @@ class Event<
 
 		this.calls++;
 		this.notify(payload);
+	};
+
+	listen = (listener: Observer<TPayload>) => {
+		return this.observe(listener);
 	};
 }
 

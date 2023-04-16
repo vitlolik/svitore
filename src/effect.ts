@@ -38,21 +38,21 @@ class Effect<
 		super();
 		this.effectFunctionState = new State(effectFunction);
 
-		this.started.subscribe(() => {
-			this.runningCountState.change((state) => state + 1);
+		this.started.listen(() => {
+			this.runningCountState.set(this.runningCountState.get() + 1);
 			this.statusState.set(EffectStatus.pending);
 		});
 
-		this.resolved.subscribe(() => {
+		this.resolved.listen(() => {
 			this.statusState.set(EffectStatus.resolved);
 		});
 
-		this.rejected.subscribe(() => {
+		this.rejected.listen(() => {
 			this.statusState.set(EffectStatus.rejected);
 		});
 
-		this.finished.subscribe(() => {
-			this.runningCountState.change((state) => state - 1);
+		this.finished.listen(() => {
+			this.runningCountState.set(this.runningCountState.get() - 1);
 		});
 	}
 

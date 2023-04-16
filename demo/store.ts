@@ -1,4 +1,4 @@
-import { Effect, Event, State, computeState } from "../src";
+import { Effect, Event, State, computeState, persistState } from "../src";
 
 const createStore = () => {
 	const changeFirstName = new Event<string>();
@@ -30,11 +30,19 @@ const createStore = () => {
 			})
 	);
 
-	const firstNameState = new State("");
-	const secondNameState = new State("");
+	const firstNameState = persistState(
+		new State(""),
+		"firstName",
+		window.sessionStorage
+	);
+	const secondNameState = persistState(
+		new State(""),
+		"lastName",
+		window.sessionStorage
+	);
 
-	changeFirstName.subscribe(firstNameState.set);
-	changeSecondName.subscribe(secondNameState.set);
+	changeFirstName.listen(firstNameState.set);
+	changeSecondName.listen(secondNameState.set);
 
 	const symbolsCountState = computeState(
 		[firstNameState, secondNameState],
@@ -42,7 +50,7 @@ const createStore = () => {
 			firstName.trim().length + secondName.trim().length
 	);
 
-	submitted.subscribe(() => {
+	submitted.listen(() => {
 		submitEffect.run({
 			firstName: firstNameState,
 			secondName: secondNameState,
@@ -50,7 +58,7 @@ const createStore = () => {
 		});
 	});
 
-	resetEvent.subscribe(() => {
+	resetEvent.listen(() => {
 		firstNameState.reset();
 		secondNameState.reset();
 	});

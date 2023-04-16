@@ -1,14 +1,13 @@
 import { Event } from "../event";
 
-const throttleEvent = <T>(event: Event<T>, timeout: number) => {
-	const throttleEvent = new Event<T>();
-	event.subscribe(throttleEvent.dispatch);
-	const throttleDispatch = throttleEvent.dispatch.bind(throttleEvent);
+const throttleEvent = <T>(timeout: number) => {
+	const event = new Event<T>();
+	const throttleDispatch = event.dispatch;
 
 	let isThrottled = false;
 	let savedParams: T | null;
 
-	const fire = (params: T): void => {
+	const throttledDispatch = (params: T): void => {
 		if (isThrottled) {
 			savedParams = params;
 			return;
@@ -20,15 +19,15 @@ const throttleEvent = <T>(event: Event<T>, timeout: number) => {
 		setTimeout(() => {
 			isThrottled = false;
 			if (savedParams) {
-				fire(savedParams);
+				throttledDispatch(savedParams);
 				savedParams = null;
 			}
 		}, timeout);
 	};
 
-	throttleEvent.dispatch = fire;
+	event.dispatch = throttledDispatch;
 
-	return throttleEvent;
+	return event;
 };
 
 export { throttleEvent };

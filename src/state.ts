@@ -1,3 +1,4 @@
+import { Observer } from "./shared";
 import { Entity } from "./shared/entity";
 
 class State<TState> extends Entity<TState> {
@@ -19,7 +20,7 @@ class State<TState> extends Entity<TState> {
 		this.notify(this.state);
 	};
 
-	change = (getNewState: (prevState: TState) => TState) => {
+	change = (getNewState: (prevState: TState) => TState): void => {
 		this.set(getNewState(this.get()));
 	};
 
@@ -33,6 +34,10 @@ class State<TState> extends Entity<TState> {
 
 	getPrev = (): TState => {
 		return this.prevState;
+	};
+
+	subscribe = (subscriber: Observer<TState>) => {
+		return this.observe(subscriber);
 	};
 }
 

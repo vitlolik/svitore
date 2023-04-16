@@ -22,9 +22,9 @@ abstract class Observable<TParams = void> {
 		});
 	}
 
-	release() {
+	release = () => {
 		this.observers = new Set();
-	}
+	};
 }
 
 export { Observable, Observer };

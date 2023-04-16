@@ -36,9 +36,8 @@ State is an object that stores any data. It will updated when got new data if th
 
 1. [get](#get) - get state
 2. [set](#set) - set new state
-3. [change](#change) - change current state
-4. [getPrev](#getPrev) - get previous state
-5. [reset](#reset) - reset current state
+3. [getPrev](#getPrev) - get previous state
+4. [reset](#reset) - reset current state
 
 #### Example
 
@@ -77,19 +76,6 @@ nameState.get(); // 'Name'
 
 nameState.set("qwerty");
 nameState.get(); // 'qwerty'
-```
-
-##### change
-
-Change current state
-
-```ts
-import { State } from "svitore";
-
-const countState = new State(0);
-countState.change((state) => state + 1);
-
-countState.get(); // 1
 ```
 
 ##### getPrev
@@ -141,6 +127,7 @@ Event is an object for send any payload to other entities. For example, to updat
 #### Methods
 
 1. [dispatch](#dispatch) - trigger event
+2. [listen](#listen) - add event listener
 
 #### Fields
 
@@ -164,7 +151,19 @@ import { Event } from "svitore";
 
 const change = new Event<string>();
 
-change.subscribe((name) => {
+change.dispatch("Alex");
+```
+
+##### listen
+
+Trigger event
+
+```ts
+import { Event } from "svitore";
+
+const change = new Event<string>();
+
+change.listen((name) => {
   console.log(name); // 'Alex'
 });
 
@@ -204,7 +203,7 @@ const effect = new Effect(
 );
 
 // called after effect.run() and when 300 milliseconds have passed
-effect.resolved.subscribe((value) => {
+effect.resolved.listen((value) => {
   console.log(value); // "Hello World"
 });
 
@@ -225,56 +224,10 @@ const effectFunction = (value: string) =>
 
 const effect = new Effect(effectFunction);
 
-effect.resolved.subscribe((value) => {
+effect.resolved.listen((value) => {
   console.log(value); // "HELLO WORLD"
 });
 
 const result = await effect.run(); // you can get data here
 console.log(result); // "HELLO WORLD"
-```
-
-### Entity Api
-
-All entity types: [State](#state), [Event](#event), [Effect](#effect) have it functionality
-
-#### Methods
-
-1. [subscribe](#subscribe) - subscribe to entity behavior. Subscriber will be notified:
-
-#### Example
-
-##### subscribe
-
-Subscribe to entity behavior. Subscriber will be notified.
-
-```ts
-import { State, Event, Effect } from "svitore";
-
-const changeState = new Event<number>();
-const state = new State(0);
-const effect = new Effect(
-  (value: string) =>
-    new Promise<string>((resolve) => {
-      setTimeout(() => resolve(value.toUpperCase()), 300);
-    })
-);
-changeState.subscribe(state.set);
-
-// called after event fired
-changeState.subscribe((value) => {
-  console.log(value); // 10
-});
-
-// called after state changed
-state.subscribe((value) => {
-  console.log(value); // 10
-});
-
-// called immediately after effect is going to run
-effect.subscribe((value) => {
-  console.log(value); // "HELLO WORLD"
-});
-
-changeState.dispatch(10);
-effect.run("hello world");
 ```
