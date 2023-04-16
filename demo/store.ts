@@ -1,4 +1,4 @@
-import { Effect, Event, State, computeState, persistState } from "../src";
+import { Effect, Event, PersistState, State, computeState } from "../src";
 
 const createStore = () => {
 	const changeFirstName = new Event<string>();
@@ -30,13 +30,13 @@ const createStore = () => {
 			})
 	);
 
-	const firstNameState = persistState(
-		new State(""),
+	const firstNameState = new PersistState(
+		"",
 		"firstName",
 		window.sessionStorage
 	);
-	const secondNameState = persistState(
-		new State(""),
+	const secondNameState = new PersistState(
+		"",
 		"lastName",
 		window.sessionStorage
 	);
