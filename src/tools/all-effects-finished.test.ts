@@ -24,8 +24,8 @@ describe("allEffectsFinished", () => {
 		);
 
 		effect1.run();
-		effect1.resolved.channel({ target: effect2 });
-		effect2.resolved.channel({ target: effect3 });
+		effect1.resolved.subscribe(() => effect2.run());
+		effect2.resolved.subscribe(() => effect3.run());
 
 		await allEffectsFinished();
 

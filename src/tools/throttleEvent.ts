@@ -1,9 +1,9 @@
 import { Event } from "../event";
 
-const throttle = <T>(event: Event<T>, timeout: number) => {
+const throttleEvent = <T>(event: Event<T>, timeout: number) => {
 	const throttleEvent = new Event<T>();
-	event.channel({ target: throttleEvent });
-	const throttleDispatch = throttleEvent.fire.bind(throttleEvent);
+	event.subscribe(throttleEvent.dispatch);
+	const throttleDispatch = throttleEvent.dispatch.bind(throttleEvent);
 
 	let isThrottled = false;
 	let savedParams: T | null;
@@ -26,9 +26,9 @@ const throttle = <T>(event: Event<T>, timeout: number) => {
 		}, timeout);
 	};
 
-	throttleEvent.fire = fire;
+	throttleEvent.dispatch = fire;
 
 	return throttleEvent;
 };
 
-export { throttle };
+export { throttleEvent };

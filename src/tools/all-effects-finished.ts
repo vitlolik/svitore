@@ -6,7 +6,7 @@ const allEffectsFinished = async (): Promise<void> => {
 
 	const worker = async (): Promise<void> => {
 		const pendingEffects = Entity.createdEntities.filter(
-			(entity) => entity instanceof Effect && entity.$pending.get()
+			(entity) => entity instanceof Effect && entity.pendingState.get()
 		) as Effect<any>[];
 
 		if (!pendingEffects.length) {

@@ -34,99 +34,20 @@ State is an object that stores any data. It will updated when got new data if th
 
 #### Methods
 
-1. [on](#on) - add event listener to state for data updating
-2. [onReset](#onReset) - add reset event to state for reset data(special case ot the [on](#on))
-3. [map](#map) - create a state based on the current
-4. [get](#get) - get state
-5. [getPrev](#getPrev) - get previous state
+1. [get](#get) - get state
+2. [set](#set) - set new state
+3. [change](#change) - change current state
+4. [getPrev](#getPrev) - get previous state
+5. [reset](#reset) - reset current state
 
 #### Example
 
 ```ts
 import { State } from "svitore";
 
-const $count = new State(0);
+const countState = new State(0);
 
-$count.get(); // 0
-```
-
-##### on
-
-Add event listener to state for data updating
-
-```ts
-import { State, Event } from 'svitore';
-
-const incremented = new Event();
-const updated = new Event<number>();
-
-const $count = new State(0)
-  .on(incremented, (, state) => state + 1)
-  .on(updated);
-
-$count.get(); // 0
-
-incremented.fire();
-incremented.fire();
-$count.get(); // 2
-
-updated.fire(10);
-$count.get(); // 10
-```
-
-##### onReset
-
-Add reset event to state for reset data(special case ot the [on](#on))
-
-```ts
-import { State, Event } from 'svitore';
-
-const incremented = new Event();
-const reset = new Event();
-
-const $count = new State(0)
-  .on(incremented, (, state) => state + 1)
-  .onReset(reset);
-
-$count.get(); // 0
-
-incremented.fire();
-incremented.fire();
-$count.get(); // 2
-
-reset.fire();
-$count.get(); // 0
-```
-
-##### map
-
-Create a state based on the current
-
-```ts
-import { State, Event } from 'svitore';
-
-const incremented = new Event();
-const changedDouble = new Event<number>();
-
-const $count = new State(0).on(incremented, (, state) => state + 1);
-
-const $doubleCount = $count.map(count => count * 2).on(changedDouble);
-
-$count.get(); // 0
-$doubleCount.get(); // 0
-
-incremented.fire();
-$count.get(); // 1
-$doubleCount.get(); // 2
-
-incremented.fire();
-incremented.fire();
-$count.get(); // 3
-$doubleCount.get(); // 6
-
-changedDouble.fire(10);
-$count.get(); // 3
-$doubleCount.get(); // 10
+countState.get(); // 0
 ```
 
 ##### get
@@ -136,11 +57,39 @@ Get state
 ```ts
 import { State } from "svitore";
 
-const $name = new State("Name");
-const $count = new State(0);
+const nameState = new State("Name");
+const countState = new State(0);
 
-$name.get(); // 'Name'
-$count.get(); // 0
+nameState.get(); // 'Name'
+countState.get(); // 0
+```
+
+##### set
+
+Set new state
+
+```ts
+import { State } from "svitore";
+
+const nameState = new State("Name");
+
+nameState.get(); // 'Name'
+
+nameState.set("qwerty");
+nameState.get(); // 'qwerty'
+```
+
+##### change
+
+Change current state
+
+```ts
+import { State } from "svitore";
+
+const countState = new State(0);
+countState.change((state) => state + 1);
+
+countState.get(); // 1
 ```
 
 ##### getPrev
@@ -150,26 +99,39 @@ Get previous state
 ```ts
 import { State, Event } from "svitore";
 
-const changedName = new Event<string>();
-const changedCount = new Event<number>();
+const nameState = new State("Name");
+const countState = new State(0);
 
-const $name = new State("Name").on(changedName);
-const $count = new State(0).on(changedCount);
+nameState.getPrev(); // 'Name'
+countState.getPrev(); // 0
 
-$name.getPrev(); // 'Name'
-$count.getPrev(); // 0
+nameState.set("Alex");
+countState.set(5);
 
-changedName.fire("Alex");
-changedCount.fire(5);
+nameState.getPrev(); // 'Name'
+countState.getPrev(); // 0
 
-$name.getPrev(); // 'Name'
-$count.getPrev(); // 0
+nameState.set("Den");
+countState.set(20);
 
-changedName.fire("Den");
-changedCount.fire(20);
+nameState.getPrev(); // 'Alex'
+countState.getPrev(); // 5
+```
 
-$name.getPrev(); // 'Alex'
-$count.getPrev(); // 5
+##### reset
+
+Reset state to default value
+
+```ts
+import { State } from "svitore";
+
+const countState = new State(10);
+countState.change((state) => state + 1);
+
+countState.get(); // 11
+
+countState.reset();
+countState.get(); // 10
 ```
 
 ### Event
@@ -178,15 +140,12 @@ Event is an object for send any payload to other entities. For example, to updat
 
 #### Methods
 
-1. [fire](#fire) - trigger event
-2. [direct](#direct) - transfer [state](#state) data to target by event
+1. [dispatch](#dispatch) - trigger event
 
 #### Fields
 
 1. `calls` - number of event calls
-2. `prevPayload` - previous data with which the event was called
-3. `payload` - data with which the event was last called
-4. `meta` - any data
+2. `meta` - any data
 
 #### Example
 
@@ -196,7 +155,7 @@ import { Event } from "svitore";
 const change = new Event<string>();
 ```
 
-##### fire
+##### dispatch
 
 Trigger event
 
@@ -205,38 +164,11 @@ import { Event } from "svitore";
 
 const change = new Event<string>();
 
-// called after submit.fire("Alex")
 change.subscribe((name) => {
   console.log(name); // 'Alex'
 });
 
-change.fire("Alex");
-```
-
-##### direct
-
-Transfer [state](#state) data to target by event
-
-```ts
-import { Event, State } from "svitore";
-
-const submit = new Event<string>();
-const $name = new State("Alex");
-const $age = new State(20);
-const target = new Event<{ name: string; age: number }>();
-
-submit.direct({
-  data: [$name, $age],
-  map: (name, age) => ({ name, age }),
-  target,
-});
-
-// called after submit.fire()
-target.subscribe((value) => {
-  console.log(value); // { name: 'Alex'; age: 20 }
-});
-
-submit.fire();
+change.dispatch("Alex");
 ```
 
 ### Effect
@@ -246,7 +178,6 @@ Effect is an object for any side effects. It's more complex entity includes [sta
 #### Methods
 
 1. [run](#run) - run effect function
-2. [onReset](#onReset) - reset the internal state of the effect
 
 #### Fields
 
@@ -256,9 +187,9 @@ Effect is an object for any side effects. It's more complex entity includes [sta
 4. `finished` - [event](#event) that is triggered when effect function finished
 5. `aborted` - [event](#event) that is triggered when effect function has aborted. For example `AbortController.abort()`
 
-6. `$status` - [state](#state) status that shows process
-7. `$pending` - [state](#state) flag that shows whether the effect is in progress
-8. `$runningCount` - [state](#state) that shows count of effect function in progress
+6. `statusState` - [state](#state) status that shows process
+7. `pendingState` - [state](#state) flag that shows whether the effect is in progress
+8. `runningCountState` - [state](#state) that shows count of effect function in progress
 
 #### Example
 
@@ -310,18 +241,6 @@ All entity types: [State](#state), [Event](#event), [Effect](#effect) have it fu
 
 1. [subscribe](#subscribe) - subscribe to entity behavior. Subscriber will be notified:
 
-- For [State](#state) - with new state
-- For [Event](#event) - with event payload
-- For [Event](#event) - with effect function params
-
-2. [inform](#inform) - abstraction:
-
-- For [State](#state) - update state and notify subscribers
-- For [Event](#event) - fire event and notify subscribers (same as [fire](#fire))
-- For [Event](#event) - run effect and notify subscribers (same as [run](#run))
-
-3. [channel](#channel) - create a connection/channel between entities
-
 #### Example
 
 ##### subscribe
@@ -332,13 +251,14 @@ Subscribe to entity behavior. Subscriber will be notified.
 import { State, Event, Effect } from "svitore";
 
 const changeState = new Event<number>();
-const state = new State(0).on(changeState);
+const state = new State(0);
 const effect = new Effect(
   (value: string) =>
     new Promise<string>((resolve) => {
       setTimeout(() => resolve(value.toUpperCase()), 300);
     })
 );
+changeState.subscribe(state.set);
 
 // called after event fired
 changeState.subscribe((value) => {
@@ -355,41 +275,6 @@ effect.subscribe((value) => {
   console.log(value); // "HELLO WORLD"
 });
 
-changeState.fire(10);
+changeState.dispatch(10);
 effect.run("hello world");
-```
-
-##### channel
-
-Create a connection/channel between entities
-
-```ts
-import { State, Event } from "svitore";
-
-const changeCount = new Event<number>();
-const $count = new State(0);
-
-const target1 = new Event<number>();
-const target2 = new Event<number>();
-
-// when $count going to be equal 2 will execute map and result going to go to target1 and target2
-$count.channel({
-  filter: (count: number) => count % 2 == 0,
-  map: (count: number) => count * 2,
-  target: [target1, target2],
-});
-
-// called only one time
-target1.subscribe((value) => {
-  console.log(value); // 8
-});
-
-// called only one time
-target2.subscribe((value) => {
-  console.log(value); // 8
-});
-
-changeCount.fire(1);
-changeCount.fire(3);
-changeCount.fire(4);
 ```

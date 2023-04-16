@@ -1,6 +1,6 @@
 import { Effect } from "../effect";
 
-const cancelable = <
+const cancelableEffect = <
 	TParams extends any = void,
 	TResult extends any = void,
 	TError extends Error = Error
@@ -9,7 +9,7 @@ const cancelable = <
 ): Effect<TParams, TResult, TError> => {
 	const abortControllerList: AbortController[] = [];
 	const effect = new Effect<TParams, TResult, TError>(
-		targetEffect.$effectFunction.get()
+		targetEffect.effectFunctionState.get()
 	);
 	const runFunction = effect.run.bind(effect);
 
@@ -17,7 +17,7 @@ const cancelable = <
 		const abortController = new AbortController();
 		abortControllerList.push(abortController);
 
-		if (effect.$runningCount.get() > 0) {
+		if (effect.runningCountState.get() > 0) {
 			const needToAbort = abortControllerList.slice(0, -1);
 			needToAbort.forEach((controller) => controller.abort());
 		}
@@ -35,4 +35,4 @@ const cancelable = <
 	return effect;
 };
 
-export { cancelable };
+export { cancelableEffect };

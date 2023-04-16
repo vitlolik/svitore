@@ -17,31 +17,31 @@ const main = () => {
 
 	form.addEventListener("submit", (event) => {
 		event.preventDefault();
-		store.submitted.fire();
+		store.submitted.dispatch();
 	});
 	fistNameInput.addEventListener("input", (event) => {
-		store.changedFirstName.fire((event.target as HTMLInputElement).value);
+		store.changeFirstName.dispatch((event.target as HTMLInputElement).value);
 	});
 	secondNameInput.addEventListener("input", (event) => {
-		store.changedSecondName.fire((event.target as HTMLInputElement).value);
+		store.changeSecondName.dispatch((event.target as HTMLInputElement).value);
 	});
 	resetButton.addEventListener("click", () => {
-		store.resetEvent.fire();
+		store.resetEvent.dispatch();
 	});
 
-	store.$firstName.subscribe((value) => {
+	store.firstNameState.subscribe((value) => {
 		fistNameInput.value = value;
 	});
-	store.$secondName.subscribe((value) => {
+	store.secondNameState.subscribe((value) => {
 		secondNameInput.value = value;
 	});
-	store.$symbolsCount.subscribe((value) => {
+	store.symbolsCountState.subscribe((value) => {
 		symbolsCount.textContent = value.toString();
 	});
 
-	fistNameInput.value = store.$firstName.get();
-	secondNameInput.value = store.$secondName.get();
-	symbolsCount.textContent = store.$symbolsCount.get().toString();
+	fistNameInput.value = store.firstNameState.get();
+	secondNameInput.value = store.secondNameState.get();
+	symbolsCount.textContent = store.symbolsCountState.get().toString();
 };
 
 main();

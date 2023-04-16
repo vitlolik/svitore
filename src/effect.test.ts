@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { Effect } from "./effect";
-import { EffectStatus } from "./types";
+import { Effect, EffectStatus } from "./effect";
 import { Entity } from "./shared/entity";
 import { State } from "./state";
 import { Event } from "./event";
@@ -12,73 +11,73 @@ describe("effect", () => {
 		expect(effect).instanceOf(Entity);
 	});
 
-	describe("$status:state", () => {
+	describe("statusState:state", () => {
 		it("is state", () => {
 			const effect = new Effect(() => Promise.resolve());
 
-			expect(effect.$status).instanceOf(State);
+			expect(effect.statusState).instanceOf(State);
 		});
 
 		it("initial state", () => {
 			const effect = new Effect(() => Promise.resolve());
 
-			expect(effect.$status.get()).toBe(EffectStatus.idle);
+			expect(effect.statusState.get()).toBe(EffectStatus.idle);
 		});
 
 		it("subscribe to events", () => {
 			const effect = new Effect(() => Promise.resolve());
 
-			effect.started.fire();
-			expect(effect.$status.get()).toBe(EffectStatus.pending);
+			effect.started.dispatch();
+			expect(effect.statusState.get()).toBe(EffectStatus.pending);
 
-			effect.resolved.fire({ result: undefined, params: undefined });
-			expect(effect.$status.get()).toBe(EffectStatus.resolved);
+			effect.resolved.dispatch({ result: undefined, params: undefined });
+			expect(effect.statusState.get()).toBe(EffectStatus.resolved);
 
-			effect.rejected.fire({ error: new Error(), params: undefined });
-			expect(effect.$status.get()).toBe(EffectStatus.rejected);
+			effect.rejected.dispatch({ error: new Error(), params: undefined });
+			expect(effect.statusState.get()).toBe(EffectStatus.rejected);
 		});
 	});
 
-	describe("$pending:state", () => {
+	describe("pendingState:state", () => {
 		it("is state", () => {
 			const effect = new Effect(() => Promise.resolve());
 
-			expect(effect.$pending).instanceOf(State);
+			expect(effect.pendingState).instanceOf(State);
 		});
 
-		it("it depends from $status", () => {
+		it("it depends from statusState", () => {
 			const effect = new Effect(() => Promise.resolve());
-			expect(effect.$pending.get()).toBe(false);
+			expect(effect.pendingState.get()).toBe(false);
 
-			effect.$status.inform(EffectStatus.pending);
-			expect(effect.$pending.get()).toBe(true);
+			effect.statusState.set(EffectStatus.pending);
+			expect(effect.pendingState.get()).toBe(true);
 
-			effect.$status.inform(EffectStatus.resolved);
-			expect(effect.$pending.get()).toBe(false);
+			effect.statusState.set(EffectStatus.resolved);
+			expect(effect.pendingState.get()).toBe(false);
 
-			effect.$status.inform(EffectStatus.rejected);
-			expect(effect.$pending.get()).toBe(false);
+			effect.statusState.set(EffectStatus.rejected);
+			expect(effect.pendingState.get()).toBe(false);
 		});
 	});
 
-	describe("$runningCount:state", () => {
+	describe("runningCountState:state", () => {
 		it("is state", () => {
 			const effect = new Effect(() => Promise.resolve());
 
-			expect(effect.$runningCount).instanceOf(State);
+			expect(effect.runningCountState).instanceOf(State);
 		});
 
 		it("calc in flight effects count", async () => {
 			const effect = new Effect(() => Promise.resolve());
-			expect(effect.$runningCount.get()).toBe(0);
+			expect(effect.runningCountState.get()).toBe(0);
 
 			effect.run();
 			effect.run();
 			effect.run();
-			expect(effect.$runningCount.get()).toBe(3);
+			expect(effect.runningCountState.get()).toBe(3);
 
 			await Promise.resolve();
-			expect(effect.$runningCount.get()).toBe(0);
+			expect(effect.runningCountState.get()).toBe(0);
 		});
 	});
 
@@ -92,46 +91,6 @@ describe("effect", () => {
 
 		expect(effectFunction).toHaveBeenCalledTimes(0);
 		expect(newEffectFunction).toHaveBeenCalledTimes(1);
-	});
-
-	describe("onReset", () => {
-		it("effect function", () => {
-			const effectFunction = vi.fn(() => Promise.resolve());
-			const newEffectFunction = vi.fn(() => Promise.resolve());
-			const effect = new Effect(effectFunction);
-			const resetEvent = new Event();
-			effect.onReset(resetEvent);
-
-			effect.run();
-			expect(effectFunction).toHaveBeenCalledTimes(1);
-
-			effect.implement(newEffectFunction);
-			effect.run();
-			expect(effectFunction).toHaveBeenCalledTimes(1);
-			expect(newEffectFunction).toHaveBeenCalledTimes(1);
-
-			resetEvent.fire();
-			effect.run();
-			expect(effectFunction).toHaveBeenCalledTimes(2);
-			expect(newEffectFunction).toHaveBeenCalledTimes(1);
-		});
-
-		it("state", () => {
-			const effectFunction = vi.fn(() => Promise.resolve());
-
-			const effect = new Effect(effectFunction);
-			const resetEvent = new Event();
-			effect.onReset(resetEvent);
-			effect.$status.inform(EffectStatus.pending);
-
-			expect(effect.$status.get()).toBe(EffectStatus.pending);
-			expect(effect.$pending.get()).toBe(true);
-
-			resetEvent.fire();
-
-			expect(effect.$status.get()).toBe(EffectStatus.idle);
-			expect(effect.$pending.get()).toBe(false);
-		});
 	});
 
 	describe("run", () => {
@@ -170,25 +129,25 @@ describe("effect", () => {
 		it("call started event", () => {
 			const effect = new Effect((value: number) => Promise.resolve(value));
 			const startedEvent = new Event<number>();
-			startedEvent.fire = vi.fn();
+			startedEvent.dispatch = vi.fn();
 
 			effect.started = startedEvent;
 			effect.run(100);
 
-			expect(startedEvent.fire).toHaveBeenCalledTimes(1);
-			expect(startedEvent.fire).toHaveBeenCalledWith(100);
+			expect(startedEvent.dispatch).toHaveBeenCalledTimes(1);
+			expect(startedEvent.dispatch).toHaveBeenCalledWith(100);
 		});
 
 		it("call resolved event", async () => {
 			const effect = new Effect(() => Promise.resolve("hello"));
 			const resolvedEvent = new Event<{ params: void; result: string }>();
-			resolvedEvent.fire = vi.fn();
+			resolvedEvent.dispatch = vi.fn();
 			effect.resolved = resolvedEvent;
 
 			await effect.run();
 
-			expect(resolvedEvent.fire).toHaveBeenCalledTimes(1);
-			expect(resolvedEvent.fire).toHaveBeenCalledWith({
+			expect(resolvedEvent.dispatch).toHaveBeenCalledTimes(1);
+			expect(resolvedEvent.dispatch).toHaveBeenCalledWith({
 				params: undefined,
 				result: "hello",
 			});
@@ -205,15 +164,15 @@ describe("effect", () => {
 		it("call rejected event", async () => {
 			const effect = new Effect(() => Promise.reject("rejected error"));
 			const rejectedEvent = new Event<{ params: void; error: Error }>();
-			rejectedEvent.fire = vi.fn();
+			rejectedEvent.dispatch = vi.fn();
 			effect.rejected = rejectedEvent;
 
 			try {
 				await effect.run();
 			} catch {
 			} finally {
-				expect(rejectedEvent.fire).toHaveBeenCalledTimes(1);
-				expect(rejectedEvent.fire).toHaveBeenCalledWith({
+				expect(rejectedEvent.dispatch).toHaveBeenCalledTimes(1);
+				expect(rejectedEvent.dispatch).toHaveBeenCalledWith({
 					params: undefined,
 					error: "rejected error",
 				});
@@ -233,9 +192,6 @@ describe("effect", () => {
 				await effect.run();
 			} catch (error) {
 				expect(effect.aborted.calls).toBe(1);
-				expect(effect.aborted.payload).toEqual({
-					error: abortedError,
-				});
 			}
 		});
 
@@ -254,38 +210,28 @@ describe("effect", () => {
 			it("on resolved", async () => {
 				const effect = new Effect((value: string) => Promise.resolve(value));
 				const finishedEvent = new Event<string>();
-				finishedEvent.fire = vi.fn();
+				finishedEvent.dispatch = vi.fn();
 				effect.finished = finishedEvent;
 
 				await effect.run("hello");
 
-				expect(finishedEvent.fire).toHaveBeenCalledTimes(1);
-				expect(finishedEvent.fire).toHaveBeenCalledWith("hello");
+				expect(finishedEvent.dispatch).toHaveBeenCalledTimes(1);
+				expect(finishedEvent.dispatch).toHaveBeenCalledWith("hello");
 			});
 
 			it("on rejected", async () => {
 				const effect = new Effect((value: string) => Promise.reject(value));
 				const finishedEvent = new Event<string>();
-				finishedEvent.fire = vi.fn();
+				finishedEvent.dispatch = vi.fn();
 				effect.finished = finishedEvent;
 
 				try {
 					await effect.run("hello");
 				} catch (error) {
-					expect(finishedEvent.fire).toHaveBeenCalledTimes(1);
-					expect(finishedEvent.fire).toHaveBeenCalledWith("hello");
+					expect(finishedEvent.dispatch).toHaveBeenCalledTimes(1);
+					expect(finishedEvent.dispatch).toHaveBeenCalledWith("hello");
 				}
 			});
 		});
-	});
-
-	it("inform", () => {
-		const effect = new Effect((value: string) => Promise.resolve(value));
-		const run = vi.fn();
-		effect.run = run;
-
-		effect.inform("test");
-		expect(run).toHaveBeenCalledTimes(1);
-		expect(run).toHaveBeenCalledWith("test");
 	});
 });

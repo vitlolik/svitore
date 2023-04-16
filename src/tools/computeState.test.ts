@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { merge } from "./merge";
+import { computeState } from "./computeState";
 import { State } from "../state";
 
-describe("merge", () => {
+describe("computeState", () => {
 	it("type", () => {
 		const state1 = new State(5);
 		const state2 = new State(5);
-		const mergedState = merge(
+		const mergedState = computeState(
 			[state1, state2],
 			(value1, value2) => value1 + value2
 		);
@@ -17,7 +17,7 @@ describe("merge", () => {
 	it("initial state", () => {
 		const state1 = new State("hello");
 		const state2 = new State("!");
-		const mergedState = merge(
+		const mergedState = computeState(
 			[state1, state2],
 			(value1, value2) => value1 + " world" + value2
 		);
@@ -28,16 +28,16 @@ describe("merge", () => {
 	it("subscribe to state list", () => {
 		const state1 = new State("hello");
 		const state2 = new State("world");
-		const mergedState = merge(
+		const computed = computeState(
 			[state1, state2],
 			(state1, state2) => `${state1} ${state2}`
 		);
-		expect(mergedState.get()).toBe("hello world");
+		expect(computed.get()).toBe("hello world");
 
-		state1.inform("HELLO");
-		expect(mergedState.get()).toBe("HELLO world");
+		state1.set("HELLO");
+		expect(computed.get()).toBe("HELLO world");
 
-		state2.inform("WORLD");
-		expect(mergedState.get()).toBe("HELLO WORLD");
+		state2.set("WORLD");
+		expect(computed.get()).toBe("HELLO WORLD");
 	});
 });

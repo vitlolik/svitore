@@ -45,7 +45,7 @@
 		{
 			"path": "./dist/index.js",
 			"import": "*",
-			"limit": "1.8 kb"
+			"limit": "1.5 kb"
 		}
 	],
 	"keywords": [

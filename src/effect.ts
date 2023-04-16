@@ -1,7 +1,14 @@
 import { Event } from "./event";
+import { computeState } from "./tools";
 import { Entity } from "./shared/entity";
 import { State } from "./state";
-import { EffectStatus } from "./types";
+
+enum EffectStatus {
+	idle = "idle",
+	pending = "pending",
+	resolved = "resolved",
+	rejected = "rejected",
+}
 
 type EffectFunction<TParams, TResult> = (
 	params: TParams,
@@ -19,73 +26,66 @@ class Effect<
 	finished = new Event<TParams>();
 	aborted = new Event<{ params: TParams; error: Error }>();
 
-	$status: State<EffectStatus>;
-	$pending: State<boolean>;
-	$runningCount: State<number>;
-	$effectFunction: State<EffectFunction<TParams, TResult>>;
-
-	private incrementRunningCount = new Event();
-	private decrementRunningCount = new Event();
+	statusState = new State<EffectStatus>(EffectStatus.idle);
+	runningCountState = new State(0);
+	pendingState = computeState(
+		[this.statusState],
+		(status) => status === EffectStatus.pending
+	);
+	effectFunctionState: State<EffectFunction<TParams, TResult>>;
 
 	constructor(effectFunction: EffectFunction<TParams, TResult>) {
 		super();
-		this.$effectFunction = new State(effectFunction);
-		this.$status = new State<EffectStatus>(EffectStatus.idle)
-			.on(this.started, () => EffectStatus.pending)
-			.on(this.resolved, () => EffectStatus.resolved)
-			.on(this.rejected, () => EffectStatus.rejected);
+		this.effectFunctionState = new State(effectFunction);
 
-		this.$pending = this.$status.map(
-			(status) => status === EffectStatus.pending
-		);
+		this.started.subscribe(() => {
+			this.runningCountState.change((state) => state + 1);
+			this.statusState.set(EffectStatus.pending);
+		});
 
-		this.$runningCount = new State(0)
-			.on(this.incrementRunningCount, (_, state) => state + 1)
-			.on(this.decrementRunningCount, (_, state) => state - 1);
+		this.resolved.subscribe(() => {
+			this.statusState.set(EffectStatus.resolved);
+		});
 
-		this.started.channel({ target: this.incrementRunningCount });
-		this.finished.channel({ target: this.decrementRunningCount });
+		this.rejected.subscribe(() => {
+			this.statusState.set(EffectStatus.rejected);
+		});
+
+		this.finished.subscribe(() => {
+			this.runningCountState.change((state) => state - 1);
+		});
 	}
 
-	implement(effectFunction: EffectFunction<TParams, TResult>): void {
-		this.$effectFunction.inform(effectFunction);
-	}
+	implement = (effectFunction: EffectFunction<TParams, TResult>): void => {
+		this.effectFunctionState.set(effectFunction);
+	};
 
-	onReset(event: Event): void {
-		this.$effectFunction.onReset(event);
-		this.$status.onReset(event);
-		this.$pending.onReset(event);
-		this.$runningCount.onReset(event);
-	}
-
-	inform(params: TParams): void {
-		this.run(params);
-	}
-
-	async run(
+	run = async (
 		params: TParams,
 		abortController: AbortController = new AbortController()
-	): Promise<TResult> {
+	): Promise<TResult> => {
 		try {
-			this.notify(params);
-			this.started.fire(params);
-			const result = await this.$effectFunction.get()(params, abortController);
-			this.resolved.fire({ params, result });
+			this.started.dispatch(params);
+			const result = await this.effectFunctionState.get()(
+				params,
+				abortController
+			);
+			this.resolved.dispatch({ params, result });
 
 			return result;
 		} catch (e) {
 			const error = e as TError;
 
-			this[error.name === "AbortError" ? "aborted" : "rejected"].fire({
+			this[error.name === "AbortError" ? "aborted" : "rejected"].dispatch({
 				params,
 				error,
 			});
 
 			throw error;
 		} finally {
-			this.finished.fire(params);
+			this.finished.dispatch(params);
 		}
-	}
+	};
 }
 
-export { Effect, EffectFunction };
+export { Effect, EffectFunction, EffectStatus };

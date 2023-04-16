@@ -1,32 +1,37 @@
 import { State } from "../state";
 
-export function merge<TResult, A, B>(
-	stateLists: [State<A>, State<B>],
+export function computeState<TResult, A>(
+	states: [State<A>],
+	selector: (a: A) => TResult
+): State<TResult>;
+
+export function computeState<TResult, A, B>(
+	states: [State<A>, State<B>],
 	selector: (a: A, b: B) => TResult
 ): State<TResult>;
 
-export function merge<TResult, A, B, C>(
-	stateLists: [State<A>, State<B>, State<C>],
+export function computeState<TResult, A, B, C>(
+	states: [State<A>, State<B>, State<C>],
 	selector: (a: A, b: B, c: C) => TResult
 ): State<TResult>;
 
-export function merge<TResult, A, B, C, D>(
-	stateLists: [State<A>, State<B>, State<C>, State<D>],
+export function computeState<TResult, A, B, C, D>(
+	states: [State<A>, State<B>, State<C>, State<D>],
 	selector: (a: A, b: B, c: C, d: D) => TResult
 ): State<TResult>;
 
-export function merge<TResult, A, B, C, D, E>(
-	stateLists: [State<A>, State<B>, State<C>, State<D>, State<E>],
+export function computeState<TResult, A, B, C, D, E>(
+	states: [State<A>, State<B>, State<C>, State<D>, State<E>],
 	selector: (a: A, b: B, c: C, d: D, e: E) => TResult
 ): State<TResult>;
 
-export function merge<TResult, A, B, C, D, E, F>(
-	stateLists: [State<A>, State<B>, State<C>, State<D>, State<E>, State<F>],
+export function computeState<TResult, A, B, C, D, E, F>(
+	states: [State<A>, State<B>, State<C>, State<D>, State<E>, State<F>],
 	selector: (a: A, b: B, c: C, d: D, e: E, f: F) => TResult
 ): State<TResult>;
 
-export function merge<TResult, A, B, C, D, E, F, G>(
-	stateLists: [
+export function computeState<TResult, A, B, C, D, E, F, G>(
+	states: [
 		State<A>,
 		State<B>,
 		State<C>,
@@ -38,8 +43,8 @@ export function merge<TResult, A, B, C, D, E, F, G>(
 	selector: (a: A, b: B, c: C, d: D, e: E, f: F, g: G) => TResult
 ): State<TResult>;
 
-export function merge<TResult, A, B, C, D, E, F, G, H>(
-	stateLists: [
+export function computeState<TResult, A, B, C, D, E, F, G, H>(
+	states: [
 		State<A>,
 		State<B>,
 		State<C>,
@@ -52,8 +57,8 @@ export function merge<TResult, A, B, C, D, E, F, G, H>(
 	selector: (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H) => TResult
 ): State<TResult>;
 
-export function merge<TResult, A, B, C, D, E, F, G, H, I>(
-	stateLists: [
+export function computeState<TResult, A, B, C, D, E, F, G, H, I>(
+	states: [
 		State<A>,
 		State<B>,
 		State<C>,
@@ -67,8 +72,8 @@ export function merge<TResult, A, B, C, D, E, F, G, H, I>(
 	selector: (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I) => TResult
 ): State<TResult>;
 
-export function merge<TResult, A, B, C, D, E, F, G, H, I, J>(
-	stateLists: [
+export function computeState<TResult, A, B, C, D, E, F, G, H, I, J>(
+	states: [
 		State<A>,
 		State<B>,
 		State<C>,
@@ -95,19 +100,17 @@ export function merge<TResult, A, B, C, D, E, F, G, H, I, J>(
 	) => TResult
 ): State<TResult>;
 
-export function merge<TState>(
-	stateLists: State<any>[],
+export function computeState<TState>(
+	states: State<any>[],
 	selector: (...args: any[]) => TState
 ): State<TState> {
-	const getStateData = (stateLists: State<any>[]) =>
-		selector(...stateLists.map((state) => state.get()));
+	const getStateData = () => selector(...states.map((state) => state.get()));
 
-	const newState = new State(getStateData(stateLists));
+	const newState = new State(getStateData());
 
-	stateLists.forEach((state) => {
-		state.channel({
-			target: newState,
-			map: () => getStateData(stateLists),
+	states.forEach((state) => {
+		state.subscribe(() => {
+			newState.set(getStateData());
 		});
 	});
 

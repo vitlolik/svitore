@@ -1,47 +1,68 @@
-import { Effect, Event, State, merge, reset } from "../src";
+import { Effect, Event, State, computeState } from "../src";
 
 const createStore = () => {
-	const changedFirstName = new Event<string>();
-	const changedSecondName = new Event<string>();
+	const changeFirstName = new Event<string>();
+	const changeSecondName = new Event<string>();
 	const submitted = new Event();
 	const resetEvent = new Event();
 
 	const submitEffect = new Effect(
-		(data: { firstName: string; secondName: string; symbolsCount: number }) =>
+		(data: {
+			firstName: State<string>;
+			secondName: State<string>;
+			symbolsCount: State<number>;
+		}) =>
 			new Promise<void>((resolve) => {
-				console.log(JSON.stringify(data, null, 2));
-				resolve();
+				setTimeout(() => {
+					console.log(
+						JSON.stringify(
+							{
+								firstName: data.firstName.get(),
+								secondName: data.secondName.get(),
+								symbolsCount: data.symbolsCount.get(),
+							},
+							null,
+							2
+						)
+					);
+					resolve();
+				}, 3000);
 			})
 	);
 
-	const $firstName = new State("").on(changedFirstName);
-	const $secondName = new State("").on(changedSecondName);
+	const firstNameState = new State("");
+	const secondNameState = new State("");
 
-	const $symbolsCount = merge(
-		[$firstName, $secondName],
-		(firstName, secondName) => firstName.length + secondName.length
+	changeFirstName.subscribe(firstNameState.set);
+	changeSecondName.subscribe(secondNameState.set);
+
+	const symbolsCountState = computeState(
+		[firstNameState, secondNameState],
+		(firstName, secondName) =>
+			firstName.trim().length + secondName.trim().length
 	);
 
-	submitted.direct({
-		data: [$firstName, $secondName, $symbolsCount],
-		map: (firstName, secondName, symbolsCount) => ({
-			firstName,
-			secondName,
-			symbolsCount,
-		}),
-		target: submitEffect,
+	submitted.subscribe(() => {
+		submitEffect.run({
+			firstName: firstNameState,
+			secondName: secondNameState,
+			symbolsCount: symbolsCountState,
+		});
 	});
 
-	reset({ trigger: resetEvent, target: [$firstName, $secondName] });
+	resetEvent.subscribe(() => {
+		firstNameState.reset();
+		secondNameState.reset();
+	});
 
 	return {
-		changedFirstName,
-		changedSecondName,
+		changeFirstName,
+		changeSecondName,
 		submitted,
 		resetEvent,
-		$firstName,
-		$secondName,
-		$symbolsCount,
+		firstNameState,
+		secondNameState,
+		symbolsCountState,
 	};
 };
 
