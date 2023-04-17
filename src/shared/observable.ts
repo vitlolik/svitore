@@ -18,7 +18,9 @@ abstract class Observable<TParams = void> {
 		this.observers.forEach((observer) => {
 			try {
 				observer(params, this);
-			} catch (error) {}
+			} catch (error) {
+				console.error(error);
+			}
 		});
 	}
 

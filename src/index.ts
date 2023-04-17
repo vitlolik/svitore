@@ -1,4 +1,5 @@
 export * from "./state";
+export * from "./compute-state";
 export * from "./persist-state";
 export * from "./event";
 export * from "./debounced-event";

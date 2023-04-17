@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { computeState } from "./compute-state";
-import { State } from "../state";
+import { ComputeState } from "./compute-state";
+import { State } from "./state";
 
 describe("computeState", () => {
 	it("type", () => {
 		const state1 = new State(5);
 		const state2 = new State(5);
-		const mergedState = computeState(
+		const mergedState = new ComputeState(
 			[state1, state2],
 			(value1, value2) => value1 + value2
 		);
@@ -17,7 +17,7 @@ describe("computeState", () => {
 	it("initial state", () => {
 		const state1 = new State("hello");
 		const state2 = new State("!");
-		const mergedState = computeState(
+		const mergedState = new ComputeState(
 			[state1, state2],
 			(value1, value2) => value1 + " world" + value2
 		);
@@ -28,7 +28,7 @@ describe("computeState", () => {
 	it("subscribe to state list", () => {
 		const state1 = new State("hello");
 		const state2 = new State("world");
-		const computed = computeState(
+		const computed = new ComputeState(
 			[state1, state2],
 			(state1, state2) => `${state1} ${state2}`
 		);

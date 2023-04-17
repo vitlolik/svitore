@@ -1,4 +1,4 @@
-import { Effect, Event, PersistState, State, computeState } from "../src";
+import { Effect, Event, PersistState, State, ComputeState } from "../src";
 
 const createStore = () => {
 	const changeFirstName = new Event<string>();
@@ -44,7 +44,7 @@ const createStore = () => {
 	changeFirstName.listen((value) => firstNameState.set(value));
 	changeSecondName.listen((value) => secondNameState.set(value));
 
-	const symbolsCountState = computeState(
+	const symbolsCountState = new ComputeState(
 		[firstNameState, secondNameState],
 		(firstName, secondName) =>
 			firstName.trim().length + secondName.trim().length

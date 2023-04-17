@@ -1,5 +1,5 @@
+import { ComputeState } from "./compute-state";
 import { Event } from "./event";
-import { computeState } from "./tools";
 import { Entity } from "./shared/entity";
 import { State } from "./state";
 
@@ -28,7 +28,7 @@ class Effect<
 
 	statusState = new State<EffectStatus>(EffectStatus.idle);
 	runningCountState = new State(0);
-	pendingState = computeState(
+	pendingState = new ComputeState(
 		[this.statusState],
 		(status) => status === EffectStatus.pending
 	);
