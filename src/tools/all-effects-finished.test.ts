@@ -9,7 +9,7 @@ describe("allEffectsFinished", () => {
 
 		await allEffectsFinished();
 
-		expect(effect.finished.calls).toBe(1);
+		expect(effect.onFinish.calls).toBe(1);
 	});
 
 	it("should wait all pending effects", async () => {
@@ -24,13 +24,13 @@ describe("allEffectsFinished", () => {
 		);
 
 		effect1.run();
-		effect1.resolved.listen(() => effect2.run());
-		effect2.resolved.listen(() => effect3.run());
+		effect1.onResolve.listen(() => effect2.run());
+		effect2.onResolve.listen(() => effect3.run());
 
 		await allEffectsFinished();
 
-		expect(effect1.finished.calls).toBe(1);
-		expect(effect2.finished.calls).toBe(1);
-		expect(effect3.finished.calls).toBe(1);
+		expect(effect1.onFinish.calls).toBe(1);
+		expect(effect2.onFinish.calls).toBe(1);
+		expect(effect3.onFinish.calls).toBe(1);
 	});
 });

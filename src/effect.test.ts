@@ -23,61 +23,27 @@ describe("effect", () => {
 
 			expect(effect.statusState.get()).toBe(EffectStatus.idle);
 		});
-
-		it("subscribe to events", () => {
-			const effect = new Effect(() => Promise.resolve());
-
-			effect.started.dispatch();
-			expect(effect.statusState.get()).toBe(EffectStatus.pending);
-
-			effect.resolved.dispatch({ result: undefined, params: undefined });
-			expect(effect.statusState.get()).toBe(EffectStatus.resolved);
-
-			effect.rejected.dispatch({ error: new Error(), params: undefined });
-			expect(effect.statusState.get()).toBe(EffectStatus.rejected);
-		});
 	});
 
-	describe("pendingState:state", () => {
+	describe("isPendingState:state", () => {
 		it("is state", () => {
 			const effect = new Effect(() => Promise.resolve());
 
-			expect(effect.pendingState).instanceOf(State);
+			expect(effect.isPendingState).instanceOf(State);
 		});
 
 		it("it depends from statusState", () => {
 			const effect = new Effect(() => Promise.resolve());
-			expect(effect.pendingState.get()).toBe(false);
+			expect(effect.isPendingState.get()).toBe(false);
 
 			effect.statusState.set(EffectStatus.pending);
-			expect(effect.pendingState.get()).toBe(true);
+			expect(effect.isPendingState.get()).toBe(true);
 
 			effect.statusState.set(EffectStatus.resolved);
-			expect(effect.pendingState.get()).toBe(false);
+			expect(effect.isPendingState.get()).toBe(false);
 
 			effect.statusState.set(EffectStatus.rejected);
-			expect(effect.pendingState.get()).toBe(false);
-		});
-	});
-
-	describe("runningCountState:state", () => {
-		it("is state", () => {
-			const effect = new Effect(() => Promise.resolve());
-
-			expect(effect.runningCountState).instanceOf(State);
-		});
-
-		it("calc in flight effects count", async () => {
-			const effect = new Effect(() => Promise.resolve());
-			expect(effect.runningCountState.get()).toBe(0);
-
-			effect.run();
-			effect.run();
-			effect.run();
-			expect(effect.runningCountState.get()).toBe(3);
-
-			await Promise.resolve();
-			expect(effect.runningCountState.get()).toBe(0);
+			expect(effect.isPendingState.get()).toBe(false);
 		});
 	});
 
@@ -101,37 +67,12 @@ describe("effect", () => {
 			expect(runResult).instanceOf(Promise);
 		});
 
-		it("can accept abort controller", () => {
-			const noop = () => null;
-			const mockAbortController: AbortController = {
-				abort: () => null,
-				signal: {
-					...new AbortController().signal,
-					addEventListener: vi.fn(),
-				},
-			};
-			const effect = new Effect((_, abortController) => {
-				abortController.signal.addEventListener("abort", noop);
-				return Promise.resolve();
-			});
-
-			effect.run(undefined, mockAbortController);
-
-			expect(mockAbortController.signal.addEventListener).toHaveBeenCalledTimes(
-				1
-			);
-			expect(mockAbortController.signal.addEventListener).toHaveBeenCalledWith(
-				"abort",
-				noop
-			);
-		});
-
-		it("call started event", () => {
+		it("call onStart event", () => {
 			const effect = new Effect((value: number) => Promise.resolve(value));
 			const startedEvent = new Event<number>();
 			startedEvent.dispatch = vi.fn();
 
-			effect.started = startedEvent;
+			effect.onStart = startedEvent;
 			effect.run(100);
 
 			expect(startedEvent.dispatch).toHaveBeenCalledTimes(1);
@@ -142,7 +83,7 @@ describe("effect", () => {
 			const effect = new Effect(() => Promise.resolve("hello"));
 			const resolvedEvent = new Event<{ params: void; result: string }>();
 			resolvedEvent.dispatch = vi.fn();
-			effect.resolved = resolvedEvent;
+			effect.onResolve = resolvedEvent;
 
 			await effect.run();
 
@@ -153,19 +94,19 @@ describe("effect", () => {
 			});
 		});
 
-		it("return result", async () => {
+		it("return void", async () => {
 			const effect = new Effect(() => Promise.resolve("hello"));
 
 			const result = await effect.run();
 
-			expect(result).toBe("hello");
+			expect(result).toBe(undefined);
 		});
 
 		it("call rejected event", async () => {
 			const effect = new Effect(() => Promise.reject("rejected error"));
 			const rejectedEvent = new Event<{ params: void; error: Error }>();
 			rejectedEvent.dispatch = vi.fn();
-			effect.rejected = rejectedEvent;
+			effect.onReject = rejectedEvent;
 
 			try {
 				await effect.run();
@@ -191,7 +132,7 @@ describe("effect", () => {
 			try {
 				await effect.run();
 			} catch (error) {
-				expect(effect.aborted.calls).toBe(1);
+				expect(effect.onAbort.calls).toBe(1);
 			}
 		});
 
@@ -211,7 +152,7 @@ describe("effect", () => {
 				const effect = new Effect((value: string) => Promise.resolve(value));
 				const finishedEvent = new Event<string>();
 				finishedEvent.dispatch = vi.fn();
-				effect.finished = finishedEvent;
+				effect.onFinish = finishedEvent;
 
 				await effect.run("hello");
 
@@ -223,7 +164,7 @@ describe("effect", () => {
 				const effect = new Effect((value: string) => Promise.reject(value));
 				const finishedEvent = new Event<string>();
 				finishedEvent.dispatch = vi.fn();
-				effect.finished = finishedEvent;
+				effect.onFinish = finishedEvent;
 
 				try {
 					await effect.run("hello");

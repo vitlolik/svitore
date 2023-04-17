@@ -5,10 +5,7 @@ type EventOptions<Payload = void, Meta = any> = {
 	meta?: Meta;
 };
 
-class Event<
-	Payload extends any = void,
-	Meta extends any = any
-> extends Entity<Payload> {
+class Event<Payload = void, Meta = any> extends Entity<Payload> {
 	calls = 0;
 	meta?: Meta;
 

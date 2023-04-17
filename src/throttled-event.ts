@@ -1,9 +1,6 @@
 import { Event, EventOptions } from "./event";
 
-class ThrottledEvent<
-	Payload extends any = void,
-	Meta extends any = any
-> extends Event<Payload, Meta> {
+class ThrottledEvent<Payload = void, Meta = any> extends Event<Payload, Meta> {
 	private isThrottled = false;
 	private savedParams: Payload | null = null;
 

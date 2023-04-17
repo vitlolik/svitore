@@ -203,7 +203,7 @@ const effect = new Effect(
 );
 
 // called after effect.run() and when 300 milliseconds have passed
-effect.resolved.listen((value) => {
+effect.onResolve.listen((value) => {
   console.log(value); // "Hello World"
 });
 
@@ -224,7 +224,7 @@ const effectFunction = (value: string) =>
 
 const effect = new Effect(effectFunction);
 
-effect.resolved.listen((value) => {
+effect.onResolve.listen((value) => {
   console.log(value); // "HELLO WORLD"
 });
 

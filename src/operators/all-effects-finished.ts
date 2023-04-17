@@ -6,7 +6,7 @@ const allEffectsFinished = async (): Promise<void> => {
 
 	const worker = async (): Promise<void> => {
 		const pendingEffects = Entity.createdEntities.filter(
-			(entity) => entity instanceof Effect && entity.pendingState.get()
+			(entity) => entity instanceof Effect && entity.isPendingState.get()
 		) as Effect<any>[];
 
 		if (!pendingEffects.length) {
@@ -18,7 +18,7 @@ const allEffectsFinished = async (): Promise<void> => {
 			pendingEffects.map(
 				(effect) =>
 					new Promise((resolve) => {
-						unsubscribeList.push(effect.finished.listen(resolve));
+						unsubscribeList.push(effect.onFinish.listen(resolve));
 					})
 			)
 		);
