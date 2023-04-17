@@ -15,9 +15,10 @@ const deleteTodo = new Event<string>();
 const toggleTodo = new Event<string>();
 
 addTodo.listen((title) => {
-	todoListState.change((todoList) =>
-		todoList.concat({ id: window.crypto.randomUUID(), title })
-	);
+	todoListState.change((todoList) => [
+		...todoList,
+		{ id: window.crypto.randomUUID(), title },
+	]);
 });
 
 deleteTodo.listen((id) => {

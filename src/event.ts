@@ -1,18 +1,18 @@
 import { Entity, Observer } from "./shared";
 
-type EventOptions<TPayload = void, TMeta = any> = {
-	shouldDispatch?: (event: Event<TPayload>) => boolean;
-	meta?: TMeta;
+type EventOptions<Payload = void, Meta = any> = {
+	shouldDispatch?: (event: Event<Payload>) => boolean;
+	meta?: Meta;
 };
 
 class Event<
-	TPayload extends any = void,
-	TMeta extends any = any
-> extends Entity<TPayload> {
+	Payload extends any = void,
+	Meta extends any = any
+> extends Entity<Payload> {
 	calls = 0;
-	meta?: TMeta;
+	meta?: Meta;
 
-	constructor(protected options: EventOptions<TPayload, TMeta> = {}) {
+	constructor(protected options: EventOptions<Payload, Meta> = {}) {
 		super();
 		this.meta = options.meta;
 	}
@@ -21,18 +21,18 @@ class Event<
 		return this.options.shouldDispatch?.(this) ?? true;
 	}
 
-	protected fire(payload: TPayload): void {
+	protected fire(payload: Payload): void {
 		if (!this.shouldDispatch()) return;
 
 		this.calls++;
 		this.notify(payload);
 	}
 
-	dispatch(payload: TPayload): void {
+	dispatch(payload: Payload): void {
 		this.fire(payload);
 	}
 
-	listen(listener: Observer<TPayload>) {
+	listen(listener: Observer<Payload>) {
 		return this.observe(listener);
 	}
 }

@@ -1,16 +1,16 @@
 import { Entity, Observer } from "./shared";
 
-class State<TState> extends Entity<TState> {
-	protected defaultState: TState;
-	private prevState: TState;
+class State<Data> extends Entity<Data> {
+	protected defaultState: Data;
+	private prevState: Data;
 
-	constructor(protected state: TState) {
+	constructor(protected state: Data) {
 		super();
 		this.defaultState = state;
 		this.prevState = state;
 	}
 
-	set(newState: TState): void {
+	set(newState: Data): void {
 		if (this.state === newState) return;
 
 		this.prevState = this.state;
@@ -19,7 +19,7 @@ class State<TState> extends Entity<TState> {
 		this.notify(this.state);
 	}
 
-	change(getNewState: (prevState: TState) => TState): void {
+	change(getNewState: (prevState: Data) => Data): void {
 		this.set(getNewState(this.get()));
 	}
 
@@ -27,15 +27,15 @@ class State<TState> extends Entity<TState> {
 		this.set(this.defaultState);
 	}
 
-	get(): TState {
+	get(): Data {
 		return this.state;
 	}
 
-	getPrev(): TState {
+	getPrev(): Data {
 		return this.prevState;
 	}
 
-	subscribe(subscriber: Observer<TState>) {
+	subscribe(subscriber: Observer<Data>) {
 		return this.observe(subscriber);
 	}
 }

@@ -1,12 +1,9 @@
-type Observer<TParams = void> = (
-	data: TParams,
-	instance: Observable<TParams>
-) => void;
+type Observer<T = void> = (data: T, instance: Observable<T>) => void;
 
-abstract class Observable<TParams = void> {
-	protected observers: Set<Observer<TParams>> = new Set();
+abstract class Observable<T = void> {
+	protected observers: Set<Observer<T>> = new Set();
 
-	protected observe(observer: Observer<TParams>) {
+	protected observe(observer: Observer<T>) {
 		this.observers.add(observer);
 
 		return () => {
@@ -14,7 +11,7 @@ abstract class Observable<TParams = void> {
 		};
 	}
 
-	protected notify(params: TParams) {
+	protected notify(params: T) {
 		this.observers.forEach((observer) => {
 			try {
 				observer(params, this);

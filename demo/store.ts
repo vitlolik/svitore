@@ -45,7 +45,8 @@ const createStore = () => {
 	changeSecondName.listen((value) => secondNameState.set(value));
 
 	const symbolsCountState = new ComputeState(
-		[firstNameState, secondNameState],
+		firstNameState,
+		secondNameState,
 		(firstName, secondName) =>
 			firstName.trim().length + secondName.trim().length
 	);

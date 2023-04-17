@@ -1,15 +1,15 @@
 import { State } from "./state";
 import { DebouncedEvent } from "./debounced-event";
 
-class PersistState<TState> extends State<TState> {
+class PersistState<Data> extends State<Data> {
 	constructor(
-		state: TState,
+		state: Data,
 		private storageKey: string,
 		private storage: Storage = window.localStorage
 	) {
 		super(state);
 
-		const changeEvent = new DebouncedEvent<TState>(100);
+		const changeEvent = new DebouncedEvent<Data>(100);
 		changeEvent.listen((newState) => {
 			storage.setItem(
 				storageKey,
@@ -24,7 +24,7 @@ class PersistState<TState> extends State<TState> {
 		try {
 			this.set(JSON.parse(valueFromStorage));
 		} catch (error) {
-			this.set(valueFromStorage as TState);
+			this.set(valueFromStorage as Data);
 		}
 	}
 

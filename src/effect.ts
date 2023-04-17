@@ -10,31 +10,31 @@ enum EffectStatus {
 	rejected = "rejected",
 }
 
-type EffectFunction<TParams, TResult> = (
-	params: TParams,
+type EffectFunction<Params, Result> = (
+	params: Params,
 	abortController: AbortController
-) => Promise<TResult>;
+) => Promise<Result>;
 
 class Effect<
-	TParams extends any = void,
-	TResult extends any = void,
-	TError extends Error = Error
-> extends Entity<TParams> {
-	started = new Event<TParams>();
-	resolved = new Event<{ params: TParams; result: TResult }>();
-	rejected = new Event<{ params: TParams; error: TError }>();
-	finished = new Event<TParams>();
-	aborted = new Event<{ params: TParams; error: Error }>();
+	Params extends any = void,
+	Result extends any = void,
+	ErrorType extends Error = Error
+> extends Entity<Params> {
+	started = new Event<Params>();
+	resolved = new Event<{ params: Params; result: Result }>();
+	rejected = new Event<{ params: Params; error: ErrorType }>();
+	finished = new Event<Params>();
+	aborted = new Event<{ params: Params; error: Error }>();
 
 	statusState = new State<EffectStatus>(EffectStatus.idle);
 	runningCountState = new State(0);
 	pendingState = new ComputeState(
-		[this.statusState],
+		this.statusState,
 		(status) => status === EffectStatus.pending
 	);
-	effectFunctionState: State<EffectFunction<TParams, TResult>>;
+	effectFunctionState: State<EffectFunction<Params, Result>>;
 
-	constructor(effectFunction: EffectFunction<TParams, TResult>) {
+	constructor(effectFunction: EffectFunction<Params, Result>) {
 		super();
 		this.effectFunctionState = new State(effectFunction);
 
@@ -56,14 +56,14 @@ class Effect<
 		});
 	}
 
-	implement = (effectFunction: EffectFunction<TParams, TResult>): void => {
+	implement = (effectFunction: EffectFunction<Params, Result>): void => {
 		this.effectFunctionState.set(effectFunction);
 	};
 
 	async run(
-		params: TParams,
+		params: Params,
 		abortController: AbortController = new AbortController()
-	): Promise<TResult> {
+	): Promise<Result> {
 		try {
 			this.started.dispatch(params);
 			const result = await this.effectFunctionState.get()(
@@ -74,7 +74,7 @@ class Effect<
 
 			return result;
 		} catch (e) {
-			const error = e as TError;
+			const error = e as ErrorType;
 
 			this[error.name === "AbortError" ? "aborted" : "rejected"].dispatch({
 				params,

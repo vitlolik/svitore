@@ -1,20 +1,17 @@
 import { Event, EventOptions } from "./event";
 
 class ThrottledEvent<
-	TPayload extends any = void,
-	TMeta extends any = any
-> extends Event<TPayload, TMeta> {
+	Payload extends any = void,
+	Meta extends any = any
+> extends Event<Payload, Meta> {
 	private isThrottled = false;
-	private savedParams: TPayload | null = null;
+	private savedParams: Payload | null = null;
 
-	constructor(
-		private timeout: number,
-		options?: EventOptions<TPayload, TMeta>
-	) {
+	constructor(private timeout: number, options?: EventOptions<Payload, Meta>) {
 		super(options);
 	}
 
-	dispatch(payload: TPayload): void {
+	dispatch(payload: Payload): void {
 		if (this.isThrottled) {
 			this.savedParams = payload;
 			return;
