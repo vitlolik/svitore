@@ -1,6 +1,6 @@
 import { Observable } from "./observable";
 
-abstract class Entity<T> extends Observable<T> {
+abstract class Entity<T = void> extends Observable<T> {
 	static createdEntities: Entity<any>[] = [];
 
 	constructor() {
