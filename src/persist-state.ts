@@ -9,7 +9,7 @@ class PersistState<Data> extends State<Data> {
 	constructor(
 		state: Data,
 		storageKey: string,
-		private storage: Storage = window.localStorage
+		private readonly storage: Storage = window.localStorage
 	) {
 		super(state);
 		this.storageKey = `${KEY_PREFIX}${storageKey}`;
@@ -34,7 +34,7 @@ class PersistState<Data> extends State<Data> {
 		}
 	}
 
-	release() {
+	release(): void {
 		this.storage.removeItem(this.storageKey);
 		super.release();
 	}

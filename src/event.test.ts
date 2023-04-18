@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
-import { Event } from "./event";
+import { Event, EventOptions } from "./event";
 import { Entity } from "./shared/entity";
 
 describe("event", () => {
 	class TestEvent<T = void> extends Event<T> {
-		getOptions() {
+		getOptions(): EventOptions<T, any> {
 			return this.options;
 		}
 
@@ -66,7 +66,7 @@ describe("event", () => {
 	});
 
 	it("shouldDispatch", () => {
-		const event = new TestEvent({ shouldDispatch: () => false });
+		const event = new TestEvent({ shouldDispatch: (): boolean => false });
 		expect(event.notify).toBeCalledTimes(0);
 
 		event.dispatch();

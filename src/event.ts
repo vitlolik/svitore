@@ -29,7 +29,7 @@ class Event<Payload = void, Meta = any> extends Entity<Payload> {
 		this.fire(payload);
 	}
 
-	listen(listener: Observer<Payload>) {
+	listen(listener: Observer<Payload>): () => void {
 		return this.observe(listener);
 	}
 }

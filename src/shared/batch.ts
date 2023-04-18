@@ -1,9 +1,13 @@
-const createBatchFunction = <Args extends any[]>(
-	callback: (...args: Args) => void
-) => {
+type BaseArgs = any[];
+
+type Callback<Args extends BaseArgs> = (...args: Args) => void;
+
+const createBatchFunction = <Args extends BaseArgs>(
+	callback: Callback<Args>
+): Callback<Args> => {
 	let callsCount = 0;
 
-	return (...args: Args) => {
+	return (...args) => {
 		callsCount++;
 
 		if (callsCount === 1) {

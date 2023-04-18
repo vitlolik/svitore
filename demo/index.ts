@@ -1,6 +1,6 @@
 import { createStore } from "./store";
 
-const main = () => {
+const main = (): void => {
 	const form = document.getElementById("app") as HTMLFormElement;
 	const fistNameInput = document.getElementById(
 		"firstName"

@@ -35,10 +35,12 @@ class ComputeState<
 		});
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	set(newState: Data): void {
 		throw new ComputeStateError();
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	change(getNewState: (prevState: Data) => Data): void {
 		throw new ComputeStateError();
 	}

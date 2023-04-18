@@ -1,6 +1,19 @@
 import { Effect, Event, PersistState, State, ComputeState } from "../src";
 
-const createStore = () => {
+type Store = {
+	changeFirstName: Event<string>;
+	changeSecondName: Event<string>;
+	changeAge: Event<number>;
+	submitted: Event<void>;
+	resetEvent: Event<void>;
+
+	symbolsCountState: State<number>;
+	firstNameState: State<string>;
+	secondNameState: State<string>;
+	ageState: State<number>;
+};
+
+const createStore = (): Store => {
 	const changeFirstName = new Event<string>();
 	const changeSecondName = new Event<string>();
 	const changeAge = new Event<number>();
@@ -32,7 +45,7 @@ const createStore = () => {
 					resolve();
 				}, 3000);
 
-				abortController.signal.onabort = () => {
+				abortController.signal.onabort = (): void => {
 					const error = new Error();
 					error.name = "AbortError";
 

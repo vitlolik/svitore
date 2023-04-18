@@ -35,7 +35,7 @@ class State<Data> extends Entity<Data> {
 		return this.prevState;
 	}
 
-	subscribe(subscriber: Observer<Data>) {
+	subscribe(subscriber: Observer<Data>): () => void {
 		return this.observe(subscriber);
 	}
 }

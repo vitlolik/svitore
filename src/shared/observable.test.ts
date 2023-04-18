@@ -3,15 +3,15 @@ import { Observable, Observer } from "./observable";
 
 describe("observable", () => {
 	class TestObservable<T = void> extends Observable<T> {
-		getObservers() {
+		getObservers(): Set<Observer<T>> {
 			return this.observers;
 		}
 
-		observe(observer: Observer<T>) {
+		observe(observer: Observer<T>): () => void {
 			return super.observe(observer);
 		}
 
-		notify(params: T) {
+		notify(params: T): void {
 			return super.notify(params);
 		}
 	}
@@ -51,7 +51,7 @@ describe("observable", () => {
 
 	it("notify observers with error in observer", async () => {
 		const observable = new TestObservable<string>();
-		const observerWithError = () => {
+		const observerWithError = (): void => {
 			throw new Error();
 		};
 		const observer = vi.fn();
@@ -73,7 +73,7 @@ describe("observable", () => {
 
 		expect(observable.getObservers().size).toBe(2);
 
-		observable.release()
+		observable.release();
 		expect(observable.getObservers().size).toBe(0);
 	});
 });

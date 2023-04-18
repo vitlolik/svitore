@@ -1,14 +1,14 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { Entity } from "./shared/entity";
 import { State } from "./state";
 
 describe("state", () => {
 	class TestState<T = void> extends State<T> {
-		getDefaultState() {
+		getDefaultState(): T {
 			return this.defaultState;
 		}
 
-		setNotify(notify: (params: T) => void) {
+		setNotify(notify: (params: T) => void): void {
 			this.notify = notify;
 		}
 	}
