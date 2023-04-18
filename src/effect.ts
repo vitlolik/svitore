@@ -48,8 +48,8 @@ class Effect<
 			const abortController = new AbortController();
 			this.abortControllerList.push(abortController);
 
-			this.onStart.dispatch(params);
 			this.statusState.set(EffectStatus.pending);
+			this.onStart.dispatch(params);
 
 			const result = await this.effectFunction(params, abortController);
 			this.abortControllerList.length = 0;
