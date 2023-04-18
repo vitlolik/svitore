@@ -8,6 +8,7 @@ const main = () => {
 	const secondNameInput = document.getElementById(
 		"secondName"
 	) as HTMLInputElement;
+	const ageInput = document.getElementById("age") as HTMLInputElement;
 	const symbolsCount = document.getElementById(
 		"symbolsCount"
 	) as HTMLSpanElement;
@@ -25,6 +26,9 @@ const main = () => {
 	secondNameInput.addEventListener("input", (event) => {
 		store.changeSecondName.dispatch((event.target as HTMLInputElement).value);
 	});
+	ageInput.addEventListener("input", (event) => {
+		store.changeAge.dispatch((event.target as HTMLInputElement).valueAsNumber);
+	});
 	resetButton.addEventListener("click", () => {
 		store.resetEvent.dispatch();
 	});
@@ -35,12 +39,16 @@ const main = () => {
 	store.secondNameState.subscribe((value) => {
 		secondNameInput.value = value;
 	});
+	store.ageState.subscribe((value) => {
+		ageInput.value = value as any;
+	});
 	store.symbolsCountState.subscribe((value) => {
 		symbolsCount.textContent = value.toString();
 	});
 
 	fistNameInput.value = store.firstNameState.get();
 	secondNameInput.value = store.secondNameState.get();
+	ageInput.value = store.ageState.get().toString();
 	symbolsCount.textContent = store.symbolsCountState.get().toString();
 };
 

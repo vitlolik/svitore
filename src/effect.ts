@@ -32,7 +32,7 @@ class Effect<
 		(status) => status === EffectStatus.pending
 	);
 
-	private abortController = new AbortController();
+	private abortControllerList: AbortController[] = [];
 
 	constructor(private effectFunction: EffectFunction<Params, Result>) {
 		super();
@@ -44,14 +44,15 @@ class Effect<
 
 	async run(params: Params): Promise<void> {
 		try {
-			if (this.isPendingState.get()) {
-				return this.abort();
-			}
+			this.abort();
+			const abortController = new AbortController();
+			this.abortControllerList.push(abortController);
 
 			this.onStart.dispatch(params);
 			this.statusState.set(EffectStatus.pending);
 
-			const result = await this.effectFunction(params, this.abortController);
+			const result = await this.effectFunction(params, abortController);
+			this.abortControllerList.length = 0;
 
 			this.statusState.set(EffectStatus.resolved);
 			this.onResolve.dispatch({ params, result });
@@ -64,16 +65,15 @@ class Effect<
 				this.statusState.set(EffectStatus.rejected);
 				this.onReject.dispatch({ params, error });
 			}
-
-			throw error;
 		} finally {
 			this.onFinish.dispatch(params);
 		}
 	}
 
 	abort(): void {
-		this.abortController.abort();
-		this.abortController = new AbortController();
+		if (this.isPendingState.get()) {
+			this.abortControllerList.forEach((controller) => controller.abort());
+		}
 	}
 }
 

@@ -3,17 +3,21 @@ import { Effect, Event, PersistState, State, ComputeState } from "../src";
 const createStore = () => {
 	const changeFirstName = new Event<string>();
 	const changeSecondName = new Event<string>();
+	const changeAge = new Event<number>();
 	const submitted = new Event();
 	const resetEvent = new Event();
 
 	const submitEffect = new Effect(
-		(data: {
-			firstName: State<string>;
-			secondName: State<string>;
-			symbolsCount: State<number>;
-		}) =>
-			new Promise<void>((resolve) => {
-				setTimeout(() => {
+		(
+			data: {
+				firstName: State<string>;
+				secondName: State<string>;
+				symbolsCount: State<number>;
+			},
+			abortController
+		) =>
+			new Promise<void>((resolve, reject) => {
+				const timeoutId = setTimeout(() => {
 					console.log(
 						JSON.stringify(
 							{
@@ -27,8 +31,19 @@ const createStore = () => {
 					);
 					resolve();
 				}, 3000);
+
+				abortController.signal.onabort = () => {
+					const error = new Error();
+					error.name = "AbortError";
+
+					clearTimeout(timeoutId);
+					console.log("aborted", timeoutId);
+					reject(error);
+				};
 			})
 	);
+
+	submitEffect.onAbort.listen(console.log);
 
 	const firstNameState = new PersistState(
 		"",
@@ -40,9 +55,11 @@ const createStore = () => {
 		"lastName",
 		window.sessionStorage
 	);
+	const ageState = new PersistState(1, "age", window.sessionStorage);
 
 	changeFirstName.listen((value) => firstNameState.set(value));
 	changeSecondName.listen((value) => secondNameState.set(value));
+	changeAge.listen((value) => ageState.set(value));
 
 	const symbolsCountState = new ComputeState(
 		firstNameState,
@@ -62,6 +79,7 @@ const createStore = () => {
 	resetEvent.listen(() => {
 		firstNameState.reset();
 		secondNameState.reset();
+		ageState.reset();
 	});
 
 	return {
@@ -72,6 +90,8 @@ const createStore = () => {
 		firstNameState,
 		secondNameState,
 		symbolsCountState,
+		ageState,
+		changeAge,
 	};
 };
 
