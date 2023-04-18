@@ -111,6 +111,7 @@ describe("effect", () => {
 			try {
 				await effect.run();
 			} catch {
+				// do nothing
 			} finally {
 				expect(rejectedEvent.dispatch).toHaveBeenCalledTimes(1);
 				expect(rejectedEvent.dispatch).toHaveBeenCalledWith({
