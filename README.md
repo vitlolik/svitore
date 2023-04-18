@@ -15,12 +15,6 @@ npm i svitore
 
 - [svitore-react](https://github.com/vitlolik/svitore-react)
 
-## Examples
-
-- [Counter](https://codesandbox.io/s/counter-t5k6t3)
-- [Todo app](https://codesandbox.io/s/todo-mnbd1g)
-- [Abort request](https://codesandbox.io/s/abort-request-ptbi4m)
-
 ## Documentation
 
 ### Entities: [State](#state) | [Event](#event) | [Effect](#effect)
