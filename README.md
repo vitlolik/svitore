@@ -180,15 +180,14 @@ Effect is an object for any side effects. It's more complex entity includes [sta
 
 #### Fields
 
-1. `started` - [event](#event) that is triggered when effect function has started
-2. `resolved` - [event](#event) that is triggered when effect function is fulfilled
-3. `rejected` - [event](#event) that is triggered when effect function is executed with any errors except `AbortError`
-4. `finished` - [event](#event) that is triggered when effect function finished
-5. `aborted` - [event](#event) that is triggered when effect function has aborted. For example `AbortController.abort()`
+1. `onStart` - [event](#event) that is triggered when effect function has started
+2. `onResolve` - [event](#event) that is triggered when effect function is fulfilled
+3. `onReject` - [event](#event) that is triggered when effect function is executed with any errors except `AbortError`
+4. `onFinish` - [event](#event) that is triggered when effect function finished
+5. `onAbort` - [event](#event) that is triggered when effect function has aborted. For example `AbortController.abort()`
 
 6. `statusState` - [state](#state) status that shows process
 7. `pendingState` - [state](#state) flag that shows whether the effect is in progress
-8. `runningCountState` - [state](#state) that shows count of effect function in progress
 
 #### Example
 
@@ -208,26 +207,4 @@ effect.onResolve.listen((value) => {
 });
 
 effect.run();
-```
-
-##### run
-
-Run effect function
-
-```ts
-import { Effect } from "svitore";
-
-const effectFunction = (value: string) =>
-  new Promise<string>((resolve) => {
-    setTimeout(() => resolve(value.toUpperCase()), 300);
-  });
-
-const effect = new Effect(effectFunction);
-
-effect.onResolve.listen((value) => {
-  console.log(value); // "HELLO WORLD"
-});
-
-const result = await effect.run(); // you can get data here
-console.log(result); // "HELLO WORLD"
 ```
