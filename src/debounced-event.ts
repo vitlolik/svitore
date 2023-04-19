@@ -1,9 +1,9 @@
 import { Event, EventOptions } from "./event";
 
-class DebouncedEvent<Payload = void, Meta = any> extends Event<Payload, Meta> {
+class DebouncedEvent<Payload = void> extends Event<Payload> {
 	private timeoutId: NodeJS.Timeout;
 
-	constructor(private timeout: number, options?: EventOptions<Payload, Meta>) {
+	constructor(private timeout: number, options?: EventOptions<Payload>) {
 		super(options);
 	}
 

@@ -4,7 +4,7 @@ import { Entity } from "./shared/entity";
 
 describe("event", () => {
 	class TestEvent<T = void> extends Event<T> {
-		getOptions(): EventOptions<T, any> {
+		getOptions(): EventOptions<T> {
 			return this.options;
 		}
 
@@ -57,12 +57,6 @@ describe("event", () => {
 		event.dispatch();
 		event.dispatch();
 		expect(event.calls).toBe(6);
-	});
-
-	it("options", () => {
-		const event = new TestEvent({ meta: "Test" });
-
-		expect(event.getOptions()).toEqual({ meta: "Test" });
 	});
 
 	it("shouldDispatch", () => {

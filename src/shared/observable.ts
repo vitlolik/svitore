@@ -1,3 +1,5 @@
+import { logError } from "./log";
+
 type Observer<T = void> = (data: T, instance: Observable<T>) => void;
 
 abstract class Observable<T = void> {
@@ -16,7 +18,7 @@ abstract class Observable<T = void> {
 			try {
 				observer(params, this);
 			} catch (error) {
-				console.error(error);
+				logError(error);
 			}
 		});
 	}

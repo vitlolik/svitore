@@ -1,3 +1,4 @@
+import { logError } from "./shared";
 import { State } from "./state";
 
 class ComputeStateError extends Error {
@@ -37,16 +38,16 @@ class ComputeState<
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	set(newState: Data): void {
-		throw new ComputeStateError();
+		logError(new ComputeStateError());
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	change(getNewState: (prevState: Data) => Data): void {
-		throw new ComputeStateError();
+		logError(new ComputeStateError());
 	}
 
 	reset(): void {
-		throw new ComputeStateError();
+		logError(new ComputeStateError());
 	}
 }
 

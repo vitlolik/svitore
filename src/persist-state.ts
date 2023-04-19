@@ -1,8 +1,15 @@
 import { State } from "./state";
-import { createBatchFunction } from "./shared";
+import { createBatchFunction, logError, LOG_PREFIX } from "./shared";
 
-const KEY_PREFIX = "@sv-";
-const VALUE_KEY = "_";
+const STORAGE_KEY_PREFIX = `${LOG_PREFIX}-` as const;
+const NESTED_KEY = "_" as const;
+
+class PersistStateError extends Error {
+	constructor() {
+		super("Invalid storage value");
+		this.name = "PersistStateError";
+	}
+}
 
 class PersistState<Data> extends State<Data> {
 	storageKey: string;
@@ -12,12 +19,12 @@ class PersistState<Data> extends State<Data> {
 		private readonly storage: Storage = window.localStorage
 	) {
 		super(state);
-		this.storageKey = `${KEY_PREFIX}${storageKey}`;
+		this.storageKey = `${STORAGE_KEY_PREFIX}${storageKey}`;
 
 		const writeToStorage = createBatchFunction((newState: Data) => {
 			storage.setItem(
 				this.storageKey,
-				JSON.stringify({ [VALUE_KEY]: newState })
+				JSON.stringify({ [NESTED_KEY]: newState })
 			);
 		});
 
@@ -27,10 +34,10 @@ class PersistState<Data> extends State<Data> {
 		if (valueFromStorage === null) return this;
 
 		try {
-			const value = JSON.parse(valueFromStorage)[VALUE_KEY];
+			const value = JSON.parse(valueFromStorage)[NESTED_KEY];
 			this.set(value);
 		} catch (error) {
-			console.error(error);
+			logError(new PersistStateError());
 		}
 	}
 

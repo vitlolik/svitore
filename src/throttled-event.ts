@@ -1,10 +1,10 @@
 import { Event, EventOptions } from "./event";
 
-class ThrottledEvent<Payload = void, Meta = any> extends Event<Payload, Meta> {
+class ThrottledEvent<Payload = void> extends Event<Payload> {
 	private isThrottled = false;
 	private savedParams: Payload | null = null;
 
-	constructor(private timeout: number, options?: EventOptions<Payload, Meta>) {
+	constructor(private timeout: number, options?: EventOptions<Payload>) {
 		super(options);
 	}
 
