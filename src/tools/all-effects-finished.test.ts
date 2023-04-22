@@ -1,15 +1,21 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { Effect } from "../effect";
 import { allEffectsFinished } from "./all-effects-finished";
 
 describe("allEffectsFinished", () => {
 	it("should wait pending effect", async () => {
 		const effect = new Effect(() => Promise.resolve());
+		const testSubscribe = vi.fn();
+		effect.subscribe((data) => {
+			if (data.status === "finished") {
+				testSubscribe();
+			}
+		});
 		effect.run();
 
 		await allEffectsFinished();
 
-		expect(effect.onFinish.calls).toBe(1);
+		expect(testSubscribe).toHaveBeenCalled();
 	});
 
 	it("should wait all pending effects", async () => {
@@ -23,14 +29,37 @@ describe("allEffectsFinished", () => {
 			() => new Promise((resolve) => setTimeout(resolve, 1))
 		);
 
+		const testSubscribe1 = vi.fn();
+		effect1.subscribe((data) => {
+			if (data.status === "resolved") {
+				effect2.run();
+			} else if (data.status === "finished") {
+				testSubscribe1();
+			}
+		});
+
+		const testSubscribe2 = vi.fn();
+		effect2.subscribe((data) => {
+			if (data.status === "resolved") {
+				effect3.run();
+			} else if (data.status === "finished") {
+				testSubscribe2();
+			}
+		});
+
+		const testSubscribe3 = vi.fn();
+		effect3.subscribe((data) => {
+			if (data.status === "finished") {
+				testSubscribe3();
+			}
+		});
+
 		effect1.run();
-		effect1.onResolve.listen(() => effect2.run());
-		effect2.onResolve.listen(() => effect3.run());
 
 		await allEffectsFinished();
 
-		expect(effect1.onFinish.calls).toBe(1);
-		expect(effect2.onFinish.calls).toBe(1);
-		expect(effect3.onFinish.calls).toBe(1);
+		expect(testSubscribe1).toHaveBeenCalled();
+		expect(testSubscribe2).toHaveBeenCalled();
+		expect(testSubscribe3).toHaveBeenCalled();
 	});
 });

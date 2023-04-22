@@ -58,4 +58,4 @@ class ComputeState<
 	}
 }
 
-export { ComputeState, Selector };
+export { ComputeState };

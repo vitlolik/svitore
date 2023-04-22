@@ -1,4 +1,4 @@
-import { Entity, Observer } from "./shared";
+import { Entity } from "./shared";
 
 class State<Data> extends Entity<Data> {
 	protected defaultState: Data;
@@ -33,10 +33,6 @@ class State<Data> extends Entity<Data> {
 
 	getPrev(): Data {
 		return this.prevState;
-	}
-
-	subscribe(subscriber: Observer<Data>): () => void {
-		return this.observe(subscriber);
 	}
 }
 

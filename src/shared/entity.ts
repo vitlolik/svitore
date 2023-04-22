@@ -1,4 +1,4 @@
-import { Observable } from "./observable";
+import { Observable, Observer } from "./observable";
 
 abstract class Entity<T = void> extends Observable<T> {
 	static createdEntities: Entity<any>[] = [];
@@ -7,6 +7,10 @@ abstract class Entity<T = void> extends Observable<T> {
 		super();
 
 		Entity.createdEntities.push(this);
+	}
+
+	subscribe(subscriber: Observer<T>): () => void {
+		return this.observe(subscriber);
 	}
 }
 

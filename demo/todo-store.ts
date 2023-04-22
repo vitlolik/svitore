@@ -14,18 +14,18 @@ const deleteTodo = new Event<string>();
 
 const toggleTodo = new Event<string>();
 
-addTodo.listen((title) => {
+addTodo.subscribe((title) => {
 	todoListState.change((todoList) => [
 		...todoList,
 		{ id: window.crypto.randomUUID(), title },
 	]);
 });
 
-deleteTodo.listen((id) => {
+deleteTodo.subscribe((id) => {
 	todoListState.change((todoList) => todoList.filter((todo) => todo.id !== id));
 });
 
-toggleTodo.listen((id) => {
+toggleTodo.subscribe((id) => {
 	todoListState.change((todoList) =>
 		todoList.map((todo) =>
 			todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo

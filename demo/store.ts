@@ -56,7 +56,9 @@ const createStore = (): Store => {
 			})
 	);
 
-	submitEffect.onAbort.listen(console.log);
+	submitEffect.subscribe((data) => {
+		console.log(`subscribe | ${data.status}`, data);
+	});
 
 	const firstNameState = new PersistState(
 		"",
@@ -70,9 +72,9 @@ const createStore = (): Store => {
 	);
 	const ageState = new PersistState(1, "age", window.sessionStorage);
 
-	changeFirstName.listen((value) => firstNameState.set(value));
-	changeSecondName.listen((value) => secondNameState.set(value));
-	changeAge.listen((value) => ageState.set(value));
+	changeFirstName.subscribe((value) => firstNameState.set(value));
+	changeSecondName.subscribe((value) => secondNameState.set(value));
+	changeAge.subscribe((value) => ageState.set(value));
 
 	const symbolsCountState = new ComputeState(
 		firstNameState,
@@ -81,7 +83,7 @@ const createStore = (): Store => {
 			firstName.trim().length + secondName.trim().length
 	);
 
-	submitted.listen(() => {
+	submitted.subscribe(() => {
 		submitEffect.run({
 			firstName: firstNameState,
 			secondName: secondNameState,
@@ -89,7 +91,7 @@ const createStore = (): Store => {
 		});
 	});
 
-	resetEvent.listen(() => {
+	resetEvent.subscribe(() => {
 		firstNameState.reset();
 		secondNameState.reset();
 		ageState.reset();

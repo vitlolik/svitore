@@ -1,37 +1,41 @@
-import { ComputeState } from "./compute-state";
-import { Event } from "./event";
 import { Entity } from "./shared/entity";
-import { State } from "./state";
-
-enum EffectStatus {
-	idle = "idle",
-	pending = "pending",
-	resolved = "resolved",
-	rejected = "rejected",
-}
 
 type EffectFunction<Params, Result> = (
 	params: Params,
 	abortController: AbortController
 ) => Promise<Result>;
 
+enum Status {
+	idle,
+	pending,
+	resolved,
+	rejected,
+}
+
+type EffectSubscribePayload<Params, Result, ErrorType> =
+	| {
+			status: "pending";
+			params: Params;
+	  }
+	| {
+			status: "resolved";
+			params: Params;
+			result: Result;
+	  }
+	| { status: "rejected"; params: Params; error: ErrorType }
+	| {
+			status: "aborted";
+			params: Params;
+			error: Error;
+	  }
+	| { status: "finished"; params: Params };
+
 class Effect<
 	Params = void,
 	Result = void,
 	ErrorType extends Error = Error
-> extends Entity<Params> {
-	onStart = new Event<Params>();
-	onResolve = new Event<{ params: Params; result: Result }>();
-	onReject = new Event<{ params: Params; error: ErrorType }>();
-	onFinish = new Event<Params>();
-	onAbort = new Event<{ params: Params; error: Error }>();
-
-	statusState = new State<EffectStatus>(EffectStatus.idle);
-	isPendingState = new ComputeState(
-		this.statusState,
-		(status) => status === EffectStatus.pending
-	);
-
+> extends Entity<EffectSubscribePayload<Params, Result, ErrorType>> {
+	private status = Status.idle;
 	private abortControllerList: AbortController[] = [];
 
 	constructor(private effectFunction: EffectFunction<Params, Result>) {
@@ -48,45 +52,42 @@ class Effect<
 			const abortController = new AbortController();
 			this.abortControllerList.push(abortController);
 
-			this.statusState.set(EffectStatus.pending);
-			this.onStart.dispatch(params);
+			this.status = Status.pending;
+			this.notify({ status: "pending", params });
 
 			const result = await this.effectFunction(params, abortController);
 			this.abortControllerList.length = 0;
 
-			this.statusState.set(EffectStatus.resolved);
-			this.onResolve.dispatch({ params, result });
+			this.status = Status.resolved;
+			this.notify({ status: "resolved", params, result });
 		} catch (e) {
 			const error = e as ErrorType;
 
 			if (error.name === "AbortError") {
-				this.onAbort.dispatch({ params, error });
+				this.notify({ status: "aborted", params, error });
 			} else {
-				this.statusState.set(EffectStatus.rejected);
-				this.onReject.dispatch({ params, error });
+				this.status = Status.rejected;
+				this.notify({ status: "rejected", params, error });
 			}
 		} finally {
-			this.onFinish.dispatch(params);
+			this.notify({ status: "finished", params });
 		}
 	}
 
+	get isPending(): boolean {
+		return this.status === Status.pending;
+	}
+
 	abort(): void {
-		if (this.isPendingState.get()) {
+		if (this.isPending) {
 			this.abortControllerList.forEach((controller) => controller.abort());
 		}
 	}
 
 	release(): void {
 		this.abort();
-		this.onStart.release();
-		this.onResolve.release();
-		this.onReject.release();
-		this.onFinish.release();
-		this.onAbort.release();
-		this.statusState.release();
-		this.isPendingState.release();
 		super.release();
 	}
 }
 
-export { Effect, EffectFunction, EffectStatus };
+export { Effect, EffectFunction, Status as EffectStatus };

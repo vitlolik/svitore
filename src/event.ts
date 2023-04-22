@@ -1,4 +1,4 @@
-import { Entity, Observer } from "./shared";
+import { Entity } from "./shared";
 
 type EventOptions<Payload = void> = {
 	shouldDispatch?: (event: Event<Payload>) => boolean;
@@ -20,10 +20,6 @@ class Event<Payload = void> extends Entity<Payload> {
 
 		this.calls++;
 		this.notify(payload);
-	}
-
-	listen(listener: Observer<Payload>): () => void {
-		return this.observe(listener);
 	}
 }
 
