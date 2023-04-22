@@ -75,6 +75,18 @@ class Effect<
 			this.abortControllerList.forEach((controller) => controller.abort());
 		}
 	}
+
+	release(): void {
+		this.abort();
+		this.onStart.release();
+		this.onResolve.release();
+		this.onReject.release();
+		this.onFinish.release();
+		this.onAbort.release();
+		this.statusState.release();
+		this.isPendingState.release();
+		super.release();
+	}
 }
 
 export { Effect, EffectFunction, EffectStatus };

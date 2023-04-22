@@ -11,6 +11,11 @@ class DebouncedEvent<Payload = void> extends Event<Payload> {
 		clearTimeout(this.timeoutId);
 		this.timeoutId = setTimeout(() => super.dispatch(payload), this.timeout);
 	}
+
+	release(): void {
+		clearTimeout(this.timeoutId);
+		super.release();
+	}
 }
 
 export { DebouncedEvent };

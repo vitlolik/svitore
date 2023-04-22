@@ -1,6 +1,7 @@
 import { Event, EventOptions } from "./event";
 
 class ThrottledEvent<Payload = void> extends Event<Payload> {
+	private timeoutId: NodeJS.Timeout;
 	private isThrottled = false;
 	private savedParams: Payload | null = null;
 
@@ -17,13 +18,18 @@ class ThrottledEvent<Payload = void> extends Event<Payload> {
 		super.dispatch(payload);
 		this.isThrottled = true;
 
-		setTimeout(() => {
+		this.timeoutId = setTimeout(() => {
 			this.isThrottled = false;
 			if (this.savedParams) {
 				this.dispatch(this.savedParams);
 				this.savedParams = null;
 			}
 		}, this.timeout);
+	}
+
+	release(): void {
+		clearTimeout(this.timeoutId);
+		super.release();
 	}
 }
 

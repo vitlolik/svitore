@@ -20,6 +20,8 @@ class ComputeState<
 	StateList extends ReadonlyArray<State<any>>,
 	Data
 > extends State<Data> {
+	private unsubscribeList: (() => void)[] = [];
+
 	constructor(...args: [...StateList, Selector<StateList, Data>]) {
 		const selector = args.pop() as Selector<StateList, Data>;
 		const stateList = args as unknown as StateList;
@@ -30,9 +32,9 @@ class ComputeState<
 		super(getStateData());
 
 		stateList.forEach((state) => {
-			state.subscribe(() => {
-				super.set(getStateData());
-			});
+			this.unsubscribeList.push(
+				state.subscribe(() => super.set(getStateData()))
+			);
 		});
 	}
 
@@ -49,6 +51,11 @@ class ComputeState<
 	reset(): void {
 		logError(new ComputeStateError());
 	}
+
+	release(): void {
+		this.unsubscribeList.forEach((unsubscribe) => unsubscribe());
+		super.release();
+	}
 }
 
-export { ComputeState };
+export { ComputeState, Selector };

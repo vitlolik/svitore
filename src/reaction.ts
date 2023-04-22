@@ -5,16 +5,16 @@ type ExtractStateType<T extends ReadonlyArray<State<any>>> = {
 	[K in keyof T]: T[K] extends State<infer U> ? U : never;
 };
 
-type Callback<StateList extends ReadonlyArray<State<any>>> = (
+type ReactionCallback<StateList extends ReadonlyArray<State<any>>> = (
 	...args: ExtractStateType<StateList>
 ) => void;
 
 class Reaction<StateList extends ReadonlyArray<State<any>>> extends Entity {
 	private unsubscribeList: (() => void)[] = [];
 
-	constructor(...args: [...StateList, Callback<StateList>]) {
+	constructor(...args: [...StateList, ReactionCallback<StateList>]) {
 		super();
-		const callback = args.pop() as Callback<StateList>;
+		const callback = args.pop() as ReactionCallback<StateList>;
 		const stateList = args as unknown as StateList;
 
 		const reactionHandler = createBatchFunction(() => {
@@ -27,8 +27,8 @@ class Reaction<StateList extends ReadonlyArray<State<any>>> extends Entity {
 	}
 
 	release(): void {
-		super.release();
 		this.unsubscribeList.forEach((unsubscribe) => unsubscribe());
+		super.release();
 	}
 }
 
