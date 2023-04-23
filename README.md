@@ -15,6 +15,10 @@ npm i svitore
 
 - [svitore-react](https://github.com/vitlolik/svitore-react)
 
+## App examples
+
+- [Github user search](https://codesandbox.io/p/sandbox/search-github-users-forked-93dh8n)
+
 ## Documentation
 
 ### Entities: [State](#state) | [Event](#event) | [Effect](#effect)
@@ -121,7 +125,7 @@ Event is an object for send any payload to other entities. For example, to updat
 #### Methods
 
 1. [dispatch](#dispatch) - trigger event
-2. [listen](#listen) - add event listener
+2. [subscribe](#subscribe) - add event listener
 
 #### Fields
 
@@ -148,7 +152,7 @@ const change = new Event<string>();
 change.dispatch("Alex");
 ```
 
-##### listen
+##### subscribe
 
 Add event listener
 
@@ -157,7 +161,7 @@ import { Event } from "svitore";
 
 const change = new Event<string>();
 
-change.listen((name) => {
+change.subscribe((name) => {
   console.log(name); // 'Alex'
 });
 
@@ -166,7 +170,7 @@ change.dispatch("Alex");
 
 ### Effect
 
-Effect is an object for any side effects. It's more complex entity includes [states](#state) and [events](#event)
+Effect is an object for any side effects.
 
 #### Methods
 
@@ -174,31 +178,4 @@ Effect is an object for any side effects. It's more complex entity includes [sta
 
 #### Fields
 
-1. `onStart` - [event](#event) that is triggered when effect function has started
-2. `onResolve` - [event](#event) that is triggered when effect function is fulfilled
-3. `onReject` - [event](#event) that is triggered when effect function is executed with any errors except `AbortError`
-4. `onFinish` - [event](#event) that is triggered when effect function finished
-5. `onAbort` - [event](#event) that is triggered when effect function has aborted. For example `AbortController.abort()`
-
-6. `statusState` - [state](#state) status that shows process
-7. `pendingState` - [state](#state) flag that shows whether the effect is in progress
-
-#### Example
-
-```ts
-import { Effect } from "svitore";
-
-const effect = new Effect(
-  () =>
-    new Promise<string>((resolve) => {
-      setTimeout(() => resolve("Hello World"), 300);
-    })
-);
-
-// called after effect.run() and when 300 milliseconds have passed
-effect.onResolve.listen((value) => {
-  console.log(value); // "Hello World"
-});
-
-effect.run();
-```
+...README in-progress
