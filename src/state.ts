@@ -10,6 +10,10 @@ class State<Data> extends Entity<Data> {
 		this.prevState = state;
 	}
 
+	clone(): State<Data> {
+		return new State(this.defaultState);
+	}
+
 	set(newState: Data): void {
 		if (this.state === newState) return;
 

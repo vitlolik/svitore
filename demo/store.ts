@@ -56,7 +56,12 @@ const createStore = (): Store => {
 			})
 	);
 
+	const submitEffectClone = submitEffect.clone();
+
 	submitEffect.subscribe((data) => {
+		console.log(`subscribe | ${data.status}`, data);
+	});
+	submitEffectClone.subscribe((data) => {
 		console.log(`subscribe | ${data.status}`, data);
 	});
 
@@ -85,6 +90,11 @@ const createStore = (): Store => {
 
 	submitted.subscribe(() => {
 		submitEffect.run({
+			firstName: firstNameState,
+			secondName: secondNameState,
+			symbolsCount: symbolsCountState,
+		});
+		submitEffectClone.run({
 			firstName: firstNameState,
 			secondName: secondNameState,
 			symbolsCount: symbolsCountState,

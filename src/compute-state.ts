@@ -2,8 +2,8 @@ import { logError } from "./shared";
 import { State } from "./state";
 
 class ComputeStateError extends Error {
-	constructor() {
-		super("ComputeState is read-only, you must not change it");
+	constructor(message?: string) {
+		super(message ?? "ComputeState is read-only, you must not change it");
 		this.name = "ComputeStateError";
 	}
 }
@@ -20,6 +20,8 @@ class ComputeState<
 	StateList extends ReadonlyArray<State<any>>,
 	Data
 > extends State<Data> {
+	private stateList: StateList;
+	private selector: Selector<StateList, Data>;
 	private unsubscribeList: (() => void)[] = [];
 
 	constructor(...args: [...StateList, Selector<StateList, Data>]) {
@@ -30,6 +32,8 @@ class ComputeState<
 			selector(...(stateList.map((state) => state.get()) as any));
 
 		super(getStateData());
+		this.selector = selector;
+		this.stateList = stateList;
 
 		stateList.forEach((state) => {
 			this.unsubscribeList.push(
@@ -50,6 +54,10 @@ class ComputeState<
 
 	reset(): void {
 		logError(new ComputeStateError());
+	}
+
+	clone(stateList = this.stateList): ComputeState<StateList, Data> {
+		return new ComputeState(...[...stateList, this.selector]);
 	}
 
 	release(): void {

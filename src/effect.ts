@@ -23,11 +23,6 @@ type EffectSubscribePayload<Params, Result, ErrorType> =
 			result: Result;
 	  }
 	| { status: "rejected"; params: Params; error: ErrorType }
-	| {
-			status: "aborted";
-			params: Params;
-			error: Error;
-	  }
 	| { status: "finished"; params: Params };
 
 class Effect<
@@ -35,11 +30,18 @@ class Effect<
 	Result = void,
 	ErrorType extends Error = Error
 > extends Entity<EffectSubscribePayload<Params, Result, ErrorType>> {
+	private isAborted = false;
 	private status = Status.idle;
-	private abortControllerList: AbortController[] = [];
+
+	private prevAbortController = new AbortController();
+	private abortController = new AbortController();
 
 	constructor(private effectFunction: EffectFunction<Params, Result>) {
 		super();
+	}
+
+	clone(): Effect<Params, Result, ErrorType> {
+		return new Effect(this.effectFunction);
 	}
 
 	implement(effectFunction: EffectFunction<Params, Result>): void {
@@ -49,28 +51,26 @@ class Effect<
 	async run(params: Params): Promise<void> {
 		try {
 			this.abort();
-			const abortController = new AbortController();
-			this.abortControllerList.push(abortController);
+			this.prevAbortController = this.abortController;
+			this.abortController = new AbortController();
 
 			this.status = Status.pending;
 			this.notify({ status: "pending", params });
 
-			const result = await this.effectFunction(params, abortController);
-			this.abortControllerList.length = 0;
+			const result = await this.effectFunction(params, this.abortController);
 
 			this.status = Status.resolved;
 			this.notify({ status: "resolved", params, result });
 		} catch (e) {
 			const error = e as ErrorType;
+			if (error.name === "AbortError") return;
 
-			if (error.name === "AbortError") {
-				this.notify({ status: "aborted", params, error });
-			} else {
-				this.status = Status.rejected;
-				this.notify({ status: "rejected", params, error });
-			}
+			this.status = Status.rejected;
+			this.notify({ status: "rejected", params, error });
 		} finally {
-			this.notify({ status: "finished", params });
+			if (this.isAborted) {
+				this.isAborted = false;
+			} else this.notify({ status: "finished", params });
 		}
 	}
 
@@ -79,9 +79,13 @@ class Effect<
 	}
 
 	abort(): void {
-		if (this.isPending) {
-			this.abortControllerList.forEach((controller) => controller.abort());
+		if (!this.prevAbortController.signal.aborted) {
+			this.prevAbortController.abort();
 		}
+		if (!this.abortController.signal.aborted) {
+			this.abortController.abort();
+		}
+		this.isAborted = true;
 	}
 
 	release(): void {

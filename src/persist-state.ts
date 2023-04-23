@@ -12,10 +12,9 @@ class PersistStateError extends Error {
 }
 
 class PersistState<Data> extends State<Data> {
-	storageKey: string;
 	constructor(
 		state: Data,
-		storageKey: string,
+		private storageKey: string,
 		private readonly storage: Storage = window.localStorage
 	) {
 		super(state);
@@ -39,6 +38,13 @@ class PersistState<Data> extends State<Data> {
 		} catch (error) {
 			logError(new PersistStateError());
 		}
+	}
+
+	clone(
+		storageKey = this.storageKey,
+		storage = this.storage
+	): PersistState<Data> {
+		return new PersistState(this.defaultState, storageKey, storage);
 	}
 
 	release(): void {
