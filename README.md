@@ -17,7 +17,7 @@ npm i svitore
 
 ## App examples
 
-- [Github user search](https://codesandbox.io/p/sandbox/search-github-users-forked-93dh8n)
+- [Github user search](https://codesandbox.io/p/sandbox/search-github-users-forked-93dh8n?file=%2Fsrc%2Fstore.ts)
 
 ## Documentation
 
