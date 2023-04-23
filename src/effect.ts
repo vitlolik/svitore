@@ -23,14 +23,13 @@ type EffectSubscribePayload<Params, Result, ErrorType> =
 			result: Result;
 	  }
 	| { status: "rejected"; params: Params; error: ErrorType }
-	| { status: "finished"; params: Params };
+	| { status: "finished"; params: Params; isAborted: boolean };
 
 class Effect<
 	Params = void,
 	Result = void,
 	ErrorType extends Error = Error
 > extends Entity<EffectSubscribePayload<Params, Result, ErrorType>> {
-	private isAborted = false;
 	private status = Status.idle;
 
 	private prevAbortController = new AbortController();
@@ -48,6 +47,13 @@ class Effect<
 		this.effectFunction = effectFunction;
 	}
 
+	get isAborted(): boolean {
+		return (
+			this.prevAbortController.signal.aborted ||
+			this.abortController.signal.aborted
+		);
+	}
+
 	async run(params: Params): Promise<void> {
 		try {
 			this.abort();
@@ -58,6 +64,8 @@ class Effect<
 			this.notify({ status: "pending", params });
 
 			const result = await this.effectFunction(params, this.abortController);
+			this.prevAbortController = new AbortController();
+			this.abortController = new AbortController();
 
 			this.status = Status.resolved;
 			this.notify({ status: "resolved", params, result });
@@ -68,9 +76,7 @@ class Effect<
 			this.status = Status.rejected;
 			this.notify({ status: "rejected", params, error });
 		} finally {
-			if (this.isAborted) {
-				this.isAborted = false;
-			} else this.notify({ status: "finished", params });
+			this.notify({ status: "finished", params, isAborted: this.isAborted });
 		}
 	}
 
@@ -85,7 +91,6 @@ class Effect<
 		if (!this.abortController.signal.aborted) {
 			this.abortController.abort();
 		}
-		this.isAborted = true;
 	}
 
 	release(): void {
