@@ -6,11 +6,7 @@ describe("allEffectsFinished", () => {
 	it("should wait pending effect", async () => {
 		const effect = new Effect(() => Promise.resolve());
 		const testSubscribe = vi.fn();
-		effect.subscribe((data) => {
-			if (data.status === "finished") {
-				testSubscribe();
-			}
-		});
+		effect.subscribe(testSubscribe);
 		effect.run();
 
 		await allEffectsFinished();
@@ -30,29 +26,19 @@ describe("allEffectsFinished", () => {
 		);
 
 		const testSubscribe1 = vi.fn();
-		effect1.subscribe((data) => {
-			if (data.status === "resolved") {
-				effect2.run();
-			} else if (data.status === "finished") {
-				testSubscribe1();
-			}
+		effect1.subscribe(() => {
+			effect2.run();
+			testSubscribe1();
 		});
 
 		const testSubscribe2 = vi.fn();
-		effect2.subscribe((data) => {
-			if (data.status === "resolved") {
-				effect3.run();
-			} else if (data.status === "finished") {
-				testSubscribe2();
-			}
+		effect2.subscribe(() => {
+			effect3.run();
+			testSubscribe2();
 		});
 
 		const testSubscribe3 = vi.fn();
-		effect3.subscribe((data) => {
-			if (data.status === "finished") {
-				testSubscribe3();
-			}
-		});
+		effect3.subscribe(testSubscribe3);
 
 		effect1.run();
 
