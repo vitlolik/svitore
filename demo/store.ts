@@ -42,7 +42,9 @@ const createStore = (): Store => {
 							2
 						)
 					);
-					resolve();
+					if (Math.random() > 0.5) {
+						resolve();
+					} else reject();
 				}, 3000);
 
 				abortController.signal.onabort = (): void => {
@@ -56,13 +58,10 @@ const createStore = (): Store => {
 			})
 	);
 
-	const submitEffectClone = submitEffect.clone();
+	submitEffect.isPending.subscribe((v) => console.log("pendingState", v));
 
 	submitEffect.subscribe((data) => {
-		console.log(`subscribe | ${data.status}`, data);
-	});
-	submitEffectClone.subscribe((data) => {
-		console.log(`subscribe | ${data.status}`, data);
+		console.log(`subscribe | ${data.state}`, data);
 	});
 
 	const firstNameState = new PersistState(
@@ -94,11 +93,10 @@ const createStore = (): Store => {
 			secondName: secondNameState,
 			symbolsCount: symbolsCountState,
 		});
-		submitEffectClone.run({
-			firstName: firstNameState,
-			secondName: secondNameState,
-			symbolsCount: symbolsCountState,
-		});
+
+		// setTimeout(() => {
+		// 	submitEffect.release();
+		// }, 1000);
 	});
 
 	resetEvent.subscribe(() => {
