@@ -1,48 +1,43 @@
 import { describe, it, expect, vi } from "vitest";
-import { Event, EventOptions } from "./event";
+import { Event } from "./event";
 import { Entity } from "./shared/entity";
 
 describe("event", () => {
-	class TestEvent<T = void> extends Event<T> {
-		getOptions(): EventOptions<T> {
-			return this.options;
-		}
-
-		notify = vi.fn();
-	}
-
 	it("type", () => {
-		const event = new TestEvent();
+		const event = new Event();
 
 		expect(event).instanceOf(Entity);
 	});
 
 	it("initial state", () => {
-		const event = new TestEvent();
+		const event = new Event();
 
 		expect(event.calls).toBe(0);
-		expect(event.getOptions()).toEqual({});
+		expect(event.options).toEqual({});
 	});
 
-	it("notify", () => {
-		const event = new TestEvent<number>();
-		expect(event.notify).toBeCalledTimes(0);
+	it("subscribe", () => {
+		const event = new Event<number>();
+		const subscriber = vi.fn();
+		event.subscribe(subscriber);
+
+		expect(subscriber).toBeCalledTimes(0);
 
 		event.dispatch(1);
-		expect(event.notify).toBeCalledTimes(1);
-		expect(event.notify).toHaveBeenCalledWith(1);
+		expect(subscriber).toBeCalledTimes(1);
+		expect(subscriber).toHaveBeenCalledWith(1, event);
 
 		event.dispatch(2);
-		expect(event.notify).toBeCalledTimes(2);
-		expect(event.notify).toHaveBeenCalledWith(2);
+		expect(subscriber).toBeCalledTimes(2);
+		expect(subscriber).toHaveBeenCalledWith(2, event);
 
 		event.dispatch(0);
-		expect(event.notify).toBeCalledTimes(3);
-		expect(event.notify).toHaveBeenCalledWith(0);
+		expect(subscriber).toBeCalledTimes(3);
+		expect(subscriber).toHaveBeenCalledWith(0, event);
 	});
 
 	it("calls count", () => {
-		const event = new TestEvent();
+		const event = new Event();
 
 		expect(event.calls).toBe(0);
 
@@ -60,16 +55,17 @@ describe("event", () => {
 	});
 
 	it("shouldDispatch", () => {
-		const event = new TestEvent({ shouldDispatch: (): boolean => false });
-		expect(event.notify).toBeCalledTimes(0);
+		const event = new Event({ shouldDispatch: (): boolean => false });
+		const subscriber = vi.fn();
+		event.subscribe(subscriber);
 
 		event.dispatch();
-		expect(event.notify).toBeCalledTimes(0);
+		expect(subscriber).toBeCalledTimes(0);
 
 		event.dispatch();
 		event.dispatch();
 		event.dispatch();
-		expect(event.notify).toBeCalledTimes(0);
+		expect(subscriber).toBeCalledTimes(0);
 		expect(event.calls).toBe(0);
 	});
 });

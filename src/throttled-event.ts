@@ -1,4 +1,4 @@
-import { DelayedEvent } from "./shared";
+import { DelayedEvent } from "./delayed-event";
 
 class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 	private isThrottled = false;

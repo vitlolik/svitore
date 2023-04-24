@@ -1,4 +1,4 @@
-import { Event, EventOptions } from "../event";
+import { Event, EventOptions } from "./event";
 
 abstract class DelayedEvent<Payload = void> extends Event<Payload> {
 	protected timeoutId: NodeJS.Timeout;

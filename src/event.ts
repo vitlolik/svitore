@@ -7,7 +7,7 @@ type EventOptions<Payload = void> = {
 class Event<Payload = void> extends Entity<Payload> {
 	calls = 0;
 
-	constructor(protected options: EventOptions<Payload> = {}) {
+	constructor(public options: EventOptions<Payload> = {}) {
 		super();
 	}
 

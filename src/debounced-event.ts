@@ -1,4 +1,4 @@
-import { DelayedEvent } from "./shared";
+import { DelayedEvent } from "./delayed-event";
 
 class DebouncedEvent<Payload = void> extends DelayedEvent<Payload> {
 	dispatch(payload: Payload): void {
