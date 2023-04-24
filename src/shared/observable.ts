@@ -1,4 +1,4 @@
-import { logError } from "./log";
+import { logError } from "./error";
 
 type Observer<T = void> = (data: T, instance: Observable<T>) => void;
 

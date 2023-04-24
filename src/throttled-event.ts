@@ -1,13 +1,8 @@
-import { Event, EventOptions } from "./event";
+import { DelayedEvent } from "./shared";
 
-class ThrottledEvent<Payload = void> extends Event<Payload> {
-	private timeoutId: NodeJS.Timeout;
+class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 	private isThrottled = false;
 	private savedParams: Payload | null = null;
-
-	constructor(private timeout: number, options?: EventOptions<Payload>) {
-		super(options);
-	}
 
 	dispatch(payload: Payload): void {
 		if (this.isThrottled) {
@@ -25,11 +20,6 @@ class ThrottledEvent<Payload = void> extends Event<Payload> {
 				this.savedParams = null;
 			}
 		}, this.timeout);
-	}
-
-	release(): void {
-		clearTimeout(this.timeoutId);
-		super.release();
 	}
 }
 

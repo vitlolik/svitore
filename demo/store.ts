@@ -1,4 +1,12 @@
-import { Effect, Event, PersistState, State, ComputeState } from "../src";
+import {
+	Effect,
+	Event,
+	PersistState,
+	State,
+	ComputeState,
+	DebouncedEvent,
+	ThrottledEvent,
+} from "../src";
 
 type Store = {
 	changeFirstName: Event<string>;
@@ -19,6 +27,15 @@ const createStore = (): Store => {
 	const changeAge = new Event<number>();
 	const submitted = new Event();
 	const resetEvent = new Event();
+	const debouncedSubmitEvent = new DebouncedEvent(500);
+	const throttledSubmitEvent = new ThrottledEvent(500);
+
+	debouncedSubmitEvent.subscribe(() => {
+		console.log("debouncedSubmitEvent called");
+	});
+	throttledSubmitEvent.subscribe(() => {
+		console.log("throttledSubmitEvent called");
+	});
 
 	const submitEffect = new Effect(
 		(
@@ -93,6 +110,8 @@ const createStore = (): Store => {
 			secondName: secondNameState,
 			symbolsCount: symbolsCountState,
 		});
+		debouncedSubmitEvent.dispatch();
+		throttledSubmitEvent.dispatch();
 
 		// setTimeout(() => {
 		// 	submitEffect.release();

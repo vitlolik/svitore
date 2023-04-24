@@ -1,7 +1,7 @@
 import { State } from "./state";
-import { createBatchFunction, logError, LOG_PREFIX } from "./shared";
+import { createBatchFunction, logError, PACKAGE_LABEL } from "./shared";
 
-const STORAGE_KEY_PREFIX = `${LOG_PREFIX}-` as const;
+const STORAGE_KEY_PREFIX = `${PACKAGE_LABEL}-` as const;
 const NESTED_KEY = "_" as const;
 
 class PersistStateError extends Error {

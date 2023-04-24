@@ -1,20 +1,9 @@
-import { Event, EventOptions } from "./event";
+import { DelayedEvent } from "./shared";
 
-class DebouncedEvent<Payload = void> extends Event<Payload> {
-	private timeoutId: NodeJS.Timeout;
-
-	constructor(private timeout: number, options?: EventOptions<Payload>) {
-		super(options);
-	}
-
+class DebouncedEvent<Payload = void> extends DelayedEvent<Payload> {
 	dispatch(payload: Payload): void {
-		clearTimeout(this.timeoutId);
+		this.clearTimer();
 		this.timeoutId = setTimeout(() => super.dispatch(payload), this.timeout);
-	}
-
-	release(): void {
-		clearTimeout(this.timeoutId);
-		super.release();
 	}
 }
 

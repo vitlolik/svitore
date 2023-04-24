@@ -1,10 +1,9 @@
-import { logError } from "./shared";
+import { SvitoreError } from "./shared";
 import { State } from "./state";
 
-class ComputeStateError extends Error {
+class ComputeStateError extends SvitoreError {
 	constructor(message?: string) {
 		super(message ?? "ComputeState is read-only, you must not change it");
-		this.name = "ComputeStateError";
 	}
 }
 
@@ -44,16 +43,16 @@ class ComputeState<
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	set(newState: Data): void {
-		logError(new ComputeStateError());
+		throw new ComputeStateError();
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	change(getNewState: (prevState: Data) => Data): void {
-		logError(new ComputeStateError());
+		throw new ComputeStateError();
 	}
 
 	reset(): void {
-		logError(new ComputeStateError());
+		throw new ComputeStateError();
 	}
 
 	clone(stateList = this.stateList): ComputeState<StateList, Data> {

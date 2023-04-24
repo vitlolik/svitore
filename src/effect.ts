@@ -6,7 +6,7 @@ type EffectFunction<Params, Result> = (
 	abortController: AbortController
 ) => Promise<Result>;
 
-type EffectSubscribePayload<Params, Result, ErrorType> =
+type NotifyPayload<Params, Result, ErrorType> =
 	| {
 			state: "fulfilled";
 			params: Params;
@@ -18,7 +18,7 @@ class Effect<
 	Params = void,
 	Result = void,
 	ErrorType extends Error = Error
-> extends Entity<EffectSubscribePayload<Params, Result, ErrorType>> {
+> extends Entity<NotifyPayload<Params, Result, ErrorType>> {
 	private abortController: AbortController | null = null;
 
 	isPending = new State(false);
