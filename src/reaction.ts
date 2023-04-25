@@ -1,12 +1,8 @@
-import { Entity, createBatchFunction } from "./shared";
+import { Entity, ExtractEntitiesTypes, createBatchFunction } from "./shared";
 import { State } from "./state";
 
-type ExtractStateType<T extends ReadonlyArray<State<any>>> = {
-	[K in keyof T]: T[K] extends State<infer U> ? U : never;
-};
-
 type ReactionCallback<StateList extends ReadonlyArray<State<any>>> = (
-	...args: ExtractStateType<StateList>
+	...args: ExtractEntitiesTypes<StateList>
 ) => void;
 
 class Reaction<StateList extends ReadonlyArray<State<any>>> extends Entity {

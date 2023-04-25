@@ -1,4 +1,4 @@
-import { SvitoreError } from "./shared";
+import { ExtractEntitiesTypes, SvitoreError } from "./shared";
 import { State } from "./state";
 
 class ComputeStateError extends SvitoreError {
@@ -7,12 +7,8 @@ class ComputeStateError extends SvitoreError {
 	}
 }
 
-type ExtractStateType<T extends ReadonlyArray<State<any>>> = {
-	[K in keyof T]: T[K] extends State<infer U> ? U : never;
-};
-
 type Selector<StateList extends ReadonlyArray<State<any>>, Data> = (
-	...args: ExtractStateType<StateList>
+	...args: ExtractEntitiesTypes<StateList>
 ) => Data;
 
 class ComputeState<
