@@ -1,7 +1,7 @@
 import { Event, EventOptions } from "./event";
 
 abstract class DelayedEvent<Payload = void> extends Event<Payload> {
-	protected timeoutId: NodeJS.Timeout;
+	protected timeoutId: NodeJS.Timeout | number;
 
 	constructor(protected timeout: number, options?: EventOptions<Payload>) {
 		super(options);

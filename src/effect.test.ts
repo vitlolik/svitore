@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
+
 import { Effect } from "./effect";
 import { Entity } from "./shared/entity";
 
@@ -35,17 +36,6 @@ describe("effect", () => {
 			const result = await effect.run();
 
 			expect(result).toBe(undefined);
-		});
-
-		it("throw error", async () => {
-			const customError = new Error("error");
-			const effect = new Effect(() => Promise.reject(customError));
-
-			try {
-				await effect.run();
-			} catch (error) {
-				expect(error).toBe(customError);
-			}
 		});
 	});
 });

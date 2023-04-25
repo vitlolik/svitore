@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ComputeState } from "./compute-state";
+import { ComputeState, ComputeStateError } from "./compute-state";
 import { State } from "./state";
 
 describe("computeState", () => {
@@ -42,6 +42,60 @@ describe("computeState", () => {
 		expect(computed.get()).toBe("HELLO world");
 
 		state2.set("WORLD");
+		expect(computed.get()).toBe("HELLO WORLD");
+	});
+
+	it("should be readonly, can not change the state", () => {
+		const state = new State("world");
+		const computed = new ComputeState(state, (state) => state.toUpperCase());
+
+		try {
+			computed.set("");
+		} catch (error) {
+			expect(error).toBeInstanceOf(ComputeStateError);
+		}
+		try {
+			computed.change((prev) => prev.toLowerCase());
+		} catch (error) {
+			expect(error).toBeInstanceOf(ComputeStateError);
+		}
+		try {
+			computed.reset();
+		} catch (error) {
+			expect(error).toBeInstanceOf(ComputeStateError);
+		}
+	});
+
+	it("clone - should clone state with others state list", () => {
+		const state1 = new State("hello");
+		const state2 = new State("world");
+		const computed = new ComputeState(state1, state2, (value1, value2) =>
+			`${value1} ${value2}`.toUpperCase()
+		);
+
+		const newState1 = new State("foo");
+		const newState2 = new State("bar");
+
+		const cloned = computed.clone([newState1, newState2]);
+
+		expect(cloned.get()).toBe("FOO BAR");
+	});
+
+	it("release - should unsubscribe from the state list", () => {
+		const state1 = new State("hello");
+		const state2 = new State("world");
+
+		const computed = new ComputeState(state1, state2, (value1, value2) =>
+			`${value1} ${value2}`.toUpperCase()
+		);
+
+		expect(computed.get()).toBe("HELLO WORLD");
+
+		computed.release();
+
+		state1.set("foo");
+		state2.set("bar");
+
 		expect(computed.get()).toBe("HELLO WORLD");
 	});
 });

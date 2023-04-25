@@ -65,4 +65,4 @@ class ComputeState<
 	}
 }
 
-export { ComputeState };
+export { ComputeState, ComputeStateError };

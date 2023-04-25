@@ -1,21 +1,14 @@
 import { State } from "./state";
-import { createBatchFunction, logError, PACKAGE_LABEL } from "./shared";
+import { createBatchFunction, PACKAGE_LABEL, SvitoreError } from "./shared";
 
 const STORAGE_KEY_PREFIX = `${PACKAGE_LABEL}-` as const;
 const NESTED_KEY = "_" as const;
 
-class PersistStateError extends Error {
-	constructor() {
-		super("Invalid storage value");
-		this.name = "PersistStateError";
-	}
-}
-
 class PersistState<Data> extends State<Data> {
 	constructor(
 		state: Data,
-		private storageKey: string,
-		private readonly storage: Storage = window.localStorage
+		private readonly storageKey: string,
+		private readonly storage: Storage = localStorage
 	) {
 		super(state);
 		this.storageKey = `${STORAGE_KEY_PREFIX}${storageKey}`;
@@ -27,29 +20,31 @@ class PersistState<Data> extends State<Data> {
 			);
 		});
 
-		this.subscribe(writeToStorage);
 		const valueFromStorage = storage.getItem(this.storageKey);
 
-		if (valueFromStorage === null) return this;
+		if (valueFromStorage === null) {
+			this.subscribe(writeToStorage);
+			return this;
+		}
 
 		try {
 			const value = JSON.parse(valueFromStorage)[NESTED_KEY];
 			this.set(value);
+			this.subscribe(writeToStorage);
 		} catch (error) {
-			logError(new PersistStateError());
+			throw new SvitoreError("Invalid storage value");
 		}
 	}
 
 	clone(
-		storageKey = this.storageKey,
+		storageKey = this.storageKey.replace(STORAGE_KEY_PREFIX, ""),
 		storage = this.storage
 	): PersistState<Data> {
 		return new PersistState(this.defaultState, storageKey, storage);
 	}
 
-	release(): void {
+	clearStorage(): void {
 		this.storage.removeItem(this.storageKey);
-		super.release();
 	}
 }
 
