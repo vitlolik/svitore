@@ -1,6 +1,10 @@
 import { Entity } from "./shared/entity";
 import { State } from "./state";
 
+type EffectOptions = {
+	isAutoAbort?: boolean;
+};
+
 type EffectFunction<Params, Result> = (
 	params: Params,
 	abortController: AbortController
@@ -23,12 +27,15 @@ class Effect<
 
 	isPending = new State(false);
 
-	constructor(private effectFunction: EffectFunction<Params, Result>) {
+	constructor(
+		private effectFunction: EffectFunction<Params, Result>,
+		private options: EffectOptions = {}
+	) {
 		super();
 	}
 
-	clone(): Effect<Params, Result, ErrorType> {
-		return new Effect(this.effectFunction);
+	clone(options = this.options): Effect<Params, Result, ErrorType> {
+		return new Effect(this.effectFunction, options);
 	}
 
 	implement(effectFunction: EffectFunction<Params, Result>): void {
@@ -47,7 +54,10 @@ class Effect<
 		try {
 			this.isPending.set(true);
 
-			this.abortIfNeeded();
+			if (this.options.isAutoAbort) {
+				this.abortIfNeeded();
+			}
+
 			this.abortController = new AbortController();
 
 			const result = await this.effectFunction(params, this.abortController);

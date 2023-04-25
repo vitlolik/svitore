@@ -48,10 +48,13 @@ describe("effect", () => {
 
 		it("should abort if needed", async () => {
 			const abortListener = vi.fn();
-			const effect = new Effect(async (_data, abortController) => {
-				abortController.signal.addEventListener("abort", abortListener);
-				await Promise.resolve("hello");
-			});
+			const effect = new Effect(
+				async (_data, abortController) => {
+					abortController.signal.addEventListener("abort", abortListener);
+					await Promise.resolve("hello");
+				},
+				{ isAutoAbort: true }
+			);
 
 			effect.run();
 			effect.run();
@@ -111,7 +114,7 @@ describe("effect", () => {
 	it("clone - should clone an effect with existing effect function", () => {
 		const effect = new Effect(() => Promise.resolve());
 
-		expect(effect.clone()).instanceOf(Entity);
+		expect(effect.clone({ isAutoAbort: true })).instanceOf(Entity);
 	});
 
 	it("abort - should abort effect and set change pending state", () => {
@@ -147,11 +150,14 @@ describe("effect", () => {
 
 	it("if happened auto-abort with specific error, subscribers should not be notified", async () => {
 		const subscriber = vi.fn();
-		const autoAbortEmulateEffect = new Effect(() => {
-			const abortError = new Error();
-			abortError.name = "AbortError";
-			return Promise.reject(abortError);
-		});
+		const autoAbortEmulateEffect = new Effect(
+			() => {
+				const abortError = new Error();
+				abortError.name = "AbortError";
+				return Promise.reject(abortError);
+			},
+			{ isAutoAbort: true }
+		);
 		autoAbortEmulateEffect.subscribe(subscriber);
 
 		await autoAbortEmulateEffect.run();

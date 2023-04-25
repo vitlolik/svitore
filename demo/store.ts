@@ -72,7 +72,8 @@ const createStore = (): Store => {
 					console.log("aborted", timeoutId);
 					reject(error);
 				};
-			})
+			}),
+		{ isAutoAbort: true }
 	);
 
 	submitEffect.isPending.subscribe((v) => console.log("pendingState", v));
