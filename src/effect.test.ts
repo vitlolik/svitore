@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 
 import { Effect } from "./effect";
-import { Entity } from "./shared/entity";
+import { Entity } from "./shared";
 
 describe("effect", () => {
 	it("type", () => {

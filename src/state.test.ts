@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { Entity } from "./shared/entity";
+import { Entity } from "./shared";
 import { State } from "./state";
 
 describe("state", () => {
@@ -54,15 +54,6 @@ describe("state", () => {
 
 			expect(subscriber).toHaveBeenCalledWith("new value", state);
 		});
-	});
-
-	it("change - change state by callback", () => {
-		const state = new State("test");
-		state.set = vi.fn();
-
-		state.change((prevState) => `${prevState} new`);
-
-		expect(state.set).toHaveBeenCalledWith("test new");
 	});
 
 	it("reset - reset state to default value", () => {

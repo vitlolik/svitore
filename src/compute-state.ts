@@ -1,26 +1,20 @@
-import { ExtractEntitiesTypes, SvitoreError } from "./shared";
+import { SelectorCallback, SvitoreError } from "./shared";
 import { State } from "./state";
 
-class ComputeStateError extends SvitoreError {
-	constructor(message?: string) {
-		super(message ?? "ComputeState is read-only, you must not change it");
-	}
-}
-
-type Selector<StateList extends ReadonlyArray<State<any>>, Data> = (
-	...args: ExtractEntitiesTypes<StateList>
-) => Data;
+const throwComputeStateError = (): never => {
+	throw new SvitoreError("ComputeState is read-only, you must not change it");
+};
 
 class ComputeState<
 	StateList extends ReadonlyArray<State<any>>,
 	Data
 > extends State<Data> {
 	private stateList: StateList;
-	private selector: Selector<StateList, Data>;
+	private selector: SelectorCallback<StateList, Data>;
 	private unsubscribeList: (() => void)[] = [];
 
-	constructor(...args: [...StateList, Selector<StateList, Data>]) {
-		const selector = args.pop() as Selector<StateList, Data>;
+	constructor(...args: [...StateList, SelectorCallback<StateList, Data>]) {
+		const selector = args.pop() as SelectorCallback<StateList, Data>;
 		const stateList = args as unknown as StateList;
 
 		const getStateData = (): Data =>
@@ -39,16 +33,11 @@ class ComputeState<
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	set(newState: Data): void {
-		throw new ComputeStateError();
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	change(getNewState: (prevState: Data) => Data): void {
-		throw new ComputeStateError();
+		throwComputeStateError();
 	}
 
 	reset(): void {
-		throw new ComputeStateError();
+		throwComputeStateError();
 	}
 
 	clone(stateList = this.stateList): ComputeState<StateList, Data> {
@@ -61,4 +50,4 @@ class ComputeState<
 	}
 }
 
-export { ComputeState, ComputeStateError };
+export { ComputeState };

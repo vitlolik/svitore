@@ -5,15 +5,15 @@ type Callback<Args extends BaseArgs> = (...args: Args) => void;
 const createBatchFunction = <Args extends BaseArgs>(
 	callback: Callback<Args>
 ): Callback<Args> => {
-	let callsCount = 0;
+	let isPending = false;
 
 	return (...args) => {
-		callsCount++;
+		if (!isPending) {
+			isPending = true;
 
-		if (callsCount === 1) {
 			queueMicrotask(() => {
 				callback(...args);
-				callsCount = 0;
+				isPending = false;
 			});
 		}
 	};

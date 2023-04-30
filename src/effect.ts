@@ -1,4 +1,4 @@
-import { Entity } from "./shared/entity";
+import { Entity } from "./shared";
 import { State } from "./state";
 
 type EffectOptions = {

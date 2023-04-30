@@ -11,6 +11,14 @@ State manager
 npm i svitore
 ```
 
+```sh
+pnpm i svitore
+```
+
+```sh
+yarn add svitore
+```
+
 ## Packages
 
 - [svitore-react](https://github.com/vitlolik/svitore-react)
@@ -110,7 +118,7 @@ Reset state to default value
 import { State } from "svitore";
 
 const countState = new State(10);
-countState.change((state) => state + 1);
+countState.set(countState.get() + 1);
 
 countState.get(); // 11
 

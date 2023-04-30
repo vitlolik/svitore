@@ -1,4 +1,4 @@
-import { Entity } from "../shared/entity";
+import { Entity } from "../shared";
 import { Effect } from "../effect";
 
 const allEffectsFinished = async (): Promise<void> => {

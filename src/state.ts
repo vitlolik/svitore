@@ -23,10 +23,6 @@ class State<Data> extends Entity<Data> {
 		this.notify(this.state);
 	}
 
-	change(getNewState: (prevState: Data) => Data): void {
-		this.set(getNewState(this.get()));
-	}
-
 	reset(): void {
 		this.set(this.defaultState);
 	}

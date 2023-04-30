@@ -1,6 +1,7 @@
 import { Entity } from "./shared";
 
 type EventOptions<Payload = void> = {
+	[x: string]: any;
 	shouldDispatch?: (event: Event<Payload>) => boolean;
 };
 

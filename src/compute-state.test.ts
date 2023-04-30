@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { ComputeState, ComputeStateError } from "./compute-state";
+import { ComputeState } from "./compute-state";
 import { State } from "./state";
+import { SvitoreError } from "./shared";
 
 describe("computeState", () => {
 	it("type", () => {
@@ -52,17 +53,12 @@ describe("computeState", () => {
 		try {
 			computed.set("");
 		} catch (error) {
-			expect(error).toBeInstanceOf(ComputeStateError);
-		}
-		try {
-			computed.change((prev) => prev.toLowerCase());
-		} catch (error) {
-			expect(error).toBeInstanceOf(ComputeStateError);
+			expect(error).toBeInstanceOf(SvitoreError);
 		}
 		try {
 			computed.reset();
 		} catch (error) {
-			expect(error).toBeInstanceOf(ComputeStateError);
+			expect(error).toBeInstanceOf(SvitoreError);
 		}
 	});
 

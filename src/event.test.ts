@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { Event } from "./event";
-import { Entity } from "./shared/entity";
+import { Entity } from "./shared";
 
 describe("event", () => {
 	it("type", () => {
