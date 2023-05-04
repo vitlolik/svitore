@@ -18,11 +18,9 @@ type NotifyPayload<Params, Result, ErrorType> =
 	  }
 	| { state: "rejected"; params: Params; error: ErrorType };
 
-class Effect<
-	Params = void,
-	Result = void,
-	ErrorType extends Error = Error
-> extends Entity<NotifyPayload<Params, Result, ErrorType>> {
+class Effect<Params = void, Result = void, ErrorType = any> extends Entity<
+	NotifyPayload<Params, Result, ErrorType>
+> {
 	private abortController: AbortController | null = null;
 
 	isPending = new State(false);
@@ -65,8 +63,8 @@ class Effect<
 
 			this.isPending.set(false);
 			this.notify({ state: "fulfilled", params, result });
-		} catch (thrownError) {
-			const error = (thrownError ?? {}) as ErrorType;
+		} catch (e) {
+			const error = (e ?? {}) as any;
 			if (error.name === "AbortError") return;
 
 			this.isPending.set(false);

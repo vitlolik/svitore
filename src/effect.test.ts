@@ -64,7 +64,7 @@ describe("effect", () => {
 
 		it("should set pending state on finished", async () => {
 			const effectFulfilled = new Effect(() => Promise.resolve("hello"));
-			const effectRejected = new Effect(() => Promise.resolve("error"));
+			const effectRejected = new Effect(() => Promise.reject("error"));
 
 			expect(effectFulfilled.isPending.get()).toBe(false);
 			const effectFulfilledPromise = effectFulfilled.run();
