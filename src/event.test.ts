@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 
 import { Event } from "./event";
 import { Entity } from "./shared";
+import { Validator } from "./validator";
 
 describe("event", () => {
 	it("type", () => {
@@ -67,13 +68,82 @@ describe("event", () => {
 			event.subscribe(subscriber);
 
 			event.dispatch();
-			expect(subscriber).toBeCalledTimes(0);
+			expect(subscriber).toHaveBeenCalledTimes(0);
 
 			event.dispatch();
 			event.dispatch();
 			event.dispatch();
-			expect(subscriber).toBeCalledTimes(0);
+			expect(subscriber).toHaveBeenCalledTimes(0);
 			expect(event.calls).toBe(0);
+		});
+	});
+
+	describe("validator", () => {
+		it("should call validator chain", () => {
+			const validatorFunc1 = vi.fn((payload) => payload);
+			const validatorFunc2 = vi.fn((payload) => payload);
+
+			const event = new Event<number>().applyValidators([
+				new Validator(validatorFunc1),
+				new Validator(validatorFunc2),
+			]);
+
+			event.dispatch(10);
+
+			expect(validatorFunc1).toHaveBeenCalledTimes(1);
+			expect(validatorFunc2).toHaveBeenCalledTimes(1);
+			expect(validatorFunc1).toHaveBeenCalledWith(10);
+			expect(validatorFunc2).toHaveBeenCalledWith(10);
+		});
+
+		it("should mutate payload inside chain", () => {
+			const validatorFunc1 = vi.fn((payload) => payload + 1);
+			const validatorFunc2 = vi.fn((payload) => payload);
+
+			const event = new Event<number>().applyValidators([
+				new Validator(validatorFunc1),
+				new Validator(validatorFunc2),
+			]);
+
+			event.dispatch(10);
+
+			expect(validatorFunc1).toHaveBeenCalledWith(10);
+			expect(validatorFunc2).toHaveBeenCalledWith(11);
+		});
+
+		it("should break the chain if there is an error", () => {
+			const validatorFunc1 = vi.fn((_payload) => {
+				throw new Error();
+			});
+			const validatorFunc2 = vi.fn((payload) => payload);
+
+			const event = new Event<number>().applyValidators([
+				new Validator(validatorFunc1),
+				new Validator(validatorFunc2),
+			]);
+
+			event.dispatch(10);
+
+			expect(validatorFunc1).toHaveBeenCalledTimes(1);
+			expect(validatorFunc2).toHaveBeenCalledTimes(0);
+		});
+
+		it("should not notify subscribers if there is an error inside chain", () => {
+			const validatorFunc1 = (_payload: number): number => {
+				throw new Error();
+			};
+			const validatorFunc2 = (payload: number): number => payload;
+			const mockSubscriber = vi.fn();
+
+			const event = new Event<number>().applyValidators([
+				new Validator(validatorFunc1),
+				new Validator(validatorFunc2),
+			]);
+			event.subscribe(mockSubscriber);
+
+			event.dispatch(10);
+
+			expect(mockSubscriber).toHaveBeenCalledTimes(0);
 		});
 	});
 });
