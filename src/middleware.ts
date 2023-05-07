@@ -1,12 +1,12 @@
 type ErrorHandler<ErrorType> = (error: ErrorType) => void;
 
-class Validator<Payload = any, ErrorType = any> {
+class Middleware<Payload = any, ErrorType = any> {
 	private handleError?: ErrorHandler<ErrorType>;
-	constructor(private validatorFunction: (args: Payload) => Payload) {}
+	constructor(private middlewareFunction: (args: Payload) => Payload) {}
 
 	call(payload: Payload): { hasError: boolean; payload: Payload } {
 		try {
-			return { hasError: false, payload: this.validatorFunction(payload) };
+			return { hasError: false, payload: this.middlewareFunction(payload) };
 		} catch (error) {
 			this.handleError?.(error as ErrorType);
 			return { hasError: true, payload };
@@ -20,4 +20,4 @@ class Validator<Payload = any, ErrorType = any> {
 	}
 }
 
-export { Validator };
+export { Middleware };

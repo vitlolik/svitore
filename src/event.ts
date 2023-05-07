@@ -1,5 +1,5 @@
 import { Entity } from "./shared";
-import { Validator } from "./validator";
+import { Middleware } from "./middleware";
 
 type EventOptions<Payload = void> = {
 	[x: string]: any;
@@ -7,7 +7,7 @@ type EventOptions<Payload = void> = {
 };
 
 class Event<Payload = void> extends Entity<Payload> {
-	private validatorChain: Validator<Payload>[] = [];
+	private middlewareChain: Middleware<Payload>[] = [];
 	calls = 0;
 
 	constructor(public options: EventOptions<Payload> = {}) {
@@ -21,12 +21,12 @@ class Event<Payload = void> extends Entity<Payload> {
 		let result: Payload = payload;
 		let hasError = false;
 
-		for (const validator of this.validatorChain) {
-			const validatorResult = validator.call(result);
-			hasError = validatorResult.hasError;
+		for (const middleware of this.middlewareChain) {
+			const middlewareResult = middleware.call(result);
+			hasError = middlewareResult.hasError;
 			if (hasError) break;
 
-			result = validatorResult.payload;
+			result = middlewareResult.payload;
 		}
 
 		return { hasError, payload: result };
@@ -46,8 +46,8 @@ class Event<Payload = void> extends Entity<Payload> {
 		this.notify(validatorsResult.payload);
 	}
 
-	applyValidators(validatorChain: Validator<Payload>[]): this {
-		this.validatorChain = validatorChain;
+	setMiddlewareChain(middlewareChain: Middleware<Payload>[]): this {
+		this.middlewareChain = middlewareChain;
 		return this;
 	}
 }

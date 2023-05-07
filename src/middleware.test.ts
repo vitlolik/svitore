@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
 
-import { Validator } from "./validator";
+import { Middleware } from "./middleware";
 
 describe("validator", () => {
 	it("call - should call function with payload", () => {
 		const mockFn = vi.fn<[number]>((value) => value);
-		const middleware = new Validator(mockFn);
+		const middleware = new Middleware(mockFn);
 		middleware.call(10);
 
 		expect(mockFn).toHaveBeenCalledTimes(1);
@@ -13,14 +13,14 @@ describe("validator", () => {
 	});
 
 	it("call - should return specific object", () => {
-		const middleware = new Validator<number>((value) => value);
+		const middleware = new Middleware<number>((value) => value);
 		const result = middleware.call(10);
 
 		expect(result).toEqual({ hasError: false, payload: 10 });
 	});
 
 	it("call - should return correct hasError", () => {
-		const middleware = new Validator<string>((value) => {
+		const middleware = new Middleware<string>((value) => {
 			throw new Error(value);
 		});
 		const result = middleware.call("test");
@@ -30,7 +30,7 @@ describe("validator", () => {
 
 	it("should call the onError handler if an error occurs", () => {
 		const mockErrorHandler = vi.fn();
-		const middleware = new Validator<string>((value) => {
+		const middleware = new Middleware<string>((value) => {
 			throw new Error(`Test error: ${value}`);
 		});
 		middleware.onError(mockErrorHandler);
