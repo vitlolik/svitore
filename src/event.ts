@@ -1,4 +1,4 @@
-import { Entity } from "./shared";
+import { Entity, logError } from "./shared";
 import { Middleware } from "./middleware";
 
 type EventOptions<Payload = void> = {
@@ -14,22 +14,14 @@ class Event<Payload = void> extends Entity<Payload> {
 		super();
 	}
 
-	private callValidators(payload: Payload): {
-		hasError: boolean;
-		payload: Payload;
-	} {
+	private callMiddlewares(payload: Payload): Payload {
 		let result: Payload = payload;
-		let hasError = false;
 
 		for (const middleware of this.middlewareChain) {
-			const middlewareResult = middleware.call(result);
-			hasError = middlewareResult.hasError;
-			if (hasError) break;
-
-			result = middlewareResult.payload;
+			result = middleware.call(result);
 		}
 
-		return { hasError, payload: result };
+		return result;
 	}
 
 	private shouldDispatch(): boolean {
@@ -39,11 +31,13 @@ class Event<Payload = void> extends Entity<Payload> {
 	dispatch(payload: Payload): void {
 		if (!this.shouldDispatch()) return;
 
-		const validatorsResult = this.callValidators(payload);
-		if (validatorsResult.hasError) return;
-
-		this.calls++;
-		this.notify(validatorsResult.payload);
+		try {
+			const newPayload = this.callMiddlewares(payload);
+			this.calls++;
+			this.notify(newPayload);
+		} catch (error) {
+			logError(error);
+		}
 	}
 
 	setMiddlewareChain(middlewareChain: Middleware<Payload>[]): this {

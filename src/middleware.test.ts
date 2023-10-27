@@ -16,25 +16,32 @@ describe("validator", () => {
 		const middleware = new Middleware<number>((value) => value);
 		const result = middleware.call(10);
 
-		expect(result).toEqual({ hasError: false, payload: 10 });
+		expect(result).toEqual(10);
 	});
 
 	it("call - should return correct hasError", () => {
 		const middleware = new Middleware<string>((value) => {
 			throw new Error(value);
 		});
-		const result = middleware.call("test");
-
-		expect(result).toEqual({ hasError: true, payload: "test" });
+		try {
+			middleware.call("test");
+		} catch (error: any) {
+			expect(error).toBeInstanceOf(Error);
+			expect(error.message).toBe("test");
+		}
 	});
 
-	it("should call the onError handler if an error occurs", () => {
+	it("should catch error if an error occurs", () => {
 		const mockErrorHandler = vi.fn();
 		const middleware = new Middleware<string>((value) => {
 			throw new Error(`Test error: ${value}`);
 		});
-		middleware.onError(mockErrorHandler);
-		middleware.call("test");
+		middleware.catch(mockErrorHandler);
+		try {
+			middleware.call("test");
+		} catch {
+			// no catch
+		}
 
 		expect(mockErrorHandler).toHaveBeenCalledTimes(1);
 		expect(mockErrorHandler).toHaveBeenCalledWith(
