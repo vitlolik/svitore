@@ -8,7 +8,7 @@ export default defineConfig({
 			entry: "./src/index.ts",
 			fileName: "index",
 			name: "svitore",
-			formats: ["es", "cjs", "umd"],
+			formats: ["es"],
 		},
 	},
 });
