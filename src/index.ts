@@ -2,7 +2,6 @@ export { State } from "./state";
 export { ComputeState } from "./compute-state";
 export { PersistState } from "./persist-state";
 export { Event } from "./event";
-export { Middleware } from "./middleware";
 export { DebouncedEvent } from "./debounced-event";
 export { ThrottledEvent } from "./throttled-event";
 export { Effect } from "./effect";
