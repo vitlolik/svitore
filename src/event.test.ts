@@ -78,8 +78,8 @@ describe("event", () => {
 		});
 	});
 
-	describe("validator", () => {
-		it("should call validator chain", () => {
+	describe("middlewares", () => {
+		it("should call middleware chain", () => {
 			const middlewareFunc1 = vi.fn((payload) => payload);
 			const middlewareFunc2 = vi.fn((payload) => payload);
 

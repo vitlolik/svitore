@@ -14,7 +14,7 @@ class Event<Payload = void> extends Entity<Payload> {
 		super();
 	}
 
-	private callValidators(payload: Payload): {
+	private callMiddlewares(payload: Payload): {
 		hasError: boolean;
 		payload: Payload;
 	} {
@@ -39,11 +39,11 @@ class Event<Payload = void> extends Entity<Payload> {
 	dispatch(payload: Payload): void {
 		if (!this.shouldDispatch()) return;
 
-		const validatorsResult = this.callValidators(payload);
-		if (validatorsResult.hasError) return;
+		const result = this.callMiddlewares(payload);
+		if (result.hasError) return;
 
 		this.calls++;
-		this.notify(validatorsResult.payload);
+		this.notify(result.payload);
 	}
 
 	setMiddlewareChain(middlewareChain: Middleware<Payload>[]): this {

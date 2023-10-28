@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 
 import { Middleware } from "./middleware";
 
-describe("validator", () => {
+describe("middleware", () => {
 	it("call - should call function with payload", () => {
 		const mockFn = vi.fn<[number]>((value) => value);
 		const middleware = new Middleware(mockFn);
