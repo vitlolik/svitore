@@ -1,4 +1,4 @@
-import { Event, State, StateManager } from "../dist";
+import { Event, Middleware, State, StateManager } from "../dist";
 
 type Store = {
 	changeFirstName: Event<string>;
@@ -16,14 +16,18 @@ type Store = {
 const createStore = (): Store => {
 	const demoFormModule = StateManager.initModule("demo form");
 
+	const logMiddleware: Middleware<any> = (context, next) => {
+		console.log(context);
+		next();
+	};
+
 	const changeFirstName = demoFormModule
 		.initEvent<string>()
-		.applyMiddleware((context, next) => {
-			context.value = context.value.toUpperCase();
-			next();
-		});
+		.applyMiddleware(logMiddleware);
 
-	const changeSecondName = demoFormModule.initEvent<string>();
+	const changeSecondName = demoFormModule
+		.initEvent<string>()
+		.applyMiddleware(logMiddleware);
 	const changeAge = demoFormModule.initEvent<number>();
 	const submitted = demoFormModule.initEvent();
 	const resetEvent = demoFormModule.initEvent();
@@ -122,8 +126,6 @@ const createStore = (): Store => {
 	resetEvent.subscribe(() => {
 		demoFormModule.resetState();
 	});
-
-	console.log({ StateManager });
 
 	return {
 		changeFirstName,
