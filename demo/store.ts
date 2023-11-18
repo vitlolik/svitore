@@ -1,4 +1,4 @@
-import { Event, Middleware, State, StateManager } from "../dist";
+import { Event, Middleware, State, StateManager } from "../src";
 
 type Store = {
 	changeFirstName: Event<string>;

@@ -1,45 +1,47 @@
 import { PACKAGE_LABEL } from "../constants";
-import { createBatchFunction, SvitoreError } from "../utils";
+import { createBatchFunction, logError } from "../utils";
 import { State } from "./state";
 
-const STORAGE_KEY_PREFIX = `${PACKAGE_LABEL}-` as const;
-const NESTED_KEY = "_" as const;
+const PERSIST_STORAGE_KEY = `${PACKAGE_LABEL}-persist-data` as const;
 
 class PersistState<Data> extends State<Data> {
 	constructor(
 		state: Data,
-		private readonly storageKey: string,
+		storageKey: string,
 		private readonly storage: Storage = localStorage
 	) {
 		super(state);
-		this.storageKey = `${STORAGE_KEY_PREFIX}${storageKey}`;
+
+		const getPersistData = (): Record<string, Data> => {
+			try {
+				return JSON.parse(storage.getItem(PERSIST_STORAGE_KEY)!) ?? {};
+			} catch (error) {
+				logError("Invalid storage value");
+				return {};
+			}
+		};
 
 		const writeToStorage = createBatchFunction((newState: Data) => {
 			storage.setItem(
-				this.storageKey,
-				JSON.stringify({ [NESTED_KEY]: newState })
+				PERSIST_STORAGE_KEY,
+				JSON.stringify({ ...getPersistData(), [storageKey]: newState })
 			);
 		});
 
-		const valueFromStorage = storage.getItem(this.storageKey);
+		const stateFromStorage = getPersistData()[storageKey];
 
-		if (valueFromStorage === null) {
+		if (stateFromStorage === undefined) {
 			this.subscribe(writeToStorage);
 			return this;
 		}
 
-		try {
-			const value = JSON.parse(valueFromStorage)[NESTED_KEY];
-			this.set(value);
-			this.subscribe(writeToStorage);
-		} catch (error) {
-			throw new SvitoreError("Invalid storage value");
-		}
+		this.set(stateFromStorage);
+		this.subscribe(writeToStorage);
 	}
 
 	clearStorage(): void {
-		this.storage.removeItem(this.storageKey);
+		this.storage.removeItem(PERSIST_STORAGE_KEY);
 	}
 }
 
-export { PersistState };
+export { PersistState, PERSIST_STORAGE_KEY };

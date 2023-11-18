@@ -1,6 +1,6 @@
 import { vi, it, expect, describe } from "vitest";
 
-import { PersistState } from "./persist-state";
+import { PERSIST_STORAGE_KEY, PersistState } from "./persist-state";
 import { State } from "./state";
 import { SvitoreError } from "../utils";
 
@@ -34,22 +34,26 @@ describe("persist state", () => {
 		expect(persistState.get()).toBe("test state");
 	});
 
-	it("should set state from storage if storage has value", () => {
+	it("should set state from storage if storage has value", async () => {
 		const storage = new MockStorage();
+
 		storage.getItem = vi.fn((_key: string) =>
-			JSON.stringify({ _: "value in storage" })
+			JSON.stringify({ "test-key": "value in storage" })
 		);
 		const persistState = new PersistState("test state", "test-key", storage);
 
+		// because storage updated as microtask
+		// await Promise.resolve();
+
 		expect(storage.getItem).toHaveBeenCalledTimes(1);
-		expect(storage.getItem).toHaveBeenCalledWith("[svitore]-test-key");
+		expect(storage.getItem).toHaveBeenCalledWith(PERSIST_STORAGE_KEY);
 		expect(persistState.get()).toBe("value in storage");
 	});
 
 	it("should subscribe to state and update storage", async () => {
 		const storage = new MockStorage();
 		storage.getItem = vi.fn((_key: string) =>
-			JSON.stringify({ _: "value in storage" })
+			JSON.stringify({ "test-key": "value in storage" })
 		);
 		const persistState = new PersistState("test state", "test-key", storage);
 
@@ -60,8 +64,8 @@ describe("persist state", () => {
 
 		expect(storage.setItem).toHaveBeenCalledTimes(1);
 		expect(storage.setItem).toHaveBeenCalledWith(
-			"[svitore]-test-key",
-			JSON.stringify({ _: "new test value" })
+			PERSIST_STORAGE_KEY,
+			JSON.stringify({ "test-key": "new test value" })
 		);
 	});
 
@@ -72,7 +76,7 @@ describe("persist state", () => {
 		persistState.clearStorage();
 
 		expect(storage.removeItem).toHaveBeenCalledTimes(1);
-		expect(storage.removeItem).toHaveBeenCalledWith("[svitore]-test-key");
+		expect(storage.removeItem).toHaveBeenCalledWith(PERSIST_STORAGE_KEY);
 	});
 
 	it("should throw error if value invalid in storage", () => {
