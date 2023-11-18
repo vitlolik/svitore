@@ -1,4 +1,4 @@
-import { logError } from "./error";
+import { logError } from "../../utils";
 
 type Observer<T = void> = (data: T, instance: Observable<T>) => void;
 
@@ -28,4 +28,5 @@ abstract class Observable<T = void> {
 	}
 }
 
-export { Observable, Observer };
+export { Observable };
+export type { Observer };

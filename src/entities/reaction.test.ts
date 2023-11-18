@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 
-import { Entity } from "./shared";
+import { Entity } from "./services";
 import { Reaction } from "./reaction";
 import { State } from "./state";
 

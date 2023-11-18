@@ -1,10 +1,10 @@
-import { Event, EventOptions } from "./event";
+import { AbstractEvent } from "./abstract-event";
 
-abstract class DelayedEvent<Payload = void> extends Event<Payload> {
+abstract class DelayedEvent<Payload = void> extends AbstractEvent<Payload> {
 	protected timeoutId: NodeJS.Timeout | number;
 
-	constructor(protected timeout: number, options?: EventOptions<Payload>) {
-		super(options);
+	constructor(protected readonly timeout: number) {
+		super();
 	}
 
 	protected clearTimer(): void {

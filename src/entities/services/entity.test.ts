@@ -9,7 +9,7 @@ describe("entity", () => {
 
 	it("type", () => {
 		const entity = new TestEntity();
-		Entity.createdEntities = [];
+		Entity.ENTITIES = [];
 
 		expect(entity).instanceOf(Observable);
 	});
@@ -19,8 +19,8 @@ describe("entity", () => {
 		const entity2 = new TestEntity();
 		const entity3 = new TestEntity();
 
-		expect(Entity.createdEntities).toHaveLength(3);
-		expect(Entity.createdEntities).toEqual([entity1, entity2, entity3]);
+		expect(Entity.ENTITIES).toHaveLength(3);
+		expect(Entity.ENTITIES).toEqual([entity1, entity2, entity3]);
 	});
 
 	it("subscribe - should call observe from parent class", () => {

@@ -1,12 +1,4 @@
-import {
-	Effect,
-	Event,
-	PersistState,
-	State,
-	ComputeState,
-	DebouncedEvent,
-	ThrottledEvent,
-} from "../src";
+import { Event, State, StateManager } from "../src";
 
 type Store = {
 	changeFirstName: Event<string>;
@@ -22,13 +14,21 @@ type Store = {
 };
 
 const createStore = (): Store => {
-	const changeFirstName = new Event<string>();
-	const changeSecondName = new Event<string>();
-	const changeAge = new Event<number>();
-	const submitted = new Event();
-	const resetEvent = new Event();
-	const debouncedSubmitEvent = new DebouncedEvent(500);
-	const throttledSubmitEvent = new ThrottledEvent(500);
+	const demoFormModule = StateManager.initModule("demo form");
+
+	const changeFirstName = demoFormModule
+		.initEvent<string>()
+		.applyMiddleware((context, next) => {
+			context.value = context.value.toUpperCase();
+			next();
+		});
+
+	const changeSecondName = demoFormModule.initEvent<string>();
+	const changeAge = demoFormModule.initEvent<number>();
+	const submitted = demoFormModule.initEvent();
+	const resetEvent = demoFormModule.initEvent();
+	const debouncedSubmitEvent = demoFormModule.initDebouncedEvent(500);
+	const throttledSubmitEvent = demoFormModule.initThrottledEvent(500);
 
 	debouncedSubmitEvent.subscribe(() => {
 		console.log("debouncedSubmitEvent called");
@@ -37,7 +37,7 @@ const createStore = (): Store => {
 		console.log("throttledSubmitEvent called");
 	});
 
-	const submitEffect = new Effect(
+	const submitEffect = demoFormModule.initEffect(
 		(
 			data: {
 				firstName: State<string>;
@@ -82,23 +82,27 @@ const createStore = (): Store => {
 		console.log(`subscribe | ${data.state}`, data);
 	});
 
-	const firstNameState = new PersistState(
+	const firstNameState = demoFormModule.initPersistState(
 		"",
 		"firstName",
 		window.sessionStorage
 	);
-	const secondNameState = new PersistState(
+	const secondNameState = demoFormModule.initPersistState(
 		"",
 		"lastName",
 		window.sessionStorage
 	);
-	const ageState = new PersistState(1, "age", window.sessionStorage);
+	const ageState = demoFormModule.initPersistState(
+		1,
+		"age",
+		window.sessionStorage
+	);
 
 	changeFirstName.subscribe((value) => firstNameState.set(value));
 	changeSecondName.subscribe((value) => secondNameState.set(value));
 	changeAge.subscribe((value) => ageState.set(value));
 
-	const symbolsCountState = new ComputeState(
+	const symbolsCountState = demoFormModule.initComputedState(
 		firstNameState,
 		secondNameState,
 		(firstName, secondName) =>
@@ -113,17 +117,13 @@ const createStore = (): Store => {
 		});
 		debouncedSubmitEvent.dispatch();
 		throttledSubmitEvent.dispatch();
-
-		// setTimeout(() => {
-		// 	submitEffect.release();
-		// }, 1000);
 	});
 
 	resetEvent.subscribe(() => {
-		firstNameState.reset();
-		secondNameState.reset();
-		ageState.reset();
+		demoFormModule.resetState();
 	});
+
+	console.log({ StateManager });
 
 	return {
 		changeFirstName,

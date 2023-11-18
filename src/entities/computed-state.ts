@@ -1,16 +1,15 @@
-import { SelectorCallback, SvitoreError } from "./shared";
+import { SelectorCallback } from "../types";
+import { SvitoreError } from "../utils";
 import { State } from "./state";
 
-const throwComputeStateError = (): never => {
-	throw new SvitoreError("ComputeState is read-only, you must not change it");
+const throwComputedStateError = (): never => {
+	throw new SvitoreError("ComputedState is read-only, you must not change it");
 };
 
-class ComputeState<
+class ComputedState<
 	StateList extends ReadonlyArray<State<any>>,
 	Data
 > extends State<Data> {
-	private stateList: StateList;
-	private selector: SelectorCallback<StateList, Data>;
 	private unsubscribeList: (() => void)[] = [];
 
 	constructor(...args: [...StateList, SelectorCallback<StateList, Data>]) {
@@ -21,8 +20,6 @@ class ComputeState<
 			selector(...(stateList.map((state) => state.get()) as any));
 
 		super(getStateData());
-		this.selector = selector;
-		this.stateList = stateList;
 
 		stateList.forEach((state) => {
 			this.unsubscribeList.push(
@@ -31,17 +28,12 @@ class ComputeState<
 		});
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	set(newState: Data): void {
-		throwComputeStateError();
+	set(_newState: Data): never {
+		return throwComputedStateError();
 	}
 
-	reset(): void {
-		throwComputeStateError();
-	}
-
-	clone(stateList = this.stateList): ComputeState<StateList, Data> {
-		return new ComputeState(...[...stateList, this.selector]);
+	reset(): never {
+		return throwComputedStateError();
 	}
 
 	release(): void {
@@ -50,4 +42,4 @@ class ComputeState<
 	}
 }
 
-export { ComputeState };
+export { ComputedState };

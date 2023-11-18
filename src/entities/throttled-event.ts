@@ -1,8 +1,12 @@
-import { DelayedEvent } from "./delayed-event";
+import { DelayedEvent } from "./services";
 
 class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 	private isThrottled = false;
 	private savedParams: Payload | null = null;
+
+	constructor(timeout: number) {
+		super(timeout);
+	}
 
 	dispatch(payload: Payload): void {
 		if (this.isThrottled) {

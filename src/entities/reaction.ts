@@ -1,5 +1,7 @@
-import { Entity, SelectorCallback, createBatchFunction } from "./shared";
+import { Entity } from "./services";
 import { State } from "./state";
+import { SelectorCallback } from "../types";
+import { createBatchFunction } from "../utils";
 
 class Reaction<StateList extends ReadonlyArray<State<any>>> extends Entity {
 	private unsubscribeList: (() => void)[] = [];

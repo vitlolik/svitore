@@ -1,4 +1,4 @@
-import { Entity } from "./shared";
+import { Entity } from "./services";
 
 class State<Data> extends Entity<Data> {
 	protected defaultState: Data;
@@ -8,10 +8,6 @@ class State<Data> extends Entity<Data> {
 		super();
 		this.defaultState = state;
 		this.prevState = state;
-	}
-
-	clone(): State<Data> {
-		return new State(this.defaultState);
 	}
 
 	set(newState: Data): void {

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 
-import { Entity } from "./shared";
+import { Entity } from "./services";
 import { State } from "./state";
 
 describe("state", () => {
@@ -15,15 +15,6 @@ describe("state", () => {
 
 		expect(state.getPrev()).toBe("test");
 		expect(state.get()).toBe("test");
-	});
-
-	it("clone - create new state object with same data", () => {
-		const state = new State({ name: "vit", age: 20 });
-		const clonedState = state.clone();
-		expect(clonedState.get()).toEqual({ name: "vit", age: 20 });
-
-		clonedState.set({ name: "alex", age: 21 });
-		expect(state.get()).toEqual({ name: "vit", age: 20 });
 	});
 
 	describe("set - set new state", () => {

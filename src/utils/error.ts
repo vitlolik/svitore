@@ -1,4 +1,4 @@
-import { PACKAGE_LABEL } from "./constants";
+import { PACKAGE_LABEL } from "../constants";
 
 class SvitoreError extends Error {
 	constructor(message: string) {

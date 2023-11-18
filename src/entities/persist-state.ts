@@ -1,5 +1,6 @@
+import { PACKAGE_LABEL } from "../constants";
+import { createBatchFunction, SvitoreError } from "../utils";
 import { State } from "./state";
-import { createBatchFunction, PACKAGE_LABEL, SvitoreError } from "./shared";
 
 const STORAGE_KEY_PREFIX = `${PACKAGE_LABEL}-` as const;
 const NESTED_KEY = "_" as const;
@@ -34,13 +35,6 @@ class PersistState<Data> extends State<Data> {
 		} catch (error) {
 			throw new SvitoreError("Invalid storage value");
 		}
-	}
-
-	clone(
-		storageKey = this.storageKey.replace(STORAGE_KEY_PREFIX, ""),
-		storage = this.storage
-	): PersistState<Data> {
-		return new PersistState(this.defaultState, storageKey, storage);
 	}
 
 	clearStorage(): void {

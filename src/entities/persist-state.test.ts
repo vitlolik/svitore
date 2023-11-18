@@ -2,7 +2,7 @@ import { vi, it, expect, describe } from "vitest";
 
 import { PersistState } from "./persist-state";
 import { State } from "./state";
-import { SvitoreError } from "./shared";
+import { SvitoreError } from "../utils";
 
 class MockStorage implements Storage {
 	length: number;
@@ -63,63 +63,6 @@ describe("persist state", () => {
 			"[svitore]-test-key",
 			JSON.stringify({ _: "new test value" })
 		);
-	});
-
-	describe("clone - should clone state with default data", () => {
-		it("should clone state with default data", () => {
-			const persistState = new PersistState(
-				"test state",
-				"test-key",
-				new MockStorage()
-			);
-			const cloned = persistState.clone();
-
-			expect(cloned.get()).toBe("test state");
-		});
-
-		it("should change storage key", async () => {
-			const storage = new MockStorage();
-			storage.getItem = vi.fn((_key: string) =>
-				JSON.stringify({ _: "value in storage" })
-			);
-			const persistState = new PersistState("test state", "test-key", storage);
-			const cloned = persistState.clone("new-test-key");
-
-			cloned.set("new test value for new key");
-
-			// because storage updated as microtask
-			await Promise.resolve();
-
-			expect(storage.setItem).toHaveBeenCalledTimes(1);
-			expect(storage.setItem).toHaveBeenCalledWith(
-				"[svitore]-new-test-key",
-				JSON.stringify({ _: "new test value for new key" })
-			);
-		});
-
-		it("should change storage object", async () => {
-			const persistState = new PersistState(
-				"test state",
-				"test-key",
-				new MockStorage()
-			);
-			const newStorage = new MockStorage();
-			newStorage.getItem = vi.fn((_key: string) =>
-				JSON.stringify({ _: "value in new storage" })
-			);
-			const cloned = persistState.clone(undefined, newStorage);
-
-			cloned.set("new test value for new storage");
-
-			// because storage updated as microtask
-			await Promise.resolve();
-
-			expect(newStorage.setItem).toHaveBeenCalledTimes(1);
-			expect(newStorage.setItem).toHaveBeenCalledWith(
-				"[svitore]-test-key",
-				JSON.stringify({ _: "new test value for new storage" })
-			);
-		});
 	});
 
 	it("clearStorage - should remove item from storage", () => {

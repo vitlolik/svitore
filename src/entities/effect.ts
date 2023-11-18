@@ -1,4 +1,4 @@
-import { Entity } from "./shared";
+import { Entity } from "./services";
 import { State } from "./state";
 
 type EffectOptions = {
@@ -10,16 +10,16 @@ type EffectFunction<Params, Result> = (
 	abortController: AbortController
 ) => Promise<Result>;
 
-type NotifyPayload<Params, Result, ErrorType> =
+type NotifyPayload<Params, Result, Error> =
 	| {
 			state: "fulfilled";
 			params: Params;
 			result: Result;
 	  }
-	| { state: "rejected"; params: Params; error: ErrorType };
+	| { state: "rejected"; params: Params; error: Error };
 
-class Effect<Params = void, Result = void, ErrorType = any> extends Entity<
-	NotifyPayload<Params, Result, ErrorType>
+class Effect<Params = void, Result = void, Error = any> extends Entity<
+	NotifyPayload<Params, Result, Error>
 > {
 	private abortController: AbortController | null = null;
 
@@ -30,10 +30,6 @@ class Effect<Params = void, Result = void, ErrorType = any> extends Entity<
 		private options: EffectOptions = {}
 	) {
 		super();
-	}
-
-	clone(options = this.options): Effect<Params, Result, ErrorType> {
-		return new Effect(this.effectFunction, options);
 	}
 
 	implement(effectFunction: EffectFunction<Params, Result>): void {

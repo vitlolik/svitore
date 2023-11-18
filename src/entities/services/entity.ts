@@ -1,12 +1,14 @@
 import { Observable, Observer } from "./observable";
+import { generateId } from "../../utils";
 
 abstract class Entity<T = void> extends Observable<T> {
-	static createdEntities: Entity<any>[] = [];
+	id: number;
+	static ENTITIES: Entity<any>[] = [];
 
 	constructor() {
 		super();
-
-		Entity.createdEntities.push(this);
+		this.id = generateId.next().value;
+		Entity.ENTITIES.push(this);
 	}
 
 	subscribe(subscriber: Observer<T>): () => void {

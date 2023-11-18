@@ -1,15 +1,15 @@
 import { describe, it, expect } from "vitest";
 
-import { ComputeState } from "./compute-state";
+import { ComputedState } from "./computed-state";
 import { State } from "./state";
-import { SvitoreError } from "./shared";
+import { SvitoreError } from "../utils";
 
 describe("computeState", () => {
 	it("type", () => {
 		const state1 = new State(5);
 		const state2 = new State(5);
 
-		const mergedState = new ComputeState(
+		const mergedState = new ComputedState(
 			state1,
 			state2,
 			(value1, value2) => value1 + value2
@@ -21,7 +21,7 @@ describe("computeState", () => {
 	it("initial state", () => {
 		const state1 = new State("hello");
 		const state2 = new State("!");
-		const mergedState = new ComputeState(
+		const mergedState = new ComputedState(
 			state1,
 			state2,
 			(value1, value2) => value1 + " world" + value2
@@ -33,7 +33,7 @@ describe("computeState", () => {
 	it("subscribe to state list", () => {
 		const state1 = new State("hello");
 		const state2 = new State("world");
-		const computed = new ComputeState(
+		const computed = new ComputedState(
 			state1,
 			state2,
 			(state1, state2) => `${state1} ${state2}`
@@ -49,7 +49,7 @@ describe("computeState", () => {
 
 	it("should be readonly, can not change the state", () => {
 		const state = new State("world");
-		const computed = new ComputeState(state, (state) => state.toUpperCase());
+		const computed = new ComputedState(state, (state) => state.toUpperCase());
 
 		try {
 			computed.set("");
@@ -63,26 +63,11 @@ describe("computeState", () => {
 		}
 	});
 
-	it("clone - should clone state with others state list", () => {
-		const state1 = new State("hello");
-		const state2 = new State("world");
-		const computed = new ComputeState(state1, state2, (value1, value2) =>
-			`${value1} ${value2}`.toUpperCase()
-		);
-
-		const newState1 = new State("foo");
-		const newState2 = new State("bar");
-
-		const cloned = computed.clone([newState1, newState2]);
-
-		expect(cloned.get()).toBe("FOO BAR");
-	});
-
 	it("release - should unsubscribe from the state list", () => {
 		const state1 = new State("hello");
 		const state2 = new State("world");
 
-		const computed = new ComputeState(state1, state2, (value1, value2) =>
+		const computed = new ComputedState(state1, state2, (value1, value2) =>
 			`${value1} ${value2}`.toUpperCase()
 		);
 

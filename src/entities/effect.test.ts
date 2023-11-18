@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 
 import { Effect } from "./effect";
-import { Entity } from "./shared";
+import { Entity } from "./services";
 
 describe("effect", () => {
 	it("type", () => {
@@ -109,12 +109,6 @@ describe("effect", () => {
 				effectRejected
 			);
 		});
-	});
-
-	it("clone - should clone an effect with existing effect function", () => {
-		const effect = new Effect(() => Promise.resolve());
-
-		expect(effect.clone({ isAutoAbort: true })).instanceOf(Entity);
 	});
 
 	it("abort - should abort effect and set change pending state", () => {
