@@ -1,6 +1,6 @@
 import { SvitoreModule } from "./svitore-module";
 import { Entity } from "./entities/services";
-import { isEffect } from "./type-guards";
+import { Effect } from "./entities";
 
 class Svitore {
 	static modules: SvitoreModule[] = [];
@@ -10,7 +10,7 @@ class Svitore {
 
 		const waitIfNeeded = async (): Promise<void> => {
 			const pendingEffects = Entity.ENTITIES.filter(
-				(entity) => isEffect(entity) && entity.isPending.get()
+				(entity) => entity instanceof Effect && entity.isPending.get()
 			);
 
 			if (!pendingEffects.length) {
@@ -42,7 +42,7 @@ class Svitore {
 
 	static resetState(): void {
 		this.modules.forEach((module) => {
-			module.resetState();
+			module.resetState.dispatch();
 		});
 	}
 

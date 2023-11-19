@@ -1,59 +1,44 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
-import { Entity } from "./services";
 import { State } from "./state";
+import { Event } from "./event";
 
 describe("state", () => {
-	it("type", () => {
-		const state = new State(0);
+	it("reset - reset state to default value", () => {
+		const event = new Event<string>();
+		const resetEvent = new Event();
+		const state = new State("test").changeOn(event).resetOn(resetEvent);
 
-		expect(state).instanceOf(Entity);
-	});
+		event.dispatch("new state");
+		event.dispatch("one more new state");
+		resetEvent.dispatch();
 
-	it("initial state", () => {
-		const state = new State("test");
-
-		expect(state.getPrev()).toBe("test");
 		expect(state.get()).toBe("test");
 	});
 
-	describe("set - set new state", () => {
-		it("should do nothing if state is equal", () => {
-			const subscriber = vi.fn();
-			const state = new State("test");
-			state.subscribe(subscriber);
+	describe("on", () => {
+		it("should subscribe on event", () => {
+			const event = new Event<string>();
+			const state = new State("test").changeOn(event);
 
-			state.set("test");
+			event.dispatch("new state");
 
-			expect(subscriber).not.toHaveBeenCalled();
-		});
-
-		it("should update current and prev state", () => {
-			const state = new State("test");
-
-			state.set("new value");
-
-			expect(state.get()).toBe("new value");
+			expect(state.get()).toBe("new state");
 			expect(state.getPrev()).toBe("test");
 		});
 
-		it("should notify subscribers with new state and state instance", () => {
-			const subscriber = vi.fn();
-			const state = new State("test");
-			state.subscribe(subscriber);
+		it("should unsubscribe from event, if release has been called", () => {
+			const event1 = new Event<string>();
+			const event2 = new Event<string>();
+			const state = new State("test").changeOn(event1).changeOn(event2);
 
-			state.set("new value");
+			state.release();
 
-			expect(subscriber).toHaveBeenCalledWith("new value", state);
+			event1.dispatch("new test");
+			expect(state.get()).toBe("test");
+
+			event2.dispatch("new new test");
+			expect(state.get()).toBe("test");
 		});
-	});
-
-	it("reset - reset state to default value", () => {
-		const state = new State("test");
-		state.set("new state");
-		state.set("one more new state");
-		state.reset();
-
-		expect(state.get()).toBe("test");
 	});
 });

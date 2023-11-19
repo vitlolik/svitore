@@ -1,4 +1,4 @@
-import { Event, Middleware, State, Svitore } from "../src";
+import { ComputedState, Event, Middleware, State, Svitore } from "../src";
 
 type Store = {
 	changeFirstName: Event<string>;
@@ -7,7 +7,7 @@ type Store = {
 	submitted: Event<void>;
 	resetEvent: Event<void>;
 
-	symbolsCountState: State<number>;
+	symbolsCountState: ComputedState<[State<string>, State<string>], number>;
 	firstNameState: State<string>;
 	secondNameState: State<string>;
 	ageState: State<number>;
@@ -46,7 +46,7 @@ const createStore = (): Store => {
 			data: {
 				firstName: State<string>;
 				secondName: State<string>;
-				symbolsCount: State<number>;
+				symbolsCount: ComputedState<[State<string>, State<string>], number>;
 			},
 			abortController
 		) =>
@@ -86,25 +86,16 @@ const createStore = (): Store => {
 		console.log(`subscribe | ${data.state}`, data);
 	});
 
-	const firstNameState = demoFormModule.initPersistState(
-		"",
-		"firstName",
-		window.sessionStorage
-	);
-	const secondNameState = demoFormModule.initPersistState(
-		"",
-		"lastName",
-		window.sessionStorage
-	);
-	const ageState = demoFormModule.initPersistState(
-		1,
-		"age",
-		window.sessionStorage
-	);
+	const firstNameState = demoFormModule
+		.initPersistState("", "firstName", window.sessionStorage)
+		.changeOn(changeFirstName);
 
-	changeFirstName.subscribe((value) => firstNameState.set(value));
-	changeSecondName.subscribe((value) => secondNameState.set(value));
-	changeAge.subscribe((value) => ageState.set(value));
+	const secondNameState = demoFormModule
+		.initPersistState("", "lastName", window.sessionStorage)
+		.changeOn(changeSecondName);
+	const ageState = demoFormModule
+		.initPersistState(1, "age", window.sessionStorage)
+		.changeOn(changeAge);
 
 	const symbolsCountState = demoFormModule.initComputedState(
 		firstNameState,
@@ -124,7 +115,7 @@ const createStore = (): Store => {
 	});
 
 	resetEvent.subscribe(() => {
-		demoFormModule.resetState();
+		demoFormModule.resetState.dispatch();
 	});
 
 	return {

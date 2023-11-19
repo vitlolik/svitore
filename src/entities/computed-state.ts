@@ -1,15 +1,11 @@
 import { SelectorCallback } from "../types";
-import { SvitoreError } from "../utils";
+import { AbstractState } from "./services";
 import { State } from "./state";
-
-const throwComputedStateError = (): never => {
-	throw new SvitoreError("ComputedState is read-only, you must not change it");
-};
 
 class ComputedState<
 	StateList extends ReadonlyArray<State<any>>,
 	Data
-> extends State<Data> {
+> extends AbstractState<Data> {
 	private unsubscribeList: (() => void)[] = [];
 
 	constructor(...args: [...StateList, SelectorCallback<StateList, Data>]) {
@@ -26,14 +22,6 @@ class ComputedState<
 				state.subscribe(() => super.set(getStateData()))
 			);
 		});
-	}
-
-	set(_newState: Data): never {
-		return throwComputedStateError();
-	}
-
-	reset(): never {
-		return throwComputedStateError();
 	}
 
 	release(): void {

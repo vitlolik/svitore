@@ -70,15 +70,15 @@ describe("Svitore", () => {
 			const testModule1 = Svitore.initModule("test1");
 			const testModule2 = Svitore.initModule("test2");
 			const testModule3 = Svitore.initModule("test3");
-			testModule1.resetState = vi.fn();
-			testModule2.resetState = vi.fn();
-			testModule3.resetState = vi.fn();
+			testModule1.resetState.dispatch = vi.fn();
+			testModule2.resetState.dispatch = vi.fn();
+			testModule3.resetState.dispatch = vi.fn();
 
 			Svitore.resetState();
 
-			expect(testModule1.resetState).toHaveBeenCalledOnce();
-			expect(testModule2.resetState).toHaveBeenCalledOnce();
-			expect(testModule3.resetState).toHaveBeenCalledOnce();
+			expect(testModule1.resetState.dispatch).toHaveBeenCalledOnce();
+			expect(testModule2.resetState.dispatch).toHaveBeenCalledOnce();
+			expect(testModule3.resetState.dispatch).toHaveBeenCalledOnce();
 		});
 	});
 

@@ -1,3 +1,3 @@
-export { SvitoreError, logError } from "./error";
+export { logError } from "./logError";
 export { createBatchFunction } from "./batch";
 export { generateId } from "./generateId";

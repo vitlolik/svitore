@@ -1,34 +1,43 @@
-import { Entity } from "./services";
+import { Event } from "./event";
+import { AbstractState } from "./services";
 
-class State<Data> extends Entity<Data> {
-	protected defaultState: Data;
-	private prevState: Data;
+class State<Data> extends AbstractState<Data> {
+	private eventUnsubscribeMap: Map<Event<any>, () => void> = new Map();
 
 	constructor(protected state: Data) {
-		super();
-		this.defaultState = state;
-		this.prevState = state;
+		super(state);
 	}
 
-	set(newState: Data): void {
-		if (this.state === newState) return;
+	changeOn<Payload extends Data>(event: Event<Payload>): this;
+	changeOn<Payload>(
+		event: Event<Payload>,
+		selector: (payload: Payload, state: Data) => Data
+	): this;
+	changeOn(
+		event: Event<any>,
+		selector?: (payload: any, state: Data) => Data
+	): this {
+		if (this.eventUnsubscribeMap.has(event)) return this;
 
-		this.prevState = this.state;
-		this.state = newState;
+		const unsubscribe = event.subscribe((payload) => {
+			this.set(selector ? selector(payload, this.state) : payload);
+		});
+		this.eventUnsubscribeMap.set(event, unsubscribe);
 
-		this.notify(this.state);
+		return this;
 	}
 
-	reset(): void {
-		this.set(this.defaultState);
+	resetOn(event: Event<any>): this {
+		return this.changeOn(event, () => this.defaultState);
 	}
 
-	get(): Data {
-		return this.state;
-	}
+	release(): void {
+		for (const unsubscribe of this.eventUnsubscribeMap.values()) {
+			unsubscribe();
+		}
 
-	getPrev(): Data {
-		return this.prevState;
+		this.eventUnsubscribeMap.clear();
+		super.release();
 	}
 }
 

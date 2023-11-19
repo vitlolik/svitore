@@ -2,7 +2,7 @@ import { Observable, Observer } from "./observable";
 import { generateId } from "../../utils";
 
 abstract class Entity<T = void> extends Observable<T> {
-	id: number;
+	protected id: number;
 	static ENTITIES: Entity<any>[] = [];
 
 	constructor() {

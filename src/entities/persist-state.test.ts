@@ -2,6 +2,7 @@ import { vi, it, expect, describe, afterEach } from "vitest";
 
 import { PERSIST_STORAGE_KEY, PersistState } from "./persist-state";
 import { State } from "./state";
+import { Event } from "./event";
 
 describe("persist state", () => {
 	const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
@@ -45,9 +46,10 @@ describe("persist state", () => {
 			PERSIST_STORAGE_KEY,
 			JSON.stringify({ "test-key": "value in storage" })
 		);
-		const persistState = new PersistState("test state", "test-key");
+		const event = new Event<string>();
+		new PersistState("test state", "test-key").changeOn(event);
 
-		persistState.set("new test value");
+		event.dispatch("new test value");
 
 		// because storage updated as microtask
 		await Promise.resolve();

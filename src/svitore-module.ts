@@ -9,9 +9,9 @@ import {
 	Reaction,
 } from "./entities";
 import { Entity } from "./entities/services";
-import { isSimpleState } from "./type-guards";
 
 class SvitoreModule<T extends string = any> {
+	resetState = new Event();
 	entities: Entity[] = [];
 
 	constructor(public name: T) {}
@@ -23,7 +23,7 @@ class SvitoreModule<T extends string = any> {
 	}
 
 	initState<T>(...args: ConstructorParameters<typeof State<T>>): State<T> {
-		return this.addEntity(new State(...args));
+		return this.addEntity(new State(...args).resetOn(this.resetState));
 	}
 
 	initComputedState<StateList extends ReadonlyArray<State<any>>, T>(
@@ -35,7 +35,7 @@ class SvitoreModule<T extends string = any> {
 	initPersistState<T>(
 		...args: ConstructorParameters<typeof PersistState<T>>
 	): PersistState<T> {
-		return this.addEntity(new PersistState(...args));
+		return this.addEntity(new PersistState(...args).resetOn(this.resetState));
 	}
 
 	initEvent<T = void>(): Event<T> {
@@ -64,14 +64,6 @@ class SvitoreModule<T extends string = any> {
 		...args: ConstructorParameters<typeof Reaction<T>>
 	): Reaction<T> {
 		return this.addEntity(new Reaction(...args));
-	}
-
-	resetState(): void {
-		this.entities.forEach((entity) => {
-			if (isSimpleState(entity)) {
-				entity.reset();
-			}
-		});
 	}
 
 	release(): void {

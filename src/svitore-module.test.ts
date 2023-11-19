@@ -102,25 +102,20 @@ describe("SvitoreModule", () => {
 	describe("resetState", () => {
 		it("should call reset state on each state entity except computed state", () => {
 			const testModule = new SvitoreModule("test");
-			const simpleState = testModule.initState("simple state");
-			const persistState = testModule.initPersistState(
-				"persist state",
-				"test-key"
-			);
-			const computedState = testModule.initComputedState(
-				simpleState,
-				(value) => value
-			);
+			const changeEvent = testModule.initEvent<string>();
+			const simpleState = testModule
+				.initState("simple state")
+				.changeOn(changeEvent);
+			const persistState = testModule
+				.initPersistState("persist state", "test-key")
+				.changeOn(changeEvent);
 
-			simpleState.reset = vi.fn();
-			persistState.reset = vi.fn();
-			computedState.reset = vi.fn();
+			changeEvent.dispatch("new test value");
 
-			testModule.resetState();
+			testModule.resetState.dispatch();
 
-			expect(simpleState.reset).toHaveBeenCalledOnce();
-			expect(persistState.reset).toHaveBeenCalledOnce();
-			expect(computedState.reset).not.toHaveBeenCalled();
+			expect(simpleState.get()).toBe("simple state");
+			expect(persistState.get()).toBe("persist state");
 		});
 	});
 
