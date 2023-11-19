@@ -17,7 +17,7 @@ class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 		super.dispatch(payload);
 		this.isThrottled = true;
 
-		this.timeoutId = setTimeout(() => {
+		this.timeoutId = globalThis.setTimeout(() => {
 			this.isThrottled = false;
 			if (this.savedParams) {
 				this.dispatch(this.savedParams);

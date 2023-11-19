@@ -1,8 +1,6 @@
-type BaseArgs = any[];
+type Callback<Args extends any[]> = (...args: Args) => void;
 
-type Callback<Args extends BaseArgs> = (...args: Args) => void;
-
-const createBatchFunction = <Args extends BaseArgs>(
+const createBatchFunction = <Args extends any[]>(
 	callback: Callback<Args>
 ): Callback<Args> => {
 	let isPending = false;

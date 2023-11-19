@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 
@@ -14,5 +16,8 @@ export default defineConfig({
 			fileName: "index",
 			formats: ["es"],
 		},
+	},
+	test: {
+		environment: "jsdom",
 	},
 });

@@ -1,14 +1,9 @@
-import { StateManagerModule } from "./state-manager-module";
+import { SvitoreModule } from "./svitore-module";
 import { Entity } from "./entities/services";
-import { isEffect } from "./type-guard";
-import { SvitoreError } from "./utils";
+import { isEffect } from "./type-guards";
 
-class StateManager {
-	constructor() {
-		throw new SvitoreError("StateManager is singleton");
-	}
-
-	private static modules: StateManagerModule[] = [];
+class Svitore {
+	static modules: SvitoreModule[] = [];
 
 	static waitForEffects(): Promise<void> {
 		const unsubscribeList: (() => void)[] = [];
@@ -38,8 +33,8 @@ class StateManager {
 		return waitIfNeeded();
 	}
 
-	static initModule<T extends string>(name: T): StateManagerModule<T> {
-		const newModule = new StateManagerModule(name);
+	static initModule<T extends string>(name: T): SvitoreModule<T> {
+		const newModule = new SvitoreModule(name);
 		this.modules.push(newModule);
 
 		return newModule;
@@ -58,4 +53,4 @@ class StateManager {
 	}
 }
 
-export { StateManager };
+export { Svitore };

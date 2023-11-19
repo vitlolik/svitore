@@ -8,7 +8,7 @@ class PersistState<Data> extends State<Data> {
 	constructor(
 		state: Data,
 		storageKey: string,
-		private readonly storage: Storage = localStorage
+		private readonly storage: Storage = globalThis.localStorage
 	) {
 		super(state);
 
@@ -16,7 +16,7 @@ class PersistState<Data> extends State<Data> {
 			try {
 				return JSON.parse(storage.getItem(PERSIST_STORAGE_KEY)!) ?? {};
 			} catch (error) {
-				logError("Invalid storage value");
+				logError("PersistState", "Invalid storage value", error);
 				return {};
 			}
 		};

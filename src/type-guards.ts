@@ -12,10 +12,14 @@ const isComputedState = <StateList extends ReadonlyArray<State<any>>, T>(
 	return entity instanceof ComputedState;
 };
 
+const isSimpleState = <T>(entity: Entity<any>): entity is State<T> => {
+	return isState(entity) && !isComputedState(entity);
+};
+
 const isEffect = <Params, Result, Error>(
 	entity: Entity<any>
 ): entity is Effect<Params, Result, Error> => {
 	return entity instanceof Effect;
 };
 
-export { isState, isEffect, isComputedState };
+export { isState, isSimpleState, isEffect, isComputedState };

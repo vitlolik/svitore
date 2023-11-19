@@ -1,3 +1,3 @@
-export { StateManager } from "./state-manager";
-export type { EffectFunction, Middleware } from "./entities";
+export { Svitore } from "./svitore";
 export * from "./entities";
+export type { EffectFunction, Middleware } from "./entities";

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { Observable, Observer } from "./observable";
 
 describe("observable", () => {
@@ -15,6 +15,14 @@ describe("observable", () => {
 			return super.notify(params);
 		}
 	}
+
+	const consoleErrorSpy = vi
+		.spyOn(console, "error")
+		.mockImplementation(() => {});
+
+	afterEach(() => {
+		vi.clearAllMocks();
+	});
 
 	it("observe", async () => {
 		const observable = new TestObservable();
@@ -61,6 +69,7 @@ describe("observable", () => {
 		observable.notify("test");
 		expect(observer).toHaveBeenCalledTimes(1);
 		expect(observer).toHaveBeenCalledWith("test", observable);
+		expect(consoleErrorSpy).toHaveBeenCalledOnce();
 	});
 
 	it("release", async () => {

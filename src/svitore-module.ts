@@ -9,10 +9,10 @@ import {
 	Reaction,
 } from "./entities";
 import { Entity } from "./entities/services";
-import { isComputedState, isState } from "./type-guard";
+import { isSimpleState } from "./type-guards";
 
-class StateManagerModule<T extends string = any> {
-	private entities: Entity[] = [];
+class SvitoreModule<T extends string = any> {
+	entities: Entity[] = [];
 
 	constructor(public name: T) {}
 
@@ -68,7 +68,7 @@ class StateManagerModule<T extends string = any> {
 
 	resetState(): void {
 		this.entities.forEach((entity) => {
-			if (isState(entity) && !isComputedState(entity)) {
+			if (isSimpleState(entity)) {
 				entity.reset();
 			}
 		});
@@ -81,4 +81,4 @@ class StateManagerModule<T extends string = any> {
 	}
 }
 
-export { StateManagerModule };
+export { SvitoreModule };

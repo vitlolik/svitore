@@ -8,6 +8,6 @@ class SvitoreError extends Error {
 }
 
 const logError = (...args: any[]): void =>
-	console.error(PACKAGE_LABEL, ...args);
+	globalThis.console.error(PACKAGE_LABEL, ...args);
 
 export { SvitoreError, logError };

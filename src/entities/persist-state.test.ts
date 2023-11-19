@@ -1,92 +1,76 @@
-import { vi, it, expect, describe } from "vitest";
+import { vi, it, expect, describe, afterEach } from "vitest";
 
 import { PERSIST_STORAGE_KEY, PersistState } from "./persist-state";
 import { State } from "./state";
-import { SvitoreError } from "../utils";
-
-class MockStorage implements Storage {
-	length: number;
-	clear = vi.fn();
-	getItem = vi.fn<[string], string | null>(() => null);
-	key = vi.fn();
-	removeItem = vi.fn();
-	setItem = vi.fn<[string]>();
-}
 
 describe("persist state", () => {
+	const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+	const removeItemSpy = vi.spyOn(Storage.prototype, "removeItem");
+	const consoleErrorSpy = vi
+		.spyOn(console, "error")
+		.mockImplementation(() => {});
+
+	afterEach(() => {
+		vi.clearAllMocks();
+		localStorage.clear();
+	});
+
 	it("type", () => {
-		const persistState = new PersistState(
-			"test state",
-			"test-key",
-			new MockStorage()
-		);
+		const persistState = new PersistState("test state", "test-key");
 
 		expect(persistState).instanceOf(State);
 	});
 
 	it("should init state", () => {
-		const persistState = new PersistState(
-			"test state",
-			"test-key",
-			new MockStorage()
-		);
+		const persistState = new PersistState("test state", "test-key");
 
 		expect(persistState.get()).toBe("test state");
 	});
 
 	it("should set state from storage if storage has value", async () => {
-		const storage = new MockStorage();
-
-		storage.getItem = vi.fn((_key: string) =>
+		localStorage.setItem(
+			PERSIST_STORAGE_KEY,
 			JSON.stringify({ "test-key": "value in storage" })
 		);
-		const persistState = new PersistState("test state", "test-key", storage);
 
-		// because storage updated as microtask
-		// await Promise.resolve();
+		const persistState = new PersistState("test state", "test-key");
 
-		expect(storage.getItem).toHaveBeenCalledTimes(1);
-		expect(storage.getItem).toHaveBeenCalledWith(PERSIST_STORAGE_KEY);
+		expect(getItemSpy).toHaveBeenCalledTimes(1);
+		expect(getItemSpy).toHaveBeenCalledWith(PERSIST_STORAGE_KEY);
 		expect(persistState.get()).toBe("value in storage");
 	});
 
 	it("should subscribe to state and update storage", async () => {
-		const storage = new MockStorage();
-		storage.getItem = vi.fn((_key: string) =>
+		localStorage.setItem(
+			PERSIST_STORAGE_KEY,
 			JSON.stringify({ "test-key": "value in storage" })
 		);
-		const persistState = new PersistState("test state", "test-key", storage);
+		const persistState = new PersistState("test state", "test-key");
 
 		persistState.set("new test value");
 
 		// because storage updated as microtask
 		await Promise.resolve();
 
-		expect(storage.setItem).toHaveBeenCalledTimes(1);
-		expect(storage.setItem).toHaveBeenCalledWith(
-			PERSIST_STORAGE_KEY,
-			JSON.stringify({ "test-key": "new test value" })
+		expect(localStorage.getItem(PERSIST_STORAGE_KEY)).toBe(
+			`{"test-key":"new test value"}`
 		);
 	});
 
 	it("clearStorage - should remove item from storage", () => {
-		const storage = new MockStorage();
-		const persistState = new PersistState("test state", "test-key", storage);
+		const persistState = new PersistState("test state", "test-key");
 
 		persistState.clearStorage();
 
-		expect(storage.removeItem).toHaveBeenCalledTimes(1);
-		expect(storage.removeItem).toHaveBeenCalledWith(PERSIST_STORAGE_KEY);
+		expect(removeItemSpy).toHaveBeenCalledTimes(1);
+		expect(removeItemSpy).toHaveBeenCalledWith(PERSIST_STORAGE_KEY);
 	});
 
-	it("should throw error if value invalid in storage", () => {
-		const storage = new MockStorage();
-		storage.getItem = vi.fn((_key: string) => "");
+	it("should log error if value invalid in storage", () => {
+		localStorage.setItem(PERSIST_STORAGE_KEY, "");
 
-		try {
-			new PersistState("test state", "test-key", storage);
-		} catch (error) {
-			expect(error).toBeInstanceOf(SvitoreError);
-		}
+		new PersistState("test state", "test-key");
+
+		expect(consoleErrorSpy).toHaveBeenCalledOnce();
 	});
 });

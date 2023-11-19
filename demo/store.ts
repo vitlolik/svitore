@@ -1,4 +1,4 @@
-import { Event, Middleware, State, StateManager } from "../src";
+import { Event, Middleware, State, Svitore } from "../src";
 
 type Store = {
 	changeFirstName: Event<string>;
@@ -14,7 +14,7 @@ type Store = {
 };
 
 const createStore = (): Store => {
-	const demoFormModule = StateManager.initModule("demo form");
+	const demoFormModule = Svitore.initModule("demo form");
 
 	const logMiddleware: Middleware<any> = (context, next) => {
 		console.log(context);

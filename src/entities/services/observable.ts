@@ -18,7 +18,7 @@ abstract class Observable<T = void> {
 			try {
 				observer(params, this);
 			} catch (error) {
-				logError(error);
+				logError("Observable", "Some subscriber have an error", error);
 			}
 		});
 	}
