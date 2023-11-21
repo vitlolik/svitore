@@ -1,9 +1,8 @@
 import { SelectorCallback } from "../types";
 import { AbstractState } from "./services";
-import { State } from "./state";
 
 class ComputedState<
-	StateList extends ReadonlyArray<State<any>>,
+	StateList extends ReadonlyArray<AbstractState<any>>,
 	Data
 > extends AbstractState<Data> {
 	private unsubscribeList: (() => void)[] = [];

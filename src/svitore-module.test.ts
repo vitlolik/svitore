@@ -12,21 +12,21 @@ import {
 } from "./entities";
 
 describe("SvitoreModule", () => {
-	describe("initState", () => {
+	describe("createState", () => {
 		it("should create state and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
-			const state = testModule.initState("test state");
+			const state = testModule.createState("test state");
 
 			expect(state).instanceOf(State);
 			expect(testModule.entities).toHaveLength(1);
 		});
 	});
 
-	describe("initComputedState", () => {
+	describe("createComputedState", () => {
 		it("should create computed state and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
-			const state = testModule.initState("test state");
-			const computedState = testModule.initComputedState(state, (value) =>
+			const state = testModule.createState("test state");
+			const computedState = testModule.createComputedState(state, (value) =>
 				value.toUpperCase()
 			);
 
@@ -35,10 +35,10 @@ describe("SvitoreModule", () => {
 		});
 	});
 
-	describe("initPersistState", () => {
+	describe("createPersistState", () => {
 		it("should create persist state and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
-			const persistState = testModule.initPersistState(
+			const persistState = testModule.createPersistState(
 				"test persist state",
 				"test-key"
 			);
@@ -48,20 +48,20 @@ describe("SvitoreModule", () => {
 		});
 	});
 
-	describe("initEvent", () => {
+	describe("createEvent", () => {
 		it("should create event and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
-			const event = testModule.initEvent();
+			const event = testModule.createEvent();
 
 			expect(event).instanceOf(Event);
 			expect(testModule.entities).toHaveLength(1);
 		});
 	});
 
-	describe("initDebouncedEvent", () => {
+	describe("createDebouncedEvent", () => {
 		it("should create debounced event and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
-			const debouncedEvent = testModule.initDebouncedEvent(100);
+			const debouncedEvent = testModule.createDebouncedEvent(100);
 
 			expect(debouncedEvent).instanceOf(DebouncedEvent);
 			expect(testModule.entities).toHaveLength(1);
@@ -71,28 +71,28 @@ describe("SvitoreModule", () => {
 	describe("initThrottledEvent", () => {
 		it("should create throttled event and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
-			const throttledEvent = testModule.initThrottledEvent(100);
+			const throttledEvent = testModule.createThrottledEvent(100);
 
 			expect(throttledEvent).instanceOf(ThrottledEvent);
 			expect(testModule.entities).toHaveLength(1);
 		});
 	});
 
-	describe("initEffect", () => {
+	describe("createEffect", () => {
 		it("should create effect and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
-			const effect = testModule.initEffect(() => Promise.resolve());
+			const effect = testModule.createEffect(() => Promise.resolve());
 
 			expect(effect).instanceOf(Effect);
 			expect(testModule.entities).toHaveLength(1);
 		});
 	});
 
-	describe("initReaction", () => {
+	describe("createReaction", () => {
 		it("should create reaction and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
-			const state = testModule.initState("test state");
-			const reaction = testModule.initReaction(state, () => {});
+			const state = testModule.createState("test state");
+			const reaction = testModule.createReaction(state, () => {});
 
 			expect(reaction).instanceOf(Reaction);
 			expect(testModule.entities).toHaveLength(2);
@@ -102,17 +102,17 @@ describe("SvitoreModule", () => {
 	describe("resetState", () => {
 		it("should call reset state on each state entity except computed state", () => {
 			const testModule = new SvitoreModule("test");
-			const changeEvent = testModule.initEvent<string>();
+			const changeEvent = testModule.createEvent<string>();
 			const simpleState = testModule
-				.initState("simple state")
+				.createState("simple state")
 				.changeOn(changeEvent);
 			const persistState = testModule
-				.initPersistState("persist state", "test-key")
+				.createPersistState("persist state", "test-key")
 				.changeOn(changeEvent);
 
 			changeEvent.dispatch("new test value");
 
-			testModule.resetState.dispatch();
+			testModule.resetState();
 
 			expect(simpleState.get()).toBe("simple state");
 			expect(persistState.get()).toBe("persist state");
@@ -123,10 +123,10 @@ describe("SvitoreModule", () => {
 		it("should call release on each entity", () => {
 			const testModule = new SvitoreModule("test");
 
-			const state = testModule.initState("state");
-			const event = testModule.initEvent();
-			const effect = testModule.initEffect(() => Promise.resolve());
-			const reaction = testModule.initReaction(state, () => {});
+			const state = testModule.createState("state");
+			const event = testModule.createEvent();
+			const effect = testModule.createEffect(() => Promise.resolve());
+			const reaction = testModule.createReaction(state, () => {});
 
 			state.release = vi.fn();
 			event.release = vi.fn();

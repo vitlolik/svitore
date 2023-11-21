@@ -5,6 +5,25 @@ import { Effect } from "./entities";
 class Svitore {
 	static modules: SvitoreModule[] = [];
 
+	static createModule<T extends string>(name: T): SvitoreModule<T> {
+		const newModule = new SvitoreModule(name);
+		this.modules.push(newModule);
+
+		return newModule;
+	}
+
+	static resetState(): void {
+		this.modules.forEach((module) => {
+			module.resetState();
+		});
+	}
+
+	static release(): void {
+		this.modules.forEach((module) => {
+			module.release();
+		});
+	}
+
 	static waitForEffects(): Promise<void> {
 		const unsubscribeList: (() => void)[] = [];
 
@@ -31,25 +50,6 @@ class Svitore {
 		};
 
 		return waitIfNeeded();
-	}
-
-	static initModule<T extends string>(name: T): SvitoreModule<T> {
-		const newModule = new SvitoreModule(name);
-		this.modules.push(newModule);
-
-		return newModule;
-	}
-
-	static resetState(): void {
-		this.modules.forEach((module) => {
-			module.resetState.dispatch();
-		});
-	}
-
-	static release(): void {
-		this.modules.forEach((module) => {
-			module.release();
-		});
 	}
 }
 

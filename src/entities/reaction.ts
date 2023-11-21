@@ -1,9 +1,10 @@
-import { Entity } from "./services";
-import { State } from "./state";
+import { AbstractState, Entity } from "./services";
 import { SelectorCallback } from "../types";
 import { createBatchFunction } from "../utils";
 
-class Reaction<StateList extends ReadonlyArray<State<any>>> extends Entity {
+class Reaction<
+	StateList extends ReadonlyArray<AbstractState<any>>
+> extends Entity {
 	private unsubscribeList: (() => void)[] = [];
 
 	constructor(...args: [...StateList, SelectorCallback<StateList>]) {

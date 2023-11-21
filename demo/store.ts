@@ -14,7 +14,7 @@ type Store = {
 };
 
 const createStore = (): Store => {
-	const demoFormModule = Svitore.initModule("demo form");
+	const demoFormModule = Svitore.createModule("demo form");
 
 	const logMiddleware: Middleware<any> = (context, next) => {
 		console.log(context);
@@ -22,17 +22,17 @@ const createStore = (): Store => {
 	};
 
 	const changeFirstName = demoFormModule
-		.initEvent<string>()
+		.createEvent<string>()
 		.applyMiddleware(logMiddleware);
 
 	const changeSecondName = demoFormModule
-		.initEvent<string>()
+		.createEvent<string>()
 		.applyMiddleware(logMiddleware);
-	const changeAge = demoFormModule.initEvent<number>();
-	const submitted = demoFormModule.initEvent();
-	const resetEvent = demoFormModule.initEvent();
-	const debouncedSubmitEvent = demoFormModule.initDebouncedEvent(500);
-	const throttledSubmitEvent = demoFormModule.initThrottledEvent(500);
+	const changeAge = demoFormModule.createEvent<number>();
+	const submitted = demoFormModule.createEvent();
+	const resetEvent = demoFormModule.createEvent();
+	const debouncedSubmitEvent = demoFormModule.createDebouncedEvent(500);
+	const throttledSubmitEvent = demoFormModule.createThrottledEvent(500);
 
 	debouncedSubmitEvent.subscribe(() => {
 		console.log("debouncedSubmitEvent called");
@@ -41,7 +41,7 @@ const createStore = (): Store => {
 		console.log("throttledSubmitEvent called");
 	});
 
-	const submitEffect = demoFormModule.initEffect(
+	const submitEffect = demoFormModule.createEffect(
 		(
 			data: {
 				firstName: State<string>;
@@ -87,17 +87,17 @@ const createStore = (): Store => {
 	});
 
 	const firstNameState = demoFormModule
-		.initPersistState("", "firstName", window.sessionStorage)
+		.createPersistState("", "firstName", window.sessionStorage)
 		.changeOn(changeFirstName);
 
 	const secondNameState = demoFormModule
-		.initPersistState("", "lastName", window.sessionStorage)
+		.createPersistState("", "lastName", window.sessionStorage)
 		.changeOn(changeSecondName);
 	const ageState = demoFormModule
-		.initPersistState(1, "age", window.sessionStorage)
+		.createPersistState(1, "age", window.sessionStorage)
 		.changeOn(changeAge);
 
-	const symbolsCountState = demoFormModule.initComputedState(
+	const symbolsCountState = demoFormModule.createComputedState(
 		firstNameState,
 		secondNameState,
 		(firstName, secondName) =>
@@ -115,7 +115,7 @@ const createStore = (): Store => {
 	});
 
 	resetEvent.subscribe(() => {
-		demoFormModule.resetState.dispatch();
+		demoFormModule.resetState();
 	});
 
 	return {
