@@ -54,7 +54,7 @@ describe("observable", () => {
 
 		observable.notify("test");
 		expect(observer).toHaveBeenCalledTimes(1);
-		expect(observer).toHaveBeenCalledWith("test", observable);
+		expect(observer).toHaveBeenCalledWith("test");
 	});
 
 	it("notify observers with error in observer", async () => {
@@ -68,7 +68,7 @@ describe("observable", () => {
 
 		observable.notify("test");
 		expect(observer).toHaveBeenCalledTimes(1);
-		expect(observer).toHaveBeenCalledWith("test", observable);
+		expect(observer).toHaveBeenCalledWith("test");
 		expect(consoleErrorSpy).toHaveBeenCalledOnce();
 	});
 

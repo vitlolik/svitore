@@ -35,7 +35,7 @@ class PersistState<Data> extends State<Data> {
 			return this;
 		}
 
-		this.set(stateFromStorage);
+		this.notify(stateFromStorage);
 		this.subscribe(writeToStorage);
 	}
 

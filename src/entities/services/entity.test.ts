@@ -4,7 +4,15 @@ import { Entity } from "./entity";
 
 describe("entity", () => {
 	class TestEntity<T = void> extends Entity<T> {
-		observe = vi.fn();
+		trigger<EntityPayload>(
+			entity: Entity<EntityPayload>,
+			subscriber: (payload: EntityPayload) => void
+		): this {
+			return super.trigger(entity, subscriber);
+		}
+		notify(params: T): void {
+			return super.notify(params);
+		}
 	}
 
 	it("type", () => {
@@ -23,13 +31,27 @@ describe("entity", () => {
 		expect(Entity.ENTITIES).toEqual([entity1, entity2, entity3]);
 	});
 
-	it("subscribe - should call observe from parent class", () => {
-		const subscriber = (): void => undefined;
+	it("should subscribe", () => {
+		const mockSubscriber = vi.fn();
 
+		const entity = new TestEntity<string>();
+		entity.subscribe(mockSubscriber);
+
+		entity.notify("test");
+
+		expect(mockSubscriber).toHaveBeenCalledOnce();
+		expect(mockSubscriber).toHaveBeenCalledWith("test");
+	});
+
+	it("should subscribe on entity", () => {
 		const entity = new TestEntity();
-		entity.subscribe(subscriber);
+		const anotherEntity = new TestEntity();
 
-		expect(entity.observe).toHaveBeenCalledTimes(1);
-		expect(entity.observe).toHaveBeenCalledWith(subscriber);
+		const mockSubscriber = vi.fn();
+		entity.trigger(anotherEntity, mockSubscriber);
+
+		anotherEntity.notify();
+
+		expect(mockSubscriber).toHaveBeenCalledOnce();
 	});
 });

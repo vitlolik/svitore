@@ -18,7 +18,7 @@ class ComputedState<
 
 		stateList.forEach((state) => {
 			this.unsubscribeList.push(
-				state.subscribe(() => super.set(getStateData()))
+				state.subscribe(() => super.notify(getStateData()))
 			);
 		});
 	}

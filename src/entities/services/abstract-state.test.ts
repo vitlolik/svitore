@@ -6,7 +6,7 @@ import { AbstractState } from "./abstract-state";
 describe("state", () => {
 	class State<T> extends AbstractState<T> {
 		set(newState: T): void {
-			super.set(newState);
+			super.notify(newState);
 		}
 	}
 
@@ -23,7 +23,7 @@ describe("state", () => {
 		expect(state.get()).toBe("test");
 	});
 
-	describe("set - set new state", () => {
+	describe("set new state", () => {
 		it("should do nothing if state is equal", () => {
 			const subscriber = vi.fn();
 			const state = new State("test");
@@ -50,7 +50,7 @@ describe("state", () => {
 
 			state.set("new value");
 
-			expect(subscriber).toHaveBeenCalledWith("new value", state);
+			expect(subscriber).toHaveBeenCalledWith("new value");
 		});
 	});
 });

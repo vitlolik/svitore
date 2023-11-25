@@ -39,6 +39,17 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 
 		return this;
 	}
+
+	trigger<EntityPayload extends Payload>(entity: Entity<EntityPayload>): this;
+	trigger<EntityPayload>(
+		entity: Entity<EntityPayload>,
+		selector: (payload: EntityPayload) => Payload
+	): this;
+	trigger(entity: Entity<any>, selector?: (payload: any) => Payload): this {
+		return super.trigger(entity, (payload) => {
+			this.dispatch(selector ? selector(payload) : payload);
+		});
+	}
 }
 
 export { AbstractEvent };

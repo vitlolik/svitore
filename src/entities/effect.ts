@@ -3,29 +3,35 @@ import { Entity } from "./services";
 import { State } from "./state";
 
 type EffectOptions = {
-	isAutoAbort?: boolean;
+	isAutoCancelable?: boolean;
 };
 
 type EffectFunction<Params, Result> = (
 	params: Params,
-	abortController: AbortController
+	signal: AbortSignal
 ) => Promise<Result>;
 
-type NotifyPayload<Params, Result, Error> =
+type NotifyPayload<Params, Result, ErrorType> =
 	| {
 			state: "fulfilled";
 			params: Params;
 			result: Result;
 	  }
-	| { state: "rejected"; params: Params; error: Error };
+	| {
+			state: "rejected";
+			params: Params;
+			error: ErrorType;
+	  };
 
-class Effect<Params = void, Result = void, Error = any> extends Entity<
-	NotifyPayload<Params, Result, Error>
-> {
+class Effect<
+	Params = void,
+	Result = void,
+	ErrorType extends Error = Error
+> extends Entity<NotifyPayload<Params, Result, ErrorType>> {
 	private abortController: AbortController | null = null;
 
 	fulfilled = new Event<{ params: Params; result: Result }>();
-	rejected = new Event<{ params: Params; error: Error }>();
+	rejected = new Event<{ params: Params; error: ErrorType }>();
 
 	pendingChanged = new Event<boolean>();
 	isPending = new State<boolean>(false).changeOn(this.pendingChanged);
@@ -37,11 +43,7 @@ class Effect<Params = void, Result = void, Error = any> extends Entity<
 		super();
 	}
 
-	implement(effectFunction: EffectFunction<Params, Result>): void {
-		this.effectFunction = effectFunction;
-	}
-
-	private abortIfNeeded(): void {
+	private cancelIfNeeded(): void {
 		if (this.abortController) {
 			if (!this.abortController.signal.aborted) {
 				this.abortController.abort();
@@ -53,20 +55,23 @@ class Effect<Params = void, Result = void, Error = any> extends Entity<
 		try {
 			this.pendingChanged.dispatch(true);
 
-			if (this.options.isAutoAbort) {
-				this.abortIfNeeded();
+			if (this.options.isAutoCancelable) {
+				this.cancelIfNeeded();
 			}
 
 			this.abortController = new AbortController();
 
-			const result = await this.effectFunction(params, this.abortController);
+			const result = await this.effectFunction(
+				params,
+				this.abortController.signal
+			);
 			this.abortController = null;
 
 			this.pendingChanged.dispatch(false);
 			this.notify({ state: "fulfilled", params, result });
 			this.fulfilled.dispatch({ params, result });
 		} catch (e) {
-			const error = (e ?? {}) as any;
+			const error = e as any;
 			if (error.name === "AbortError") return;
 
 			this.pendingChanged.dispatch(false);
@@ -75,14 +80,28 @@ class Effect<Params = void, Result = void, Error = any> extends Entity<
 		}
 	}
 
-	abort(): void {
-		this.abortIfNeeded();
+	trigger<EntityPayload extends Params>(entity: Entity<EntityPayload>): this;
+	trigger<EntityPayload>(
+		entity: Entity<EntityPayload>,
+		selector: (payload: EntityPayload) => Params
+	): this;
+	trigger(
+		entity: Entity<any>,
+		selector?: ((payload: any) => Params) | undefined
+	): this {
+		return super.trigger(entity, (payload) => {
+			this.run(selector ? selector(payload) : payload);
+		});
+	}
+
+	cancel(): void {
+		this.cancelIfNeeded();
 		this.pendingChanged.dispatch(false);
 		this.abortController = null;
 	}
 
 	release(): void {
-		this.abort();
+		this.cancel();
 		this.isPending.release();
 		this.pendingChanged.release();
 		this.fulfilled.release();
@@ -91,4 +110,5 @@ class Effect<Params = void, Result = void, Error = any> extends Entity<
 	}
 }
 
-export { Effect, EffectFunction };
+export { Effect };
+export type { EffectFunction, EffectOptions };

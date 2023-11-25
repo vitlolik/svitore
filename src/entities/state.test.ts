@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 import { State } from "./state";
 import { Event } from "./event";
 
 describe("state", () => {
-	it("reset - reset state to default value", () => {
+	it("reset state to default value", () => {
 		const event = new Event<string>();
 		const resetEvent = new Event();
 		const state = new State("test").changeOn(event).resetOn(resetEvent);
@@ -16,7 +16,7 @@ describe("state", () => {
 		expect(state.get()).toBe("test");
 	});
 
-	describe("on", () => {
+	describe("changeOn", () => {
 		it("should subscribe on event", () => {
 			const event = new Event<string>();
 			const state = new State("test").changeOn(event);
@@ -39,6 +39,21 @@ describe("state", () => {
 
 			event2.dispatch("new new test");
 			expect(state.get()).toBe("test");
+		});
+
+		it("should skip subscriber if it already exist", () => {
+			const event1 = new Event<string>();
+			const mockSelector = vi.fn<[string], string>();
+
+			const state = new State("test")
+				.changeOn(event1)
+				.changeOn(event1, mockSelector);
+
+			event1.dispatch("new test");
+			event1.dispatch("new new test");
+
+			expect(state.get()).toBe("new new test");
+			expect(mockSelector).not.toHaveBeenCalled();
 		});
 	});
 });

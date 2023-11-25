@@ -1,36 +1,25 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, vi, test } from "vitest";
 
 import { Effect } from "./effect";
 import { Entity } from "./services";
+import { Event } from "./event";
 
 describe("effect", () => {
-	it("type", () => {
+	test("type", () => {
 		const effect = new Effect(() => Promise.resolve());
 
 		expect(effect).instanceOf(Entity);
 	});
 
-	it("implement effect function", () => {
-		const effectFunction = vi.fn(() => Promise.resolve());
-		const newEffectFunction = vi.fn(() => Promise.resolve());
-		const effect = new Effect(effectFunction);
-		effect.implement(newEffectFunction);
-
-		effect.run();
-
-		expect(effectFunction).toHaveBeenCalledTimes(0);
-		expect(newEffectFunction).toHaveBeenCalledTimes(1);
-	});
-
 	describe("run", () => {
-		it("return promise", () => {
+		test("return promise", () => {
 			const effect = new Effect(() => Promise.resolve());
 			const runResult = effect.run();
 
 			expect(runResult).instanceOf(Promise);
 		});
 
-		it("return void", async () => {
+		test("return void", async () => {
 			const effect = new Effect(() => Promise.resolve("hello"));
 
 			const result = await effect.run();
@@ -38,7 +27,7 @@ describe("effect", () => {
 			expect(result).toBe(undefined);
 		});
 
-		it("should set pending state on running", async () => {
+		test("should set pending state on running", async () => {
 			const effect = new Effect(() => Promise.resolve("hello"));
 			const promise = effect.run();
 			expect(effect.isPending.get()).toBe(true);
@@ -46,14 +35,14 @@ describe("effect", () => {
 			await promise;
 		});
 
-		it("should abort if needed", async () => {
+		test("should abort if needed", async () => {
 			const abortListener = vi.fn();
 			const effect = new Effect(
-				async (_data, abortController) => {
-					abortController.signal.addEventListener("abort", abortListener);
+				async (_data, signal) => {
+					signal.addEventListener("abort", abortListener);
 					await Promise.resolve("hello");
 				},
-				{ isAutoAbort: true }
+				{ isAutoCancelable: true }
 			);
 
 			effect.run();
@@ -62,7 +51,7 @@ describe("effect", () => {
 			expect(abortListener).toHaveBeenCalledTimes(1);
 		});
 
-		it("should set pending state on finished", async () => {
+		test("should set pending state on finished", async () => {
 			const effectFulfilled = new Effect(() => Promise.resolve("hello"));
 			const effectRejected = new Effect(() => Promise.reject("error"));
 
@@ -79,7 +68,7 @@ describe("effect", () => {
 			expect(effectRejected.isPending.get()).toBe(false);
 		});
 
-		it("should notify listeners on finished", async () => {
+		test("should notify listeners on finished", async () => {
 			const listenerFulfilled = vi.fn();
 			const listenerRejected = vi.fn();
 			const effectFulfilled = new Effect(() => Promise.resolve("hello"));
@@ -91,45 +80,39 @@ describe("effect", () => {
 			await Promise.all([effectFulfilled.run(), effectRejected.run()]);
 
 			expect(listenerFulfilled).toHaveBeenCalledTimes(1);
-			expect(listenerFulfilled).toHaveBeenCalledWith(
-				{
-					state: "fulfilled",
-					params: undefined,
-					result: "hello",
-				},
-				effectFulfilled
-			);
+			expect(listenerFulfilled).toHaveBeenCalledWith({
+				state: "fulfilled",
+				params: undefined,
+				result: "hello",
+			});
 			expect(listenerRejected).toHaveBeenCalledTimes(1);
-			expect(listenerRejected).toHaveBeenCalledWith(
-				{
-					state: "rejected",
-					params: undefined,
-					error: "error",
-				},
-				effectRejected
-			);
+			expect(listenerRejected).toHaveBeenCalledWith({
+				state: "rejected",
+				params: undefined,
+				error: "error",
+			});
 		});
 	});
 
-	it("abort - should abort effect and set change pending state", () => {
+	test("abort - should abort effect and set change pending state", () => {
 		const abortListener = vi.fn();
-		const effect = new Effect(async (_data, abortController) => {
-			abortController.signal.addEventListener("abort", abortListener);
+		const effect = new Effect(async (_data, signal) => {
+			signal.addEventListener("abort", abortListener);
 			await Promise.resolve("hello");
 		});
 		effect.run();
 		expect(effect.isPending.get()).toBe(true);
 
-		effect.abort();
+		effect.cancel();
 		expect(effect.isPending.get()).toBe(false);
 		expect(abortListener).toHaveBeenCalledTimes(1);
 	});
 
-	it("release - should abort and remove subscribers", async () => {
+	test("release - should abort and remove subscribers", async () => {
 		const pendingSubscriber = vi.fn();
 		const effectSubscriber = vi.fn();
 		const effect = new Effect(() => Promise.resolve("hello"));
-		effect.abort = vi.fn();
+		effect.cancel = vi.fn();
 		effect.subscribe(effectSubscriber);
 		effect.isPending.subscribe(pendingSubscriber);
 
@@ -137,12 +120,12 @@ describe("effect", () => {
 
 		await effect.run();
 
-		expect(effect.abort).toHaveBeenCalledTimes(1);
+		expect(effect.cancel).toHaveBeenCalledTimes(1);
 		expect(effectSubscriber).toHaveBeenCalledTimes(0);
 		expect(pendingSubscriber).toHaveBeenCalledTimes(0);
 	});
 
-	it("if happened auto-abort with specific error, subscribers should not be notified", async () => {
+	test("if happened auto-abort with specific error, subscribers should not be notified", async () => {
 		const subscriber = vi.fn();
 		const autoAbortEmulateEffect = new Effect(
 			() => {
@@ -150,12 +133,42 @@ describe("effect", () => {
 				abortError.name = "AbortError";
 				return Promise.reject(abortError);
 			},
-			{ isAutoAbort: true }
+			{ isAutoCancelable: true }
 		);
 		autoAbortEmulateEffect.subscribe(subscriber);
 
 		await autoAbortEmulateEffect.run();
 
 		expect(subscriber).toHaveBeenCalledTimes(0);
+	});
+
+	describe("trigger", () => {
+		test("should subscribe on another entity", async () => {
+			const effect = new Effect((value: string) => Promise.resolve(value));
+			const triggerEvent = new Event<string>();
+			const mockRun = vi.fn();
+
+			effect.trigger(triggerEvent);
+			effect.run = mockRun;
+
+			triggerEvent.dispatch("test");
+
+			expect(mockRun).toHaveBeenCalledOnce();
+			expect(mockRun).toHaveBeenCalledWith("test");
+		});
+
+		test("should subscribe on another entity and transform payload", async () => {
+			const effect = new Effect((value: string) => Promise.resolve(value));
+			const triggerEvent = new Event<number>();
+			const mockRun = vi.fn();
+
+			effect.trigger(triggerEvent, (numericValue) => numericValue + "_test");
+			effect.run = mockRun;
+
+			triggerEvent.dispatch(10);
+
+			expect(mockRun).toHaveBeenCalledOnce();
+			expect(mockRun).toHaveBeenCalledWith("10_test");
+		});
 	});
 });

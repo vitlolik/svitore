@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, vi, test } from "vitest";
 
 import { Entity } from "./entity";
 import { AbstractEvent } from "./abstract-event";
@@ -6,14 +6,14 @@ import { AbstractEvent } from "./abstract-event";
 describe("abstract-event", () => {
 	class Event<Payload = void> extends AbstractEvent<Payload> {}
 
-	it("type", () => {
+	test("type", () => {
 		const event = new Event();
 
 		expect(event).instanceOf(Entity);
 	});
 
 	describe("dispatch - call event with payload", () => {
-		it("should notify subscribers", () => {
+		test("should notify subscribers", () => {
 			const event = new Event<number>();
 			const subscriber = vi.fn();
 			event.subscribe(subscriber);
@@ -22,20 +22,20 @@ describe("abstract-event", () => {
 
 			event.dispatch(1);
 			expect(subscriber).toHaveBeenCalledOnce();
-			expect(subscriber).toHaveBeenCalledWith(1, event);
+			expect(subscriber).toHaveBeenCalledWith(1);
 
 			event.dispatch(2);
 			expect(subscriber).toBeCalledTimes(2);
-			expect(subscriber).toHaveBeenCalledWith(2, event);
+			expect(subscriber).toHaveBeenCalledWith(2);
 
 			event.dispatch(0);
 			expect(subscriber).toBeCalledTimes(3);
-			expect(subscriber).toHaveBeenCalledWith(0, event);
+			expect(subscriber).toHaveBeenCalledWith(0);
 		});
 	});
 
 	describe("applyMiddleware", () => {
-		it("should setup middlewares", () => {
+		test("should setup middlewares", () => {
 			const event = new Event<string>().applyMiddleware((_context, next) =>
 				next()
 			);
@@ -47,7 +47,7 @@ describe("abstract-event", () => {
 			expect(subscriber).toHaveBeenCalledOnce();
 		});
 
-		it("you can transform data in middleware", () => {
+		test("you can transform data in middleware", () => {
 			const event = new Event<string>().applyMiddleware((context, next) => {
 				context.value = context.value.toUpperCase();
 				next();
@@ -58,10 +58,10 @@ describe("abstract-event", () => {
 
 			event.dispatch("test");
 			expect(subscriber).toHaveBeenCalledOnce();
-			expect(subscriber).toHaveBeenCalledWith("TEST", event);
+			expect(subscriber).toHaveBeenCalledWith("TEST");
 		});
 
-		it("tou can stop event, if next function doesn't call", () => {
+		test("tou can stop event, if next function doesn't call", () => {
 			const event = new Event<string>().applyMiddleware(
 				(_context, _next) => {}
 			);
@@ -73,7 +73,7 @@ describe("abstract-event", () => {
 			expect(subscriber).not.toHaveBeenCalledOnce();
 		});
 
-		it("tou can pass many middlewares", () => {
+		test("tou can pass many middlewares", () => {
 			const event = new Event<string>()
 				.applyMiddleware((context, next) => {
 					context.value = context.value.toUpperCase();
@@ -89,7 +89,36 @@ describe("abstract-event", () => {
 
 			event.dispatch("test");
 			expect(subscriber).toHaveBeenCalledOnce();
-			expect(subscriber).toHaveBeenCalledWith("-TEST-", event);
+			expect(subscriber).toHaveBeenCalledWith("-TEST-");
+		});
+	});
+
+	describe("trigger", () => {
+		test("should subscribe on another entity", () => {
+			const event = new Event<string>();
+			const triggerEvent = new Event<string>();
+			const mockDispatch = vi.fn();
+
+			event.trigger(triggerEvent);
+			event.dispatch = mockDispatch;
+
+			triggerEvent.dispatch("test");
+
+			expect(mockDispatch).toHaveBeenCalledOnce();
+			expect(mockDispatch).toHaveBeenCalledWith("test");
+		});
+
+		test("should subscribe on another entity and transform payload", () => {
+			const event = new Event<string>();
+			const triggerEvent = new Event<number>();
+			const mockDispatch = vi.fn();
+
+			event.trigger(triggerEvent, (numericValue) => numericValue + "_test");
+			event.dispatch = mockDispatch;
+
+			triggerEvent.dispatch(10);
+			expect(mockDispatch).toHaveBeenCalledOnce();
+			expect(mockDispatch).toHaveBeenCalledWith("10_test");
 		});
 	});
 });

@@ -4,6 +4,7 @@ import {
 	ComputedState,
 	DebouncedEvent,
 	Effect,
+	EffectRunner,
 	Event,
 	PersistState,
 	Reaction,
@@ -85,6 +86,17 @@ describe("SvitoreModule", () => {
 
 			expect(effect).instanceOf(Effect);
 			expect(testModule.entities).toHaveLength(1);
+		});
+	});
+
+	describe("createEffectRunner", () => {
+		it("should create effect runner and save instance to module", () => {
+			const testModule = new SvitoreModule("test");
+			const effect = testModule.createEffect(() => Promise.resolve());
+			const effectRunner = testModule.createEffectRunner(effect, { delay: 0 });
+
+			expect(effectRunner).instanceOf(EffectRunner);
+			expect(testModule.entities).toHaveLength(2);
 		});
 	});
 

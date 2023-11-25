@@ -18,13 +18,13 @@ abstract class AbstractState<T> extends Entity<T> {
 		return this.prevState;
 	}
 
-	protected set(newState: T): void {
+	protected notify(newState: T): void {
 		if (this.state === newState) return;
 
 		this.prevState = this.state;
 		this.state = newState;
 
-		this.notify(this.state);
+		super.notify(this.state);
 	}
 }
 

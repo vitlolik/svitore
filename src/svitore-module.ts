@@ -7,6 +7,7 @@ import {
 	ComputedState,
 	Effect,
 	Reaction,
+	EffectRunner,
 } from "./entities";
 import { Entity } from "./entities/services";
 
@@ -56,10 +57,22 @@ class SvitoreModule<T extends string = any> {
 		return this.createEntity(new ThrottledEvent(...args));
 	}
 
-	createEffect<Params = void, Result = void, Error = void>(
-		...args: ConstructorParameters<typeof Effect<Params, Result, Error>>
-	): Effect<Params, Result, Error> {
+	createEffect<Params = void, Result = void, ErrorType extends Error = Error>(
+		...args: ConstructorParameters<typeof Effect<Params, Result, ErrorType>>
+	): Effect<Params, Result, ErrorType> {
 		return this.createEntity(new Effect(...args));
+	}
+
+	createEffectRunner<
+		Params = void,
+		Result = void,
+		ErrorType extends Error = Error
+	>(
+		...args: ConstructorParameters<
+			typeof EffectRunner<Params, Result, ErrorType>
+		>
+	): EffectRunner<Params, Result, ErrorType> {
+		return this.createEntity(new EffectRunner(...args));
 	}
 
 	createReaction<T extends ReadonlyArray<State<any>>>(

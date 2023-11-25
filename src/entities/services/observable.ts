@@ -1,6 +1,6 @@
 import { logError } from "../../utils";
 
-type Observer<T = void> = (data: T, instance: Observable<T>) => void;
+type Observer<T = void> = (data: T) => void;
 
 abstract class Observable<T = void> {
 	protected observers: Set<Observer<T>> = new Set();
@@ -16,7 +16,7 @@ abstract class Observable<T = void> {
 	protected notify(params: T): void {
 		this.observers.forEach((observer) => {
 			try {
-				observer(params, this);
+				observer(params);
 			} catch (error) {
 				logError("Observable", "Some subscriber have an error", error);
 			}

@@ -1,6 +1,6 @@
 import { SvitoreModule } from "./svitore-module";
 import { Entity } from "./entities/services";
-import { Effect } from "./entities";
+import { Effect, EffectRunner } from "./entities";
 
 class Svitore {
 	static modules: SvitoreModule[] = [];
@@ -24,25 +24,29 @@ class Svitore {
 		});
 	}
 
-	static waitForEffects(): Promise<void> {
+	static waitForAsync(): Promise<void> {
 		const unsubscribeList: (() => void)[] = [];
 
 		const waitIfNeeded = async (): Promise<void> => {
 			const pendingEffects = Entity.ENTITIES.filter(
 				(entity) => entity instanceof Effect && entity.isPending.get()
 			);
+			const runningEffectRunners = Entity.ENTITIES.filter(
+				(entity) => entity instanceof EffectRunner && entity.isRunning.get()
+			);
+			const pendingEntities = [...pendingEffects, ...runningEffectRunners];
 
-			if (!pendingEffects.length) {
+			if (!pendingEntities.length) {
 				unsubscribeList.forEach((unsubscribe) => unsubscribe());
 				return Promise.resolve();
 			}
 
 			await Promise.all(
-				pendingEffects.map(
-					(effect) =>
-						new Promise((resolve) => {
-							unsubscribeList.push(effect.subscribe(resolve));
-						})
+				pendingEntities.map(
+					(entity) =>
+						new Promise((resolve) =>
+							unsubscribeList.push(entity.subscribe(resolve))
+						)
 				)
 			);
 

@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, vi, test } from "vitest";
 import { Svitore } from "./svitore";
 import { SvitoreModule } from "./svitore-module";
 
 describe("Svitore", () => {
 	describe("createModule - create svitore module", () => {
-		it("should create svitore module and add it to list", () => {
+		test("should create svitore module and add it to list", () => {
 			const testModule1 = Svitore.createModule("test1");
 			const testModule2 = Svitore.createModule("test2");
 
@@ -14,20 +14,20 @@ describe("Svitore", () => {
 		});
 	});
 
-	describe("waitForEffects - waiting until all async effects to complete", () => {
-		it("should wait pending effect", async () => {
+	describe("waitForAsync - waiting until all async effects to complete", () => {
+		test("should wait pending effect", async () => {
 			const testModule = Svitore.createModule("test");
 			const effect = testModule.createEffect(() => Promise.resolve());
 			const testSubscribe = vi.fn();
 			effect.subscribe(testSubscribe);
 			effect.run();
 
-			await Svitore.waitForEffects();
+			await Svitore.waitForAsync();
 
 			expect(testSubscribe).toHaveBeenCalled();
 		});
 
-		it("should wait all pending effects", async () => {
+		test("should wait all pending effects", async () => {
 			const testModule = Svitore.createModule("test");
 
 			const effect1 = testModule.createEffect(
@@ -57,16 +57,34 @@ describe("Svitore", () => {
 
 			effect1.run();
 
-			await Svitore.waitForEffects();
+			await Svitore.waitForAsync();
 
 			expect(testSubscribe1).toHaveBeenCalled();
 			expect(testSubscribe2).toHaveBeenCalled();
 			expect(testSubscribe3).toHaveBeenCalled();
 		});
+
+		test("should wait running effect runners", async () => {
+			const testModule = Svitore.createModule("test");
+
+			const effect = testModule.createEffect(() => Promise.resolve("test"));
+			const effectRunnerSubscriber = vi.fn();
+			const effectRunner = testModule.createEffectRunner(effect, {
+				delay: 10,
+				successfulCount: 3,
+			});
+			effectRunner.subscribe(effectRunnerSubscriber);
+
+			effectRunner.start();
+
+			await Svitore.waitForAsync();
+
+			expect(effectRunnerSubscriber).toHaveBeenCalledOnce();
+		});
 	});
 
 	describe("resetState - reset state for each module. In other words, resets the state of the entire application", () => {
-		it("should call resetState for each module", () => {
+		test("should call resetState for each module", () => {
 			const testModule1 = Svitore.createModule("test1");
 			const testModule2 = Svitore.createModule("test2");
 			const testModule3 = Svitore.createModule("test3");
@@ -83,7 +101,7 @@ describe("Svitore", () => {
 	});
 
 	describe("release - clears subscriptions for each module. In other words, clears subscriptions of the entire application", () => {
-		it("should call resetState for each module", () => {
+		test("should call resetState for each module", () => {
 			const testModule1 = Svitore.createModule("test1");
 			const testModule2 = Svitore.createModule("test2");
 			const testModule3 = Svitore.createModule("test3");
