@@ -91,6 +91,55 @@ describe("abstract-event", () => {
 			expect(subscriber).toHaveBeenCalledOnce();
 			expect(subscriber).toHaveBeenCalledWith("-TEST-");
 		});
+
+		test("should call error event if error thrown", () => {
+			const toShortStringEvent = new Event<Error>();
+			const mockErrorEventSubscriber = vi.fn();
+			const mockTargetEventSubscriber = vi.fn();
+			toShortStringEvent.subscribe(mockErrorEventSubscriber);
+
+			const event = new Event<string>().applyMiddleware((context, next) => {
+				if (context.value.length < 3) {
+					throw new Error("To short string");
+				}
+
+				next();
+			}, toShortStringEvent);
+			event.subscribe(mockTargetEventSubscriber);
+
+			event.dispatch("Hello!");
+			expect(mockErrorEventSubscriber).not.toHaveBeenCalled();
+			expect(mockTargetEventSubscriber).toHaveBeenCalledOnce();
+			expect(mockTargetEventSubscriber).toHaveBeenCalledWith("Hello!");
+
+			event.dispatch("Hi");
+			expect(mockErrorEventSubscriber).toHaveBeenCalledOnce();
+			expect(mockErrorEventSubscriber).toHaveBeenCalledWith(
+				new Error("To short string")
+			);
+			expect(mockTargetEventSubscriber).toHaveBeenCalledTimes(1);
+		});
+
+		test("should throw error if error event does not defined", () => {
+			const mockTargetEventSubscriber = vi.fn();
+
+			const event = new Event<string>().applyMiddleware((context, next) => {
+				if (context.value.length < 3) {
+					throw new Error("To short string");
+				}
+
+				next();
+			});
+			event.subscribe(mockTargetEventSubscriber);
+
+			try {
+				event.dispatch("Hi");
+			} catch (error) {
+				expect(error).toEqual(new Error("To short string"));
+			}
+
+			expect(mockTargetEventSubscriber).not.toHaveBeenCalled();
+		});
 	});
 
 	describe("trigger", () => {

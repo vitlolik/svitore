@@ -7,7 +7,10 @@ type MiddlewareContext<T> = {
 type Middleware<T> = (context: MiddlewareContext<T>, next: () => void) => void;
 
 abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
-	private middlewares: Middleware<Payload>[] = [];
+	private middlewares: {
+		fn: Middleware<Payload>;
+		errorEvent?: AbstractEvent<any>;
+	}[] = [];
 
 	private invokeMiddlewares(
 		value: Payload,
@@ -17,9 +20,19 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 
 		const invoke = (index: number): void => {
 			if (index < this.middlewares.length) {
-				this.middlewares[index](context, () => {
-					invoke(index + 1);
-				});
+				const { fn, errorEvent } = this.middlewares[index];
+
+				try {
+					fn(context, () => {
+						invoke(index + 1);
+					});
+				} catch (error) {
+					if (!errorEvent) {
+						throw error;
+					}
+
+					errorEvent.dispatch(error);
+				}
 			} else {
 				dispatch(context);
 			}
@@ -34,8 +47,11 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 		});
 	}
 
-	applyMiddleware(middleware: Middleware<Payload>): this {
-		this.middlewares.push(middleware);
+	applyMiddleware<ErrorType extends Error>(
+		middleware: Middleware<Payload>,
+		errorEvent?: AbstractEvent<ErrorType>
+	): this {
+		this.middlewares.push({ fn: middleware, errorEvent });
 
 		return this;
 	}
