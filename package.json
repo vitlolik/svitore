@@ -38,7 +38,9 @@
 		{
 			"path": "./dist/index.js",
 			"import": "*",
-			"limit": "2.2 kb"
+			"limit": "8 kb",
+			"gzip": false,
+			"brotli": false
 		}
 	],
 	"keywords": [
