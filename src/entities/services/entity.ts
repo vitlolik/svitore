@@ -3,7 +3,7 @@ import { generateId } from "../../utils";
 
 abstract class Entity<T = void> extends Observable<T> {
 	protected id: number;
-	private onMap: Map<Entity<any>, () => void> = new Map();
+	private triggerMap: Map<Entity<any>, () => void> = new Map();
 	static ENTITIES: Entity<any>[] = [];
 
 	constructor() {
@@ -20,19 +20,19 @@ abstract class Entity<T = void> extends Observable<T> {
 		entity: Entity<EntityPayload>,
 		subscriber: (payload: EntityPayload) => void
 	): this {
-		if (this.onMap.has(entity)) return this;
+		if (this.triggerMap.has(entity)) return this;
 
-		this.onMap.set(entity, entity.subscribe(subscriber));
+		this.triggerMap.set(entity, entity.subscribe(subscriber));
 
 		return this;
 	}
 
 	release(): void {
-		for (const unsubscribe of this.onMap.values()) {
+		for (const unsubscribe of this.triggerMap.values()) {
 			unsubscribe();
 		}
 
-		this.onMap.clear();
+		this.triggerMap.clear();
 		super.release();
 	}
 }
