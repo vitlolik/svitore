@@ -17,7 +17,7 @@ type EffectRunnerOptions<Params, Result, ErrorType> = {
 	successfulCount?: number;
 };
 
-type NotifyType = "failureLimit" | "successfulLimit";
+type NotifyType = "failureLimit" | "successfulLimit" | "stopped";
 
 class EffectRunner<
 	Params = void,
@@ -70,15 +70,26 @@ class EffectRunner<
 			  });
 	}
 
+	private reset(): void {
+		this.unsubscribeFromEffect();
+		this.failureCount = 0;
+		this.successfulCount = 0;
+		globalThis.clearTimeout(this.timer);
+	}
+
+	private finish(type: NotifyType): void {
+		this.notify(type);
+		this.isRunningChanged.dispatch(false);
+	}
+
 	start(params: Params): void {
-		this.stop();
+		this.reset();
 		this.isRunningChanged.dispatch(true);
 
 		this.unsubscribeFromEffect = this.effect.subscribe((payload) => {
 			if (payload.state === "rejected") {
 				if (++this.failureCount >= this.options.failureCount) {
-					this.notify("failureLimit");
-					return this.stop();
+					return this.finish("failureLimit");
 				}
 
 				return (this.timer = globalThis.setTimeout(() => {
@@ -87,8 +98,7 @@ class EffectRunner<
 			}
 
 			if (++this.successfulCount >= this.options.successfulCount) {
-				this.notify("successfulLimit");
-				return this.stop();
+				return this.finish("successfulLimit");
 			}
 
 			return (this.timer = globalThis.setTimeout(() => {
@@ -100,15 +110,11 @@ class EffectRunner<
 	}
 
 	stop(): void {
-		if (this.isRunning.get()) {
-			this.effect.cancel();
-			this.isRunningChanged.dispatch(false);
-		}
+		this.reset();
+		if (!this.isRunning.get()) return;
 
-		this.unsubscribeFromEffect();
-		this.failureCount = 0;
-		this.successfulCount = 0;
-		globalThis.clearTimeout(this.timer);
+		this.effect.cancel();
+		this.finish("stopped");
 	}
 
 	trigger<EntityPayload extends Params>(entity: Entity<EntityPayload>): this;

@@ -63,6 +63,8 @@ const createStore = (): Store => {
 		successfulCount: 3,
 	});
 
+	logEffectRunner.isRunning.subscribe(console.log);
+
 	// logic
 	changeFirstName.applyMiddleware(logMiddleware);
 	changeSecondName.applyMiddleware(logMiddleware);
@@ -86,6 +88,7 @@ const createStore = (): Store => {
 
 	resetEvent.subscribe(() => {
 		demoFormModule.resetState();
+		logEffectRunner.stop();
 	});
 
 	return {
