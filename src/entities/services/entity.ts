@@ -1,14 +1,15 @@
 import { Observable, Observer } from "./observable";
-import { generateId } from "../../utils";
+
+let id = 0;
 
 abstract class Entity<T = void> extends Observable<T> {
-	protected id: number;
+	id: number;
 	private triggerMap: Map<Entity<any>, () => void> = new Map();
 	static ENTITIES: Entity<any>[] = [];
 
 	constructor() {
 		super();
-		this.id = generateId.next().value;
+		this.id = id++;
 		Entity.ENTITIES.push(this);
 	}
 
