@@ -3,26 +3,24 @@ import { SelectorCallback } from "../types";
 import { createBatchFunction } from "../utils";
 
 class Reaction<
-	StateList extends ReadonlyArray<AbstractState<any>>
+	States extends ReadonlyArray<AbstractState<any>>
 > extends Entity {
-	private unsubscribeList: (() => void)[] = [];
+	private unsubscribes: (() => void)[] = [];
 
-	constructor(...args: [...StateList, SelectorCallback<StateList>]) {
+	constructor(...args: [...States, SelectorCallback<States>]) {
 		super();
-		const callback = args.pop() as SelectorCallback<StateList>;
-		const stateList = args as unknown as StateList;
+		const fn = args.pop() as SelectorCallback<States>;
+		const states = args as unknown as States;
 
 		const reactionHandler = createBatchFunction(() => {
-			callback(...(stateList.map((state) => state.get()) as any));
+			fn(...(states.map((state) => state.get()) as any));
 		});
 
-		stateList.forEach((state) => {
-			this.unsubscribeList.push(state.subscribe(reactionHandler));
-		});
+		this.unsubscribes = states.map((state) => state.subscribe(reactionHandler));
 	}
 
 	release(): void {
-		this.unsubscribeList.forEach((unsubscribe) => unsubscribe());
+		this.unsubscribes.forEach((unsubscribe) => unsubscribe());
 		super.release();
 	}
 }
