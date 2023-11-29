@@ -3,10 +3,10 @@ import { Svitore } from "./svitore";
 import { SvitoreModule } from "./svitore-module";
 
 describe("Svitore", () => {
-	describe("createModule - create svitore module", () => {
+	describe("Module - create svitore module", () => {
 		test("should create svitore module and add it to list", () => {
-			const testModule1 = Svitore.createModule("test1");
-			const testModule2 = Svitore.createModule("test2");
+			const testModule1 = Svitore.Module("test1");
+			const testModule2 = Svitore.Module("test2");
 
 			expect(Svitore.modules).toHaveLength(2);
 			expect(testModule1).instanceOf(SvitoreModule);
@@ -16,8 +16,8 @@ describe("Svitore", () => {
 
 	describe("waitForAsync - waiting until all async effects to complete", () => {
 		test("should wait pending effect", async () => {
-			const testModule = Svitore.createModule("test");
-			const effect = testModule.createEffect(() => Promise.resolve());
+			const testModule = Svitore.Module("test");
+			const effect = testModule.Effect(() => Promise.resolve());
 			const testSubscribe = vi.fn();
 			effect.subscribe(testSubscribe);
 			effect.run();
@@ -28,15 +28,15 @@ describe("Svitore", () => {
 		});
 
 		test("should wait all pending effects", async () => {
-			const testModule = Svitore.createModule("test");
+			const testModule = Svitore.Module("test");
 
-			const effect1 = testModule.createEffect(
+			const effect1 = testModule.Effect(
 				() => new Promise((resolve) => setTimeout(resolve, 3))
 			);
-			const effect2 = testModule.createEffect(
+			const effect2 = testModule.Effect(
 				() => new Promise((resolve) => setTimeout(resolve, 2))
 			);
-			const effect3 = testModule.createEffect(
+			const effect3 = testModule.Effect(
 				() => new Promise((resolve) => setTimeout(resolve, 1))
 			);
 
@@ -65,11 +65,11 @@ describe("Svitore", () => {
 		});
 
 		test("should wait running effect runners", async () => {
-			const testModule = Svitore.createModule("test");
+			const testModule = Svitore.Module("test");
 
-			const effect = testModule.createEffect(() => Promise.resolve("test"));
+			const effect = testModule.Effect(() => Promise.resolve("test"));
 			const effectRunnerSubscriber = vi.fn();
-			const effectRunner = testModule.createEffectRunner(effect, {
+			const effectRunner = testModule.EffectRunner(effect, {
 				delay: 10,
 				successfulCount: 3,
 			});
@@ -83,28 +83,28 @@ describe("Svitore", () => {
 		});
 	});
 
-	describe("resetState - reset state for each module. In other words, resets the state of the entire application", () => {
-		test("should call resetState for each module", () => {
-			const testModule1 = Svitore.createModule("test1");
-			const testModule2 = Svitore.createModule("test2");
-			const testModule3 = Svitore.createModule("test3");
-			testModule1.resetState = vi.fn();
-			testModule2.resetState = vi.fn();
-			testModule3.resetState = vi.fn();
+	describe("reset - reset state for each module. In other words, resets the state of the entire application", () => {
+		test("should call reset for each module", () => {
+			const testModule1 = Svitore.Module("test1");
+			const testModule2 = Svitore.Module("test2");
+			const testModule3 = Svitore.Module("test3");
+			testModule1.reset = vi.fn();
+			testModule2.reset = vi.fn();
+			testModule3.reset = vi.fn();
 
-			Svitore.resetState();
+			Svitore.reset();
 
-			expect(testModule1.resetState).toHaveBeenCalledOnce();
-			expect(testModule2.resetState).toHaveBeenCalledOnce();
-			expect(testModule3.resetState).toHaveBeenCalledOnce();
+			expect(testModule1.reset).toHaveBeenCalledOnce();
+			expect(testModule2.reset).toHaveBeenCalledOnce();
+			expect(testModule3.reset).toHaveBeenCalledOnce();
 		});
 	});
 
 	describe("release - clears subscriptions for each module. In other words, clears subscriptions of the entire application", () => {
 		test("should call resetState for each module", () => {
-			const testModule1 = Svitore.createModule("test1");
-			const testModule2 = Svitore.createModule("test2");
-			const testModule3 = Svitore.createModule("test3");
+			const testModule1 = Svitore.Module("test1");
+			const testModule2 = Svitore.Module("test2");
+			const testModule3 = Svitore.Module("test3");
 			testModule1.release = vi.fn();
 			testModule2.release = vi.fn();
 			testModule3.release = vi.fn();

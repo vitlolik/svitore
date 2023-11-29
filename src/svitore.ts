@@ -5,16 +5,16 @@ import { Effect, EffectRunner } from "./entities";
 class Svitore {
 	static modules: SvitoreModule[] = [];
 
-	static createModule<T extends string>(name: T): SvitoreModule<T> {
+	static Module<T extends string>(name: T): SvitoreModule<T> {
 		const newModule = new SvitoreModule(name);
 		this.modules.push(newModule);
 
 		return newModule;
 	}
 
-	static resetState(): void {
+	static reset(): void {
 		this.modules.forEach((module) => {
-			module.resetState();
+			module.reset();
 		});
 	}
 

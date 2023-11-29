@@ -20,45 +20,41 @@ const logMiddleware: Middleware<any> = (context, next) => {
 
 const createStore = (): Store => {
 	// define
-	const demoFormModule = Svitore.createModule("demo form");
+	const demoFormModule = Svitore.Module("demo form");
 
-	const changeFirstName = demoFormModule.createEvent<string>();
-	const changeSecondName = demoFormModule.createEvent<string>();
-	const changeAge = demoFormModule.createEvent<number>();
-	const submitted = demoFormModule.createEvent();
-	const resetEvent = demoFormModule.createEvent();
-	const debouncedSubmitEvent = demoFormModule.createDebouncedEvent(500);
-	const throttledSubmitEvent = demoFormModule.createThrottledEvent(500);
+	const changeFirstName = demoFormModule.Event<string>();
+	const changeSecondName = demoFormModule.Event<string>();
+	const changeAge = demoFormModule.Event<number>();
+	const submitted = demoFormModule.Event();
+	const resetEvent = demoFormModule.Event();
+	const debouncedSubmitEvent = demoFormModule.DebouncedEvent(500);
+	const throttledSubmitEvent = demoFormModule.ThrottledEvent(500);
 
-	const firstNameState = demoFormModule.createPersistState(
+	const firstNameState = demoFormModule.PersistState(
 		"",
 		"firstName",
 		window.sessionStorage
 	);
-	const secondNameState = demoFormModule.createPersistState(
+	const secondNameState = demoFormModule.PersistState(
 		"",
 		"lastName",
 		window.sessionStorage
 	);
-	const ageState = demoFormModule.createPersistState(
-		1,
-		"age",
-		window.sessionStorage
-	);
+	const ageState = demoFormModule.PersistState(1, "age", window.sessionStorage);
 
-	const symbolsCountState = demoFormModule.createComputedState(
+	const symbolsCountState = demoFormModule.ComputedState(
 		firstNameState,
 		secondNameState,
 		(firstName, secondName) =>
 			firstName.trim().length + secondName.trim().length
 	);
 
-	const logEffect = demoFormModule.createEffect(() => {
+	const logEffect = demoFormModule.Effect(() => {
 		console.log("УРА !");
 
 		return Promise.resolve();
 	});
-	const logEffectRunner = demoFormModule.createEffectRunner(logEffect, {
+	const logEffectRunner = demoFormModule.EffectRunner(logEffect, {
 		delay: ({ successfulCount }) => successfulCount * 1500,
 		successfulCount: 3,
 	});
@@ -87,7 +83,7 @@ const createStore = (): Store => {
 	logEffectRunner.trigger(submitted);
 
 	resetEvent.subscribe(() => {
-		demoFormModule.resetState();
+		demoFormModule.reset();
 		logEffectRunner.stop();
 	});
 

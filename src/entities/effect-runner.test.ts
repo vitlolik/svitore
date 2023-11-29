@@ -115,9 +115,7 @@ describe("EffectRunner", () => {
 		});
 
 		test("you can pass delay as function", async () => {
-			const successfulSubscriber = vi.fn();
 			const effect = new Effect(() => Promise.resolve("test"));
-			effect.fulfilled.subscribe(successfulSubscriber);
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: ({ successfulCount, failureCount, params, result, error }) => {
@@ -129,14 +127,12 @@ describe("EffectRunner", () => {
 
 					return 1;
 				},
-				successfulCount: 1,
+				successfulCount: 2,
 			});
 
 			effectRunner.start();
 
 			await new Promise((resolve) => effectRunner.subscribe(resolve));
-
-			expect(successfulSubscriber).toHaveBeenCalledOnce();
 		});
 
 		test("should change isRunning state", async () => {

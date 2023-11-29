@@ -12,83 +12,97 @@ import {
 import { Entity } from "./entities/services";
 
 class SvitoreModule<T extends string = any> {
-	private resetStateEvent = new Event();
+	private resetEvent = new Event();
 	entities: Entity[] = [];
+	modules: SvitoreModule[] = [];
 
 	constructor(public name: T) {}
 
-	private createEntity<T extends Entity<any>>(entity: T): T {
+	private newEntity<T extends Entity<any>>(entity: T): T {
 		this.entities.push(entity);
 
 		return entity;
 	}
 
-	createState<T>(...args: ConstructorParameters<typeof State<T>>): State<T> {
-		return this.createEntity(new State(...args).resetOn(this.resetStateEvent));
+	Module<TNew extends string = any>(
+		newName: TNew
+	): SvitoreModule<`${T}:${TNew}`> {
+		const newModule = new SvitoreModule<`${T}:${TNew}`>(
+			`${this.name}:${newName}`
+		);
+		this.modules.push(newModule);
+
+		return newModule;
 	}
 
-	createComputedState<StateList extends ReadonlyArray<State<any>>, T>(
+	State<T>(...args: ConstructorParameters<typeof State<T>>): State<T> {
+		return this.newEntity(new State(...args).resetOn(this.resetEvent));
+	}
+
+	ComputedState<StateList extends ReadonlyArray<State<any>>, T>(
 		...args: ConstructorParameters<typeof ComputedState<StateList, T>>
 	): ComputedState<StateList, T> {
-		return this.createEntity(new ComputedState(...args));
+		return this.newEntity(new ComputedState(...args));
 	}
 
-	createPersistState<T>(
+	PersistState<T>(
 		...args: ConstructorParameters<typeof PersistState<T>>
 	): PersistState<T> {
-		return this.createEntity(
-			new PersistState(...args).resetOn(this.resetStateEvent)
-		);
+		return this.newEntity(new PersistState(...args).resetOn(this.resetEvent));
 	}
 
-	createEvent<T = void>(): Event<T> {
-		return this.createEntity(new Event());
+	Event<T = void>(): Event<T> {
+		return this.newEntity(new Event());
 	}
 
-	createDebouncedEvent<T = void>(
+	DebouncedEvent<T = void>(
 		...args: ConstructorParameters<typeof DebouncedEvent<T>>
 	): DebouncedEvent<T> {
-		return this.createEntity(new DebouncedEvent(...args));
+		return this.newEntity(new DebouncedEvent(...args));
 	}
 
-	createThrottledEvent<T = void>(
+	ThrottledEvent<T = void>(
 		...args: ConstructorParameters<typeof ThrottledEvent<T>>
 	): ThrottledEvent<T> {
-		return this.createEntity(new ThrottledEvent(...args));
+		return this.newEntity(new ThrottledEvent(...args));
 	}
 
-	createEffect<Params = void, Result = void, ErrorType extends Error = Error>(
+	Effect<Params = void, Result = void, ErrorType extends Error = Error>(
 		...args: ConstructorParameters<typeof Effect<Params, Result, ErrorType>>
 	): Effect<Params, Result, ErrorType> {
-		return this.createEntity(new Effect(...args));
+		return this.newEntity(new Effect(...args));
 	}
 
-	createEffectRunner<
-		Params = void,
-		Result = void,
-		ErrorType extends Error = Error
-	>(
+	EffectRunner<Params = void, Result = void, ErrorType extends Error = Error>(
 		...args: ConstructorParameters<
 			typeof EffectRunner<Params, Result, ErrorType>
 		>
 	): EffectRunner<Params, Result, ErrorType> {
-		return this.createEntity(new EffectRunner(...args));
+		return this.newEntity(new EffectRunner(...args));
 	}
 
-	createReaction<T extends ReadonlyArray<State<any>>>(
+	Reaction<T extends ReadonlyArray<State<any>>>(
 		...args: ConstructorParameters<typeof Reaction<T>>
 	): Reaction<T> {
-		return this.createEntity(new Reaction(...args));
+		return this.newEntity(new Reaction(...args));
 	}
 
-	resetState(): void {
-		this.resetStateEvent.dispatch();
+	reset(): void {
+		for (const module of this.modules) {
+			module.reset();
+		}
+
+		this.resetEvent.dispatch();
 	}
 
 	release(): void {
-		this.entities.forEach((entity) => {
+		for (const module of this.modules) {
+			module.release();
+		}
+
+		for (const entity of this.entities) {
 			entity.release();
-		});
+		}
 	}
 }
 
