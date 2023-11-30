@@ -70,8 +70,8 @@ describe("Svitore", () => {
 			const effect = testModule.Effect(() => Promise.resolve("test"));
 			const effectRunnerSubscriber = vi.fn();
 			const effectRunner = testModule.EffectRunner(effect, {
-				delay: 10,
-				successfulCount: 3,
+				delay: () => 10,
+				while: ({ fulfilled }) => fulfilled <= 3,
 			});
 			effectRunner.subscribe(effectRunnerSubscriber);
 

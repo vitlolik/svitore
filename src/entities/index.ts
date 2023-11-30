@@ -10,4 +10,3 @@ export { Reaction } from "./reaction";
 export { AbstractState, AbstractEvent, Entity } from "./services";
 
 export type { EffectFunction } from "./effect";
-export type { Middleware } from "./services";

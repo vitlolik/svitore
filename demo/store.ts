@@ -1,16 +1,16 @@
-import { ComputedState, Event, Middleware, State, Svitore } from "../src";
+import { AbstractEvent, Middleware, Svitore, AbstractState } from "../src";
 
 type Store = {
-	changeFirstName: Event<string>;
-	changeSecondName: Event<string>;
-	changeAge: Event<number>;
-	submitted: Event<void>;
-	resetEvent: Event<void>;
+	changeFirstName: AbstractEvent<string>;
+	changeSecondName: AbstractEvent<string>;
+	changeAge: AbstractEvent<number>;
+	submitted: AbstractEvent<void>;
+	resetEvent: AbstractEvent<void>;
 
-	symbolsCountState: ComputedState<[State<string>, State<string>], number>;
-	firstNameState: State<string>;
-	secondNameState: State<string>;
-	ageState: State<number>;
+	symbolsCountState: AbstractState<number>;
+	firstNameState: AbstractState<string>;
+	secondNameState: AbstractState<string>;
+	ageState: AbstractState<number>;
 };
 
 const logMiddleware: Middleware<any> = (context, next) => {
@@ -56,8 +56,8 @@ const createStore = (): Store => {
 	});
 
 	const logEffectRunner = demoFormModule.EffectRunner(logEffect, {
-		delay: ({ successfulCount }) => successfulCount * 1500,
-		successfulCount: 3,
+		delay: ({ fulfilled }) => fulfilled * 1500,
+		while: ({ fulfilled }) => fulfilled < 3,
 	});
 
 	logEffectRunner.pending.subscribe(console.log);

@@ -103,7 +103,10 @@ describe("SvitoreModule", () => {
 		it("should create effect runner and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const effect = testModule.Effect(() => Promise.resolve());
-			const effectRunner = testModule.EffectRunner(effect, { delay: 0 });
+			const effectRunner = testModule.EffectRunner(effect, {
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled <= 1,
+			});
 
 			expect(effectRunner).instanceOf(EffectRunner);
 			expect(testModule.entities).toHaveLength(2);

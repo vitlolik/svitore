@@ -1,3 +1,5 @@
 export { Svitore } from "./svitore";
-export * from "./entities";
-export type { EffectFunction, Middleware } from "./entities";
+export { AbstractEvent, AbstractState } from "./entities/services";
+
+export type { Middleware } from "./entities/services";
+export type { EffectFunction } from "./entities";

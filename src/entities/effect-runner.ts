@@ -3,30 +3,28 @@ import { Event } from "./event";
 import { Entity } from "./services";
 import { State } from "./state";
 
-type DelayParams<Params, Result, ErrorType> = {
-	failureCount: number;
-	successfulCount: number;
+type CallbackParams<Params, Result, ErrorType> = {
+	rejected: number;
+	fulfilled: number;
 	params: Params;
 	result: Result | null;
 	error: ErrorType | null;
 };
 
 type EffectRunnerOptions<Params, Result, ErrorType> = {
-	delay: number | ((params: DelayParams<Params, Result, ErrorType>) => number);
-	failureCount?: number;
-	successfulCount?: number;
+	delay: (params: CallbackParams<Params, Result, ErrorType>) => number;
+	while: (params: CallbackParams<Params, Result, ErrorType>) => boolean;
 };
 
-type NotifyType = "failureLimit" | "successfulLimit" | "stopped";
+type NotifyType = "stopped" | "finished";
 
 class EffectRunner<
 	Params = void,
 	Result = void,
 	ErrorType extends Error = Error
 > extends Entity<NotifyType> {
-	private options: Required<EffectRunnerOptions<Params, Result, ErrorType>>;
-	private failureCount = 0;
-	private successfulCount = 0;
+	private rejected = 0;
+	private fulfilled = 0;
 	private timer: number | NodeJS.Timeout = NaN;
 	private unsubscribe = (): void => {};
 	private changed = new Event<boolean>();
@@ -35,49 +33,19 @@ class EffectRunner<
 
 	constructor(
 		private effect: Effect<Params, Result, ErrorType>,
-		options: EffectRunnerOptions<Params, Result, ErrorType>
+		private options: EffectRunnerOptions<Params, Result, ErrorType>
 	) {
 		super();
-
-		this.options = {
-			...options,
-			failureCount: this.parseCount(options.failureCount),
-			successfulCount: this.parseCount(options.successfulCount),
-		};
-	}
-
-	private parseCount(count?: number): number {
-		if (count === undefined) return Infinity;
-
-		return count < 0 ? 0 : count;
-	}
-
-	private getDelay(
-		params: Params,
-		result: Result | null,
-		error: ErrorType | null
-	): number {
-		const { delay } = this.options;
-
-		return typeof delay === "number"
-			? delay
-			: delay({
-					failureCount: this.failureCount,
-					successfulCount: this.successfulCount,
-					params,
-					result,
-					error,
-			  });
 	}
 
 	private reset(): void {
 		this.unsubscribe();
-		this.failureCount = 0;
-		this.successfulCount = 0;
+		this.rejected = 0;
+		this.fulfilled = 0;
 		globalThis.clearTimeout(this.timer);
 	}
 
-	private finish(type: NotifyType): void {
+	private end(type: NotifyType): void {
 		this.notify(type);
 		this.changed.dispatch(false);
 	}
@@ -87,23 +55,32 @@ class EffectRunner<
 		this.changed.dispatch(true);
 
 		this.unsubscribe = this.effect.subscribe((payload) => {
+			let result: Result | null = null;
+			let error: ErrorType | null = null;
+
 			if (payload.state === "rejected") {
-				if (++this.failureCount >= this.options.failureCount) {
-					return this.finish("failureLimit");
-				}
-
-				return (this.timer = globalThis.setTimeout(() => {
-					this.effect.run(params);
-				}, this.getDelay(payload.params, null, payload.error)));
+				this.rejected++;
+				error = payload.error;
+			} else {
+				this.fulfilled++;
+				result = payload.result;
 			}
 
-			if (++this.successfulCount >= this.options.successfulCount) {
-				return this.finish("successfulLimit");
+			const callbackParams: CallbackParams<Params, Result, ErrorType> = {
+				rejected: this.rejected,
+				fulfilled: this.fulfilled,
+				params,
+				result,
+				error,
+			};
+
+			if (!this.options.while(callbackParams)) {
+				return this.end("finished");
 			}
 
-			return (this.timer = globalThis.setTimeout(() => {
+			this.timer = globalThis.setTimeout(() => {
 				this.effect.run(params);
-			}, this.getDelay(payload.params, payload.result, null)));
+			}, this.options.delay(callbackParams));
 		});
 
 		this.effect.run(params);
@@ -114,7 +91,7 @@ class EffectRunner<
 		if (!this.pending.get()) return;
 
 		this.effect.cancel();
-		this.finish("stopped");
+		this.end("stopped");
 	}
 
 	trigger<EntityPayload extends Params>(entity: Entity<EntityPayload>): this;

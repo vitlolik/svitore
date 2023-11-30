@@ -11,8 +11,8 @@ describe("EffectRunner", () => {
 			effect.fulfilled.subscribe(successfulSubscriber);
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 3,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 3,
 			});
 
 			effectRunner.start();
@@ -28,8 +28,8 @@ describe("EffectRunner", () => {
 			effect.rejected.subscribe(failureSubscriber);
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				failureCount: 5,
+				delay: () => 0,
+				while: ({ rejected }) => rejected < 5,
 			});
 
 			effectRunner.start();
@@ -59,9 +59,8 @@ describe("EffectRunner", () => {
 			effect.rejected.subscribe(failureSubscriber);
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 10,
-				failureCount: 5,
+				delay: () => 0,
+				while: ({ fulfilled, rejected }) => fulfilled < 10 && rejected < 5,
 			});
 
 			effectRunner.start();
@@ -72,36 +71,15 @@ describe("EffectRunner", () => {
 			expect(failureSubscriber).toHaveBeenCalledTimes(5);
 		});
 
-		test("should call subscribe callback with 'successfulLimit' value", async () => {
-			const successfulSubscriber = vi.fn();
-			const effect = new Effect(() => Promise.resolve("test"));
-			effect.fulfilled.subscribe(successfulSubscriber);
-
-			const effectRunnerSubscriber = vi.fn();
-			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 1,
-			});
-			effectRunner.subscribe(effectRunnerSubscriber);
-
-			effectRunner.start();
-
-			await new Promise((resolve) => effectRunner.subscribe(resolve));
-
-			expect(successfulSubscriber).toHaveBeenCalledOnce();
-			expect(effectRunnerSubscriber).toHaveBeenCalledOnce();
-			expect(effectRunnerSubscriber).toHaveBeenCalledWith("successfulLimit");
-		});
-
-		test("should call subscribe callback with 'failureLimit' value", async () => {
+		test("should call subscribe callback with 'finished' value", async () => {
 			const failureSubscriber = vi.fn();
 			const effect = new Effect(() => Promise.reject("test"));
 			effect.rejected.subscribe(failureSubscriber);
 
 			const effectRunnerSubscriber = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				failureCount: 1,
+				delay: () => 0,
+				while: ({ rejected }) => rejected < 1,
 			});
 			effectRunner.subscribe(effectRunnerSubscriber);
 
@@ -111,23 +89,23 @@ describe("EffectRunner", () => {
 
 			expect(failureSubscriber).toHaveBeenCalledOnce();
 			expect(effectRunnerSubscriber).toHaveBeenCalledOnce();
-			expect(effectRunnerSubscriber).toHaveBeenCalledWith("failureLimit");
+			expect(effectRunnerSubscriber).toHaveBeenCalledWith("finished");
 		});
 
-		test("you can pass delay as function", async () => {
+		test("should pass correct params to delay function", async () => {
 			const effect = new Effect(() => Promise.resolve("test"));
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: ({ successfulCount, failureCount, params, result, error }) => {
-					expect(successfulCount).toBeTypeOf("number");
-					expect(failureCount).toBeTypeOf("number");
+				delay: ({ fulfilled, rejected, params, result, error }) => {
+					expect(fulfilled).toBeTypeOf("number");
+					expect(rejected).toBeTypeOf("number");
 					expect(params).toBeTypeOf("undefined");
 					expect(result).toBe("test");
 					expect(error).toBe(null);
 
 					return 1;
 				},
-				successfulCount: 2,
+				while: ({ fulfilled }) => fulfilled < 2,
 			});
 
 			effectRunner.start();
@@ -139,8 +117,8 @@ describe("EffectRunner", () => {
 			const effect = new Effect(() => Promise.resolve("test"));
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 1,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled <= 1,
 			});
 
 			expect(effectRunner.pending.get()).toBe(false);
@@ -159,8 +137,8 @@ describe("EffectRunner", () => {
 			effect.cancel = effectCancelMock;
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 1,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 1,
 			});
 
 			effectRunner.start();
@@ -173,8 +151,8 @@ describe("EffectRunner", () => {
 			const effect = new Effect(() => Promise.resolve("test"));
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 1,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 1,
 			});
 
 			effectRunner.start();
@@ -188,8 +166,8 @@ describe("EffectRunner", () => {
 
 			const effectRunnerSubscriber = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 3,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 3,
 			});
 			effectRunner.subscribe(effectRunnerSubscriber);
 
@@ -210,14 +188,31 @@ describe("EffectRunner", () => {
 			const effect = new Effect(() => Promise.resolve("test"));
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 1,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 1,
 			});
 
 			effectRunner.stop();
 
 			expect(clearTimeoutSpy).toHaveBeenCalledOnce();
 			vi.clearAllMocks();
+		});
+
+		test("should call subscribe callback with 'stopped' value", () => {
+			const effect = new Effect(() => Promise.resolve("test"));
+
+			const effectRunnerSubscriber = vi.fn();
+			const effectRunner = new EffectRunner(effect, {
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 1,
+			});
+			effectRunner.subscribe(effectRunnerSubscriber);
+
+			effectRunner.start();
+			effectRunner.stop();
+
+			expect(effectRunnerSubscriber).toHaveBeenCalledOnce();
+			expect(effectRunnerSubscriber).toHaveBeenCalledWith("stopped");
 		});
 	});
 
@@ -227,8 +222,8 @@ describe("EffectRunner", () => {
 			const triggerEvent = new Event<string>();
 			const mockStart = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 1,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 1,
 			});
 			effectRunner.start = mockStart;
 			effectRunner.trigger(triggerEvent);
@@ -244,8 +239,8 @@ describe("EffectRunner", () => {
 			const triggerEvent = new Event<number>();
 			const mockStart = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 1,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 1,
 			});
 			effectRunner.start = mockStart;
 			effectRunner.trigger(
@@ -268,8 +263,8 @@ describe("EffectRunner", () => {
 			const isRunningSubscriber = vi.fn();
 
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 3,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 3,
 			});
 
 			effectRunner.subscribe(effectRunnerSubscriber);
@@ -292,8 +287,8 @@ describe("EffectRunner", () => {
 
 			const stopMock = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
-				delay: 0,
-				successfulCount: 3,
+				delay: () => 0,
+				while: ({ fulfilled }) => fulfilled < 3,
 			});
 			effectRunner.stop = stopMock;
 

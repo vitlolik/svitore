@@ -18,7 +18,10 @@
 		"check-size": "size-limit",
 		"test": "vitest",
 		"test:coverage": "vitest run --coverage",
-		"preversion": "npm run test:coverage && npm run build && npm run check-size"
+		"preversion": "npm run test:coverage && npm run build && npm run check-size",
+		"docs:dev": "vitepress dev docs",
+		"docs:build": "vitepress build docs",
+		"docs:preview": "vitepress preview docs"
 	},
 	"devDependencies": {
 		"@size-limit/preset-small-lib": "^11.0.0",
@@ -32,13 +35,14 @@
 		"typescript": "^5.2.2",
 		"vite": "^5.0.0",
 		"vite-plugin-dts": "^3.6.3",
+		"vitepress": "^1.0.0-rc.31",
 		"vitest": "^0.34.6"
 	},
 	"size-limit": [
 		{
 			"path": "./dist/index.js",
 			"import": "*",
-			"limit": "2.3 kb"
+			"limit": "2.1 kb"
 		}
 	],
 	"keywords": [
