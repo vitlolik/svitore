@@ -3,9 +3,9 @@ import { Observable, Observer } from "./observable";
 let id = 0;
 
 abstract class Entity<T = void> extends Observable<T> {
-	id: number;
+	readonly id: number;
 	private triggerMap: Map<Entity<any>, () => void> = new Map();
-	static ENTITIES: Entity<any>[] = [];
+	static readonly ENTITIES: Entity<any>[] = [];
 
 	constructor() {
 		super();

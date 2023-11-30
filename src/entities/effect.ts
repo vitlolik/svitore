@@ -29,12 +29,11 @@ class Effect<
 	ErrorType extends Error = Error
 > extends Entity<NotifyPayload<Params, Result, ErrorType>> {
 	private abortController: AbortController | null = null;
+	private pendingChanged = new Event<boolean>();
 
-	fulfilled = new Event<{ params: Params; result: Result }>();
-	rejected = new Event<{ params: Params; error: ErrorType }>();
-
-	pendingChanged = new Event<boolean>();
-	pending = new State<boolean>(false).changeOn(this.pendingChanged);
+	readonly fulfilled = new Event<{ params: Params; result: Result }>();
+	readonly rejected = new Event<{ params: Params; error: ErrorType }>();
+	readonly pending = new State<boolean>(false).changeOn(this.pendingChanged);
 
 	constructor(
 		private effectFunction: EffectFunction<Params, Result>,

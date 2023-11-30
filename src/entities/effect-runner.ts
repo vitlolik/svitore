@@ -31,7 +31,7 @@ class EffectRunner<
 	private unsubscribe = (): void => {};
 	private changed = new Event<boolean>();
 
-	pending = new State<boolean>(false).changeOn(this.changed);
+	readonly pending = new State<boolean>(false).changeOn(this.changed);
 
 	constructor(
 		private effect: Effect<Params, Result, ErrorType>,

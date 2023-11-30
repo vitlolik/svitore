@@ -3,7 +3,7 @@ import { DelayedEvent, Entity } from "./entities/services";
 import { Effect, EffectRunner } from "./entities";
 
 class Svitore {
-	static modules: SvitoreModule[] = [];
+	static readonly modules: SvitoreModule[] = [];
 
 	static Module<T extends string>(name: T): SvitoreModule<T> {
 		const newModule = new SvitoreModule(name);

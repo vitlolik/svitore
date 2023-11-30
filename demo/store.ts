@@ -54,6 +54,7 @@ const createStore = (): Store => {
 
 		return Promise.resolve();
 	});
+
 	const logEffectRunner = demoFormModule.EffectRunner(logEffect, {
 		delay: ({ successfulCount }) => successfulCount * 1500,
 		successfulCount: 3,

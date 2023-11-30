@@ -12,19 +12,19 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 		errorEvent?: AbstractEvent<any>;
 	}[] = [];
 
-	private invokeMiddlewares(
+	private callMiddlewares(
 		value: Payload,
 		dispatch: (context: MiddlewareContext<Payload>) => void
 	): void {
 		const context: MiddlewareContext<Payload> = { value };
 
-		const invoke = (index: number): void => {
+		const call = (index: number): void => {
 			if (index < this.middlewares.length) {
 				const { fn, errorEvent } = this.middlewares[index];
 
 				try {
 					fn(context, () => {
-						invoke(index + 1);
+						call(index + 1);
 					});
 				} catch (error) {
 					if (!errorEvent) {
@@ -38,11 +38,11 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 			}
 		};
 
-		invoke(0);
+		call(0);
 	}
 
 	dispatch(payload: Payload): void {
-		this.invokeMiddlewares(payload, ({ value }) => {
+		this.callMiddlewares(payload, ({ value }) => {
 			this.notify(value);
 		});
 	}

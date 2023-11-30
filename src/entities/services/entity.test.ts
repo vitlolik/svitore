@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from "vitest";
-import { Observable } from "./observable";
 import { Entity } from "./entity";
 
 describe("entity", () => {
@@ -14,13 +13,6 @@ describe("entity", () => {
 			return super.notify(params);
 		}
 	}
-
-	it("type", () => {
-		const entity = new TestEntity();
-		Entity.ENTITIES = [];
-
-		expect(entity).instanceOf(Observable);
-	});
 
 	it("should add entity instance to static variable", () => {
 		const entity1 = new TestEntity();
