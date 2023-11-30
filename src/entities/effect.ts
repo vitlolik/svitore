@@ -34,7 +34,7 @@ class Effect<
 	rejected = new Event<{ params: Params; error: ErrorType }>();
 
 	pendingChanged = new Event<boolean>();
-	isPending = new State<boolean>(false).changeOn(this.pendingChanged);
+	pending = new State<boolean>(false).changeOn(this.pendingChanged);
 
 	constructor(
 		private effectFunction: EffectFunction<Params, Result>,
@@ -102,7 +102,7 @@ class Effect<
 
 	release(): void {
 		this.cancel();
-		this.isPending.release();
+		this.pending.release();
 		this.pendingChanged.release();
 		this.fulfilled.release();
 		this.rejected.release();

@@ -13,8 +13,8 @@ import { Entity } from "./entities/services";
 
 class SvitoreModule<T extends string = any> {
 	private resetEvent = new Event();
-	entities: Entity[] = [];
 	modules: SvitoreModule[] = [];
+	entities: Entity[] = [];
 
 	constructor(public name: T) {}
 

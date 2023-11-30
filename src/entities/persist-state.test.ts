@@ -59,10 +59,10 @@ describe("persist state", () => {
 		);
 	});
 
-	it("clearStorage - should remove item from storage", () => {
+	it("clear - should remove item from storage", () => {
 		const persistState = new PersistState("test state", "test-key");
 
-		persistState.clearStorage();
+		persistState.clear();
 
 		expect(removeItemSpy).toHaveBeenCalledTimes(1);
 		expect(removeItemSpy).toHaveBeenCalledWith(PERSIST_STORAGE_KEY);

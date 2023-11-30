@@ -28,10 +28,10 @@ class EffectRunner<
 	private failureCount = 0;
 	private successfulCount = 0;
 	private timer: number | NodeJS.Timeout = NaN;
-	private unsubscribeFromEffect = (): void => {};
-	private isRunningChanged = new Event<boolean>();
+	private unsubscribe = (): void => {};
+	private changed = new Event<boolean>();
 
-	isRunning = new State<boolean>(false).changeOn(this.isRunningChanged);
+	pending = new State<boolean>(false).changeOn(this.changed);
 
 	constructor(
 		private effect: Effect<Params, Result, ErrorType>,
@@ -52,7 +52,7 @@ class EffectRunner<
 		return count < 0 ? 0 : count;
 	}
 
-	private getDelayInMilliseconds(
+	private getDelay(
 		params: Params,
 		result: Result | null,
 		error: ErrorType | null
@@ -71,7 +71,7 @@ class EffectRunner<
 	}
 
 	private reset(): void {
-		this.unsubscribeFromEffect();
+		this.unsubscribe();
 		this.failureCount = 0;
 		this.successfulCount = 0;
 		globalThis.clearTimeout(this.timer);
@@ -79,14 +79,14 @@ class EffectRunner<
 
 	private finish(type: NotifyType): void {
 		this.notify(type);
-		this.isRunningChanged.dispatch(false);
+		this.changed.dispatch(false);
 	}
 
 	start(params: Params): void {
 		this.reset();
-		this.isRunningChanged.dispatch(true);
+		this.changed.dispatch(true);
 
-		this.unsubscribeFromEffect = this.effect.subscribe((payload) => {
+		this.unsubscribe = this.effect.subscribe((payload) => {
 			if (payload.state === "rejected") {
 				if (++this.failureCount >= this.options.failureCount) {
 					return this.finish("failureLimit");
@@ -94,7 +94,7 @@ class EffectRunner<
 
 				return (this.timer = globalThis.setTimeout(() => {
 					this.effect.run(params);
-				}, this.getDelayInMilliseconds(payload.params, null, payload.error)));
+				}, this.getDelay(payload.params, null, payload.error)));
 			}
 
 			if (++this.successfulCount >= this.options.successfulCount) {
@@ -103,7 +103,7 @@ class EffectRunner<
 
 			return (this.timer = globalThis.setTimeout(() => {
 				this.effect.run(params);
-			}, this.getDelayInMilliseconds(payload.params, payload.result, null)));
+			}, this.getDelay(payload.params, payload.result, null)));
 		});
 
 		this.effect.run(params);
@@ -111,7 +111,7 @@ class EffectRunner<
 
 	stop(): void {
 		this.reset();
-		if (!this.isRunning.get()) return;
+		if (!this.pending.get()) return;
 
 		this.effect.cancel();
 		this.finish("stopped");
@@ -132,8 +132,8 @@ class EffectRunner<
 	}
 
 	release(): void {
-		this.isRunning.release();
-		this.isRunningChanged.release();
+		this.pending.release();
+		this.changed.release();
 		super.release();
 		this.stop();
 	}

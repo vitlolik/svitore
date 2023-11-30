@@ -6,11 +6,13 @@ class DebouncedEvent<Payload = void> extends DelayedEvent<Payload> {
 	}
 
 	dispatch(payload: Payload): void {
+		this.pending = true;
+
 		this.clearTimer();
-		this.timeoutId = globalThis.setTimeout(
-			() => super.dispatch(payload),
-			this.timeout
-		);
+		this.timer = globalThis.setTimeout(() => {
+			super.dispatch(payload);
+			this.pending = false;
+		}, this.timeout);
 	}
 }
 

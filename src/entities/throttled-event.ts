@@ -1,8 +1,10 @@
 import { DelayedEvent } from "./services";
 
+const noValue = Symbol("noValue");
+
 class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 	private isThrottled = false;
-	private savedParams: Payload | null = null;
+	private savedParams: Payload | typeof noValue = noValue;
 
 	constructor(timeout: number) {
 		super(timeout);
@@ -10,6 +12,7 @@ class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 
 	dispatch(payload: Payload): void {
 		if (this.isThrottled) {
+			this.pending = true;
 			this.savedParams = payload;
 			return;
 		}
@@ -17,11 +20,12 @@ class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 		super.dispatch(payload);
 		this.isThrottled = true;
 
-		this.timeoutId = globalThis.setTimeout(() => {
+		this.timer = globalThis.setTimeout(() => {
 			this.isThrottled = false;
-			if (this.savedParams) {
+			this.pending = false;
+			if (this.savedParams !== noValue) {
 				this.dispatch(this.savedParams);
-				this.savedParams = null;
+				this.savedParams = noValue;
 			}
 		}, this.timeout);
 	}

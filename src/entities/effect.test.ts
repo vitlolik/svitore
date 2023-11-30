@@ -30,7 +30,7 @@ describe("effect", () => {
 		test("should set pending state on running", async () => {
 			const effect = new Effect(() => Promise.resolve("hello"));
 			const promise = effect.run();
-			expect(effect.isPending.get()).toBe(true);
+			expect(effect.pending.get()).toBe(true);
 
 			await promise;
 		});
@@ -55,17 +55,17 @@ describe("effect", () => {
 			const effectFulfilled = new Effect(() => Promise.resolve("hello"));
 			const effectRejected = new Effect(() => Promise.reject("error"));
 
-			expect(effectFulfilled.isPending.get()).toBe(false);
+			expect(effectFulfilled.pending.get()).toBe(false);
 			const effectFulfilledPromise = effectFulfilled.run();
-			expect(effectFulfilled.isPending.get()).toBe(true);
+			expect(effectFulfilled.pending.get()).toBe(true);
 			await effectFulfilledPromise;
-			expect(effectFulfilled.isPending.get()).toBe(false);
+			expect(effectFulfilled.pending.get()).toBe(false);
 
-			expect(effectRejected.isPending.get()).toBe(false);
+			expect(effectRejected.pending.get()).toBe(false);
 			const effectRejectedPromise = effectRejected.run();
-			expect(effectRejected.isPending.get()).toBe(true);
+			expect(effectRejected.pending.get()).toBe(true);
 			await effectRejectedPromise;
-			expect(effectRejected.isPending.get()).toBe(false);
+			expect(effectRejected.pending.get()).toBe(false);
 		});
 
 		test("should notify listeners on finished", async () => {
@@ -101,10 +101,10 @@ describe("effect", () => {
 			await Promise.resolve("hello");
 		});
 		effect.run();
-		expect(effect.isPending.get()).toBe(true);
+		expect(effect.pending.get()).toBe(true);
 
 		effect.cancel();
-		expect(effect.isPending.get()).toBe(false);
+		expect(effect.pending.get()).toBe(false);
 		expect(abortListener).toHaveBeenCalledTimes(1);
 	});
 
@@ -114,7 +114,7 @@ describe("effect", () => {
 		const effect = new Effect(() => Promise.resolve("hello"));
 		effect.cancel = vi.fn();
 		effect.subscribe(effectSubscriber);
-		effect.isPending.subscribe(pendingSubscriber);
+		effect.pending.subscribe(pendingSubscriber);
 
 		effect.release();
 

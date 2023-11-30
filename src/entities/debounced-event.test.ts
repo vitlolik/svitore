@@ -3,8 +3,8 @@ import { DebouncedEvent } from "./debounced-event";
 
 describe("DebouncedEvent", () => {
 	class TestDebouncedEvent<T = void> extends DebouncedEvent<T> {
-		get timer(): number | NodeJS.Timeout {
-			return this.timeoutId;
+		get _timer(): number | NodeJS.Timeout {
+			return this.timer;
 		}
 
 		clearTimer = vi.fn();
@@ -51,6 +51,18 @@ describe("DebouncedEvent", () => {
 		debouncedEvent.dispatch();
 
 		expect(setTimeoutSpy).toHaveBeenCalledOnce();
-		expect(Number(debouncedEvent.timer)).toBe(123);
+		expect(Number(debouncedEvent._timer)).toBe(123);
+	});
+
+	test("should set pending state", async () => {
+		const event = new DebouncedEvent(100);
+
+		expect(event.pending).toBe(false);
+
+		event.dispatch();
+		expect(event.pending).toBe(true);
+
+		await new Promise((resolve) => event.subscribe(resolve));
+		expect(event.pending).toBe(false);
 	});
 });

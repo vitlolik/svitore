@@ -59,7 +59,7 @@ const createStore = (): Store => {
 		successfulCount: 3,
 	});
 
-	logEffectRunner.isRunning.subscribe(console.log);
+	logEffectRunner.pending.subscribe(console.log);
 
 	// logic
 	changeFirstName.applyMiddleware(logMiddleware);

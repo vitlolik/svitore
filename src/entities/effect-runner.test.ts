@@ -135,7 +135,7 @@ describe("EffectRunner", () => {
 			await new Promise((resolve) => effectRunner.subscribe(resolve));
 		});
 
-		test("should change isRunning state", async () => {
+		test("should change pending state", async () => {
 			const effect = new Effect(() => Promise.resolve("test"));
 
 			const effectRunner = new EffectRunner(effect, {
@@ -143,12 +143,12 @@ describe("EffectRunner", () => {
 				successfulCount: 1,
 			});
 
-			expect(effectRunner.isRunning.get()).toBe(false);
+			expect(effectRunner.pending.get()).toBe(false);
 			effectRunner.start();
-			expect(effectRunner.isRunning.get()).toBe(true);
+			expect(effectRunner.pending.get()).toBe(true);
 
 			await new Promise((resolve) => effectRunner.subscribe(resolve));
-			expect(effectRunner.isRunning.get()).toBe(false);
+			expect(effectRunner.pending.get()).toBe(false);
 		});
 	});
 
@@ -169,7 +169,7 @@ describe("EffectRunner", () => {
 			expect(effectCancelMock).toHaveBeenCalledOnce();
 		});
 
-		test("should set false for isRunning state", () => {
+		test("should set false for pending state", () => {
 			const effect = new Effect(() => Promise.resolve("test"));
 
 			const effectRunner = new EffectRunner(effect, {
@@ -180,7 +180,7 @@ describe("EffectRunner", () => {
 			effectRunner.start();
 			effectRunner.stop();
 
-			expect(effectRunner.isRunning.get()).toBe(false);
+			expect(effectRunner.pending.get()).toBe(false);
 		});
 
 		test("should unsubscribe from effect", () => {
@@ -273,7 +273,7 @@ describe("EffectRunner", () => {
 			});
 
 			effectRunner.subscribe(effectRunnerSubscriber);
-			effectRunner.isRunning.subscribe(isRunningSubscriber);
+			effectRunner.pending.subscribe(isRunningSubscriber);
 
 			effectRunner.release();
 

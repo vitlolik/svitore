@@ -1,5 +1,5 @@
 import { SvitoreModule } from "./svitore-module";
-import { Entity } from "./entities/services";
+import { DelayedEvent, Entity } from "./entities/services";
 import { Effect, EffectRunner } from "./entities";
 
 class Svitore {
@@ -13,31 +13,41 @@ class Svitore {
 	}
 
 	static reset(): void {
-		this.modules.forEach((module) => {
+		for (const module of this.modules) {
 			module.reset();
-		});
+		}
 	}
 
 	static release(): void {
-		this.modules.forEach((module) => {
+		for (const module of this.modules) {
 			module.release();
-		});
+		}
 	}
 
-	static waitForAsync(): Promise<void> {
-		const unsubscribeList: (() => void)[] = [];
+	static allSettled(): Promise<void> {
+		const unsubscribes: (() => void)[] = [];
 
 		const waitIfNeeded = async (): Promise<void> => {
 			const pendingEffects = Entity.ENTITIES.filter(
-				(entity) => entity instanceof Effect && entity.isPending.get()
+				(entity) => entity instanceof Effect && entity.pending.get()
 			);
-			const runningEffectRunners = Entity.ENTITIES.filter(
-				(entity) => entity instanceof EffectRunner && entity.isRunning.get()
+			const pendingEffectRunners = Entity.ENTITIES.filter(
+				(entity) => entity instanceof EffectRunner && entity.pending.get()
 			);
-			const pendingEntities = [...pendingEffects, ...runningEffectRunners];
+			const pendingEvents = Entity.ENTITIES.filter(
+				(entity) => entity instanceof DelayedEvent && entity.pending
+			);
+
+			const pendingEntities = [
+				...pendingEffects,
+				...pendingEffectRunners,
+				...pendingEvents,
+			];
 
 			if (!pendingEntities.length) {
-				unsubscribeList.forEach((unsubscribe) => unsubscribe());
+				for (const unsubscribe of unsubscribes) {
+					unsubscribe();
+				}
 				return Promise.resolve();
 			}
 
@@ -45,7 +55,7 @@ class Svitore {
 				pendingEntities.map(
 					(entity) =>
 						new Promise((resolve) =>
-							unsubscribeList.push(entity.subscribe(resolve))
+							unsubscribes.push(entity.subscribe(resolve))
 						)
 				)
 			);

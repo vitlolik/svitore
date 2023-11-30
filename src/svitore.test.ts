@@ -14,20 +14,20 @@ describe("Svitore", () => {
 		});
 	});
 
-	describe("waitForAsync - waiting until all async effects to complete", () => {
-		test("should wait pending effect", async () => {
+	describe("allSettled - waiting until all async operations to complete", () => {
+		test("should wait for pending effect", async () => {
 			const testModule = Svitore.Module("test");
 			const effect = testModule.Effect(() => Promise.resolve());
 			const testSubscribe = vi.fn();
 			effect.subscribe(testSubscribe);
 			effect.run();
 
-			await Svitore.waitForAsync();
+			await Svitore.allSettled();
 
 			expect(testSubscribe).toHaveBeenCalled();
 		});
 
-		test("should wait all pending effects", async () => {
+		test("should wait for pending effects", async () => {
 			const testModule = Svitore.Module("test");
 
 			const effect1 = testModule.Effect(
@@ -57,14 +57,14 @@ describe("Svitore", () => {
 
 			effect1.run();
 
-			await Svitore.waitForAsync();
+			await Svitore.allSettled();
 
 			expect(testSubscribe1).toHaveBeenCalled();
 			expect(testSubscribe2).toHaveBeenCalled();
 			expect(testSubscribe3).toHaveBeenCalled();
 		});
 
-		test("should wait running effect runners", async () => {
+		test("should wait for effect runners", async () => {
 			const testModule = Svitore.Module("test");
 
 			const effect = testModule.Effect(() => Promise.resolve("test"));
@@ -77,9 +77,27 @@ describe("Svitore", () => {
 
 			effectRunner.start();
 
-			await Svitore.waitForAsync();
+			await Svitore.allSettled();
 
 			expect(effectRunnerSubscriber).toHaveBeenCalledOnce();
+		});
+
+		test("should wait for delayed events", async () => {
+			const testModule = Svitore.Module("test");
+			const testState = testModule.State("");
+
+			const debouncedEvent = testModule.DebouncedEvent<string>(300);
+			const throttledEvent = testModule.ThrottledEvent<string>(400);
+
+			testState.changeOn(debouncedEvent).changeOn(throttledEvent);
+
+			debouncedEvent.dispatch("debounce");
+			throttledEvent.dispatch("");
+			throttledEvent.dispatch("throttle");
+
+			await Svitore.allSettled();
+
+			expect(testState.get()).toBe("throttle");
 		});
 	});
 

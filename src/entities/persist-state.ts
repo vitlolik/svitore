@@ -39,7 +39,7 @@ class PersistState<Data> extends State<Data> {
 		this.subscribe(writeToStorage);
 	}
 
-	clearStorage(): void {
+	clear(): void {
 		this.storage.removeItem(PERSIST_STORAGE_KEY);
 	}
 }
