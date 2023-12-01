@@ -33,10 +33,10 @@ class Effect<
 
 	readonly fulfilled = new Event<{ params: Params; result: Result }>();
 	readonly rejected = new Event<{ params: Params; error: ErrorType }>();
-	readonly pending = new State<boolean>(false).changeOn(this.pendingChanged);
+	readonly pending = new State(false).changeOn(this.pendingChanged);
 
 	constructor(
-		private effectFunction: EffectFunction<Params, Result>,
+		public fn: EffectFunction<Params, Result>,
 		private options: EffectOptions = {}
 	) {
 		super();
@@ -60,10 +60,7 @@ class Effect<
 
 			this.abortController = new AbortController();
 
-			const result = await this.effectFunction(
-				params,
-				this.abortController.signal
-			);
+			const result = await this.fn(params, this.abortController.signal);
 			this.abortController = null;
 
 			this.pendingChanged.dispatch(false);
