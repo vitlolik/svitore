@@ -1,8 +1,13 @@
-import { describe, expect, vi, test } from "vitest";
+import { describe, expect, vi, test, afterEach } from "vitest";
 import { Svitore } from "./svitore";
 import { SvitoreModule } from "./svitore-module";
+import { ModuleExistsError } from "./utils/error";
 
 describe("Svitore", () => {
+	afterEach(() => {
+		Svitore.release();
+	});
+
 	describe("Module - create svitore module", () => {
 		test("should create svitore module and add it to list", () => {
 			const testModule1 = Svitore.Module("test1");
@@ -11,6 +16,20 @@ describe("Svitore", () => {
 			expect(Svitore.modules).toHaveLength(2);
 			expect(testModule1).instanceOf(SvitoreModule);
 			expect(testModule2).instanceOf(SvitoreModule);
+		});
+
+		test("should throw error if module already exist", () => {
+			Svitore.Module("test1");
+
+			try {
+				Svitore.Module("test1");
+				expect(false).toBe(true);
+			} catch (error) {
+				expect(error).instanceOf(ModuleExistsError);
+				expect((error as any).message).toBe(
+					'Module with name "test1" already exists'
+				);
+			}
 		});
 	});
 

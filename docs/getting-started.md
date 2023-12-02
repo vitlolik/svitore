@@ -20,48 +20,304 @@ yarn add svitore
 
 ## First app
 
+Now we will write our first application using `svitore`.
+
+It will be a small application, but it will touch on some mechanics that are often used in frontend development.
+We will implement a search for user information on GitHub based on their nickname.
+We will not implement the view part, instead, we will focus on writing the logic.
+
+The logic description in svitore begins with creating a [module](/module).
+You don't need to know what a module or other entities we will create in this lesson are right now. You can find their descriptions later in the documentation.
+As I see it, all the code we write will be understandable without knowledge of the svitore API.
+
 ```ts
-import { Svitore } from "svitore";
-
-const myModule = Svitore.Module("myModule");
-
-const counter = myModule.State(0);
-const increased = myModule.Event();
-
-counter
-  .changeOn(increased, (_payload, state) => state + 1)
-  .subscribe(console.log);
-
-increased.dispatch();
+const $module = Svitore.Module("githubSearchModule");
 ```
 
-Сейчас мы напишем наше первое приложение используя `svitore`.
+Not bad already!
+Now let's think about what we need for our application.
 
-Это будет не большое приложение, но в нем будут затронуты некоторые механики, которые часто используются во фронтенде
-Мы реализуем поиск информации о пользователе в GitHub по его ник-нейму.
-Мы не будем реализовывать view часть, сосредоточимся на написании логики.
+1. A [state](/entities/state) where we will store what the user enters, and then display this text in the input, as well as send a request to the GitHub API with this state.
+2. [Event](/entities/event)s that modify this state.
+3. We need to send a request to the GitHub API.
+4. Process the response and display the data. In other words, we need another state.
 
-Описание логики на `svitore` начинается с создания модуля.
-Сейчас вам не нужно знать что такое модуль или другие сущности, который мы будем создавать в этом уроке, вы можете найти их описание позднее в документации.
-Как мне кажется, весь код который мы напишем будет максимально понятный без знания `svitore` API.
+Let's go!
 
-<!-- код создания модуля -->
+For now, let's forget about the GitHub API request and implement the first two points. Describe our entities.
 
-Уже не плохо!
-Теперь давайте подумаем что нам нужно для нашего приложения?
+```ts
+type GitHubUser = {
+  id: number;
+  login: string;
+  avatar_url: string;
+  html_url: string;
+};
 
-1. состояние где мы будем хранить что в водит пользователь, а затем отображать этот текст в инпуте, а так же отправлять запрос на GitHub API c этим состоянием
-2. событие которые изменяет это состояние
-3. нужно отправить запрос на GitHub API
-4. обработать ответ и отобразить данные, то есть нам нужно еще одно состояние.
+const gitHubUsers = $module.State<GitHubUser[]>([]);
+const search = $module.State("");
 
-Поехали!
+const searchChanged = $module.Event<string>();
+const githubUsersUpdated = $module.Event<GitHubUser[]>();
+```
 
-Пока забудем про запрос на GitHub API и реализуем первые два пункта.
-Описываем наши сущности
+Let's connect our entities.
 
-<!-- код описания -->
+```ts
+gitHubUsers.changeOn(githubUsersUpdated);
+search.changeOn(searchChanged);
+```
 
-Свяжем наши сущности
+::: info
+This code means:
 
-<!-- код связывания -->
+1. Save the payload from the `githubUsersUpdated` event into the `gitHubUsers` state.
+2. Save the payload from the `searchChanged` event into the `search` state.
+   :::
+
+Let's check that everything is working.
+
+```ts
+search.subscribe(console.log);
+gitHubUsers.subscribe(console.log);
+
+searchChanged.dispatch("foo");
+githubUsersUpdated.dispatch([
+  {
+    id: 1,
+    login: "test",
+    avatar_url: "/test-url.png",
+    html_url: "/test-url.html",
+  },
+]);
+```
+
+Check if the logs have appeared in the console.
+
+Now, we need to implement the request and, upon changes in the search, send a request to the GitHub API.
+Let's create a file `./api.ts` and declare a function there that will make a request to the GitHub API.
+
+```ts
+const fetchGitHubUsers = async (searchValue: string) => {
+  const response = await fetch(
+    `https://api.github.com/search/users?${new URLSearchParams({
+      q: searchValue,
+    })}`
+  );
+
+  if (!response.ok) throw new Error("Fetch error");
+
+  const json = await response.json();
+
+  return json.items;
+};
+
+export { fetchGitHubUsers };
+```
+
+To handle asynchronous operations or side effects in svitore, there is an entity called [Effect](/entities/effect).
+
+Let's create our first Effect.
+
+```ts
+const fetchGitHubUsersEffect = $module.Effect<string, GitHubUser[]>(
+  fetchGitHubUsers
+);
+```
+
+::: info
+This code means:
+
+1. The effect will be invoked with an argument of type `string`.
+2. You can subscribe to the `fulfilled` event and get the result.
+   :::
+
+Let's connect our entities.
+
+```ts
+fetchGitHubUsersEffect.trigger(searchChanged);
+
+githubUsersUpdated.trigger(
+  fetchGitHubUsersEffect.fulfilled,
+  ({ result }) => result
+);
+```
+
+Our application is already functioning.
+You can call `searchChanged` with some text and see the result in the console.
+
+```ts
+searchChanged.dispatch("a");
+```
+
+This is all the code we have right now.
+
+```ts
+import { Svitore } from "svitore";
+import { fetchGitHubUsers } from "./api";
+
+type GitHubUser = {
+  id: number;
+  login: string;
+  avatar_url: string;
+  html_url: string;
+};
+
+const $module = Svitore.Module("githubSearchModule");
+
+const gitHubUsers = $module.State<GitHubUser[]>([]);
+const search = $module.State("");
+
+const searchChanged = $module.Event<string>();
+const githubUsersUpdated = $module.Event<GitHubUser[]>();
+const fetchGitHubUsersEffect = $module.Effect<string, GitHubUser[]>(
+  fetchGitHubUsers
+);
+
+search.subscribe(console.log);
+gitHubUsers.subscribe(console.log);
+
+gitHubUsers.changeOn(githubUsersUpdated);
+search.changeOn(searchChanged);
+
+fetchGitHubUsersEffect.trigger(searchChanged);
+
+githubUsersUpdated.trigger(
+  fetchGitHubUsersEffect.fulfilled,
+  ({ result }) => result
+);
+```
+
+The application works, but there are a few problems
+
+1. With each triggering of the searchChanged event, the fetchGitHubUsersEffect is invoked, which makes a request to the GitHub API. If we imagine typing on the keyboard, a request will be sent with each keystroke, which is not desirable. We need something like debounce.
+2. It would be correct to cancel the previous request to avoid a race condition.
+3. It is desirable to perform some validation before sending the request and not send the request if we invoke the Effect with an empty string.
+
+All these issues can be solved out of the box using svitore.
+
+Let's start by creating a [debounced event](/entities/debounced-event) called `requestSent` and calling it with each invocation of `searchChanged`.
+Also, let's make our `fetchGitHubUsersEffect` depend on this event.
+
+```ts
+const githubUsersUpdated = $module.Event<GitHubUser[]>();
+const requestSent = $module.DebouncedEvent<string>(300); // [!code ++]
+const fetchGitHubUsersEffect = $module.Effect<string, GitHubUser[]>(
+  fetchGitHubUsers
+);
+```
+
+```ts
+gitHubUsers.changeOn(githubUsersUpdated);
+searchState.changeOn(searchChanged);
+
+requestSent.trigger(searchChanged); // [!code ++]
+fetchGitHubUsersEffect.trigger(requestSent); // [!code ++]
+fetchGitHubUsersEffect.trigger(searchChanged); // [!code --]
+githubUsersUpdated.trigger(
+  fetchGitHubUsersEffect.fulfilled,
+  ({ result }) => result
+);
+```
+
+Effect support auto-cancellation, which will help us cancel previous requests.
+
+```ts
+const fetchGitHubUsersEffect = $module.Effect<string, GitHubUser[]>(
+  fetchGitHubUsers,
+  { isAutoCancelable: true } // [!code ++]
+);
+```
+
+And events support middleware handlers where we can validate or transform our data in some way.
+
+```ts
+const fetchGitHubUsersEffect = $module.Effect<string, GitHubUser[]>(
+  fetchGitHubUsers,
+  { isAutoCancelable: true }
+);
+
+/* [!code ++:7] */ requestSent.applyMiddleware((context, next) => {
+  const value = context.value.trim();
+  if (value) {
+    context.value = value;
+    next();
+  }
+});
+
+gitHubUsers.changeOn(githubUsersUpdated);
+searchState.changeOn(searchChanged);
+```
+
+Now everything is great :slightly_smiling_face:
+
+The entire code:
+
+::: code-group
+
+```ts [github-search-module.ts]
+import { Svitore } from "svitore";
+import { fetchGitHubUsers } from "./api";
+
+type GitHubUser = {
+  id: number;
+  login: string;
+  avatar_url: string;
+  html_url: string;
+};
+
+const $module = Svitore.Module("gitHubSearchModule");
+
+const gitHubUsers = $module.State<GitHubUser[]>([]);
+const searchState = $module.State("");
+
+const searchChanged = $module.Event<string>();
+const githubUsersUpdated = $module.Event<GitHubUser[]>();
+const requestSent = $module.DebouncedEvent<string>(300);
+const fetchGitHubUsersEffect = $module.Effect<string, GitHubUser[]>(
+  fetchGitHubUsers,
+  { isAutoCancelable: true }
+);
+
+requestSent.applyMiddleware((context, next) => {
+  const value = context.value.trim();
+  if (value) {
+    context.value = value;
+    next();
+  }
+});
+
+gitHubUsers.changeOn(githubUsersUpdated);
+searchState.changeOn(searchChanged);
+
+requestSent.trigger(searchChanged);
+fetchGitHubUsersEffect.trigger(requestSent);
+githubUsersUpdated.trigger(
+  fetchGitHubUsersEffect.fulfilled,
+  ({ result }) => result
+);
+
+searchChanged.dispatch("a");
+```
+
+```ts [api.ts]
+const fetchGitHubUsers = async (searchValue: string) => {
+  const response = await fetch(
+    `https://api.github.com/search/users?${new URLSearchParams({
+      q: searchValue,
+    })}`
+  );
+
+  if (!response.ok) throw new Error("Fetch error");
+
+  const json = await response.json();
+
+  return json.items;
+};
+
+export { fetchGitHubUsers };
+```
+
+:::
+
+You can check the implementation of this application on [CodeSandbox](https://codesandbox.io/p/devbox/search-github-users-forked-93dh8n) with React, using the [svitore-react](/react/getting-started) library

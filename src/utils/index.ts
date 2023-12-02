@@ -1,2 +1,2 @@
-export { logError } from "./logError";
+export { logError, SvitoreError } from "./error";
 export { createBatchFunction } from "./batch";

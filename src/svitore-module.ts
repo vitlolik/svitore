@@ -10,10 +10,11 @@ import {
 	EffectRunner,
 } from "./entities";
 import { Entity } from "./entities/services";
+import { ModuleExistsError } from "./utils/error";
 
 class SvitoreModule<T extends string = any> {
 	private resetEvent = new Event();
-	readonly modules: SvitoreModule[] = [];
+	readonly modules: Map<string, SvitoreModule> = new Map();
 	readonly entities: Entity[] = [];
 
 	constructor(public name: T) {}
@@ -27,10 +28,14 @@ class SvitoreModule<T extends string = any> {
 	Module<TNew extends string = any>(
 		newName: TNew
 	): SvitoreModule<`${T}:${TNew}`> {
-		const newModule = new SvitoreModule<`${T}:${TNew}`>(
-			`${this.name}:${newName}`
-		);
-		this.modules.push(newModule);
+		const moduleName: `${T}:${TNew}` = `${this.name}:${newName}`;
+
+		if (this.modules.has(moduleName)) {
+			throw new ModuleExistsError(moduleName);
+		}
+
+		const newModule = new SvitoreModule<`${T}:${TNew}`>(moduleName);
+		this.modules.set(moduleName, newModule);
 
 		return newModule;
 	}
@@ -88,7 +93,7 @@ class SvitoreModule<T extends string = any> {
 	}
 
 	reset(): void {
-		for (const module of this.modules) {
+		for (const module of this.modules.values()) {
 			module.reset();
 		}
 
@@ -96,9 +101,10 @@ class SvitoreModule<T extends string = any> {
 	}
 
 	release(): void {
-		for (const module of this.modules) {
+		for (const module of this.modules.values()) {
 			module.release();
 		}
+		this.modules.clear();
 
 		for (const entity of this.entities) {
 			entity.release();

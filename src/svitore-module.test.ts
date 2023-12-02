@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, vi, test } from "vitest";
 import { SvitoreModule } from "./svitore-module";
 import {
 	ComputedState,
@@ -11,20 +11,36 @@ import {
 	State,
 	ThrottledEvent,
 } from "./entities";
+import { ModuleExistsError } from "./utils/error";
 
 describe("SvitoreModule", () => {
-	describe("createModule", () => {
-		it("should create new child module with correct name", () => {
+	describe("Module", () => {
+		test("should create new child module with correct name", () => {
 			const parentModule = new SvitoreModule("parent");
 			const childModule = parentModule.Module("child");
 
 			expect(parentModule.modules).toHaveLength(1);
 			expect(childModule.name).toBe("parent:child");
 		});
+
+		test("should throw error if module already exist", () => {
+			const parent = new SvitoreModule("parent");
+			parent.Module("child");
+
+			try {
+				parent.Module("child");
+				expect(false).toBe(true);
+			} catch (error) {
+				expect(error).instanceOf(ModuleExistsError);
+				expect((error as any).message).toBe(
+					'Module with name "parent:child" already exists'
+				);
+			}
+		});
 	});
 
 	describe("State", () => {
-		it("should create state and save instance to module", () => {
+		test("should create state and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const state = testModule.State("test state");
 
@@ -34,7 +50,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("ComputedState", () => {
-		it("should create computed state and save instance to module", () => {
+		test("should create computed state and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const state = testModule.State("test state");
 			const computedState = testModule.ComputedState(state, (value) =>
@@ -47,7 +63,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("PersistState", () => {
-		it("should create persist state and save instance to module", () => {
+		test("should create persist state and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const persistState = testModule.PersistState(
 				"test persist state",
@@ -60,7 +76,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("Event", () => {
-		it("should create event and save instance to module", () => {
+		test("should create event and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const event = testModule.Event();
 
@@ -70,7 +86,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("DebouncedEvent", () => {
-		it("should create debounced event and save instance to module", () => {
+		test("should create debounced event and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const debouncedEvent = testModule.DebouncedEvent(100);
 
@@ -80,7 +96,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("ThrottledEvent", () => {
-		it("should create throttled event and save instance to module", () => {
+		test("should create throttled event and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const throttledEvent = testModule.ThrottledEvent(100);
 
@@ -90,7 +106,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("Effect", () => {
-		it("should create effect and save instance to module", () => {
+		test("should create effect and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const effect = testModule.Effect(() => Promise.resolve());
 
@@ -100,7 +116,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("EffectRunner", () => {
-		it("should create effect runner and save instance to module", () => {
+		test("should create effect runner and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const effect = testModule.Effect(() => Promise.resolve());
 			const effectRunner = testModule.EffectRunner(effect, {
@@ -114,7 +130,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("Reaction", () => {
-		it("should create reaction and save instance to module", () => {
+		test("should create reaction and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const state = testModule.State("test state");
 			const reaction = testModule.Reaction(state, () => {});
@@ -125,7 +141,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("reset", () => {
-		it("should call reset state on each state entity except computed state", () => {
+		test("should call reset state on each state entity except computed state", () => {
 			const testModule = new SvitoreModule("test");
 			const changeEvent = testModule.Event<string>();
 			const simpleState = testModule
@@ -143,7 +159,7 @@ describe("SvitoreModule", () => {
 			expect(persistState.get()).toBe("persist state");
 		});
 
-		it("should reset state in each child module", () => {
+		test("should reset state in each child module", () => {
 			const parent = new SvitoreModule("parent");
 			const firstChild = parent.Module("1");
 			const secondChild = parent.Module("2");
@@ -159,7 +175,7 @@ describe("SvitoreModule", () => {
 	});
 
 	describe("release", () => {
-		it("should call release on each entity", () => {
+		test("should call release on each entity", () => {
 			const testModule = new SvitoreModule("test");
 
 			const state = testModule.State("state");
@@ -180,7 +196,7 @@ describe("SvitoreModule", () => {
 			expect(reaction.release).toHaveBeenCalledOnce();
 		});
 
-		it("should call release on each child module", () => {
+		test("should call release on each child module", () => {
 			const parent = new SvitoreModule("parent");
 			const firstChild = parent.Module("1");
 			const secondChild = parent.Module("2");

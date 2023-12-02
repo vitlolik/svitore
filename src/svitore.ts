@@ -1,27 +1,34 @@
 import { SvitoreModule } from "./svitore-module";
 import { DelayedEvent, Entity } from "./entities/services";
 import { Effect, EffectRunner } from "./entities";
+import { ModuleExistsError } from "./utils/error";
 
 class Svitore {
-	static readonly modules: SvitoreModule[] = [];
+	static readonly modules: Map<string, SvitoreModule> = new Map();
 
 	static Module<T extends string>(name: T): SvitoreModule<T> {
+		if (this.modules.has(name)) {
+			throw new ModuleExistsError(name);
+		}
+
 		const newModule = new SvitoreModule(name);
-		this.modules.push(newModule);
+		this.modules.set(name, newModule);
 
 		return newModule;
 	}
 
 	static reset(): void {
-		for (const module of this.modules) {
+		for (const module of this.modules.values()) {
 			module.reset();
 		}
 	}
 
 	static release(): void {
-		for (const module of this.modules) {
+		for (const module of this.modules.values()) {
 			module.release();
 		}
+
+		this.modules.clear();
 	}
 
 	static allSettled(): Promise<void> {

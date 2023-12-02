@@ -22,6 +22,10 @@ export default defineConfig({
 					},
 				],
 			},
+			{
+				text: "React",
+				items: [{ text: "Get Started", link: "/react/getting-started" }],
+			},
 		],
 
 		socialLinks: [
