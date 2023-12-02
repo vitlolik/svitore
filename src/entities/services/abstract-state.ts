@@ -1,12 +1,10 @@
 import { Entity } from "./entity";
 
 abstract class AbstractState<T> extends Entity<T> {
-	protected defaultState: T;
-	protected prevState: T;
+	private prevState: T;
 
-	constructor(protected state: T) {
+	constructor(private state: T) {
 		super();
-		this.defaultState = state;
 		this.prevState = state;
 	}
 

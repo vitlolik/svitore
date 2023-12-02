@@ -1,15 +1,11 @@
 import { Observable, Observer } from "./observable";
 
-let id = 0;
-
 abstract class Entity<T = void> extends Observable<T> {
-	readonly id: number;
 	private triggerMap: Map<Entity<any>, () => void> = new Map();
 	static readonly ENTITIES: Entity<any>[] = [];
 
 	constructor() {
 		super();
-		this.id = id++;
 		Entity.ENTITIES.push(this);
 	}
 

@@ -17,7 +17,7 @@ class ComputedState<
 		super(getStateData());
 
 		this.unsubscribes = states.map((state) =>
-			state.subscribe(() => super.notify(getStateData()))
+			state.subscribe(() => this.notify(getStateData()))
 		);
 	}
 

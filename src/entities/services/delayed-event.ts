@@ -9,7 +9,7 @@ abstract class DelayedEvent<Payload = void> extends AbstractEvent<Payload> {
 	}
 
 	protected clearTimer(): void {
-		clearTimeout(this.timer);
+		globalThis.clearTimeout(this.timer);
 	}
 
 	release(): void {

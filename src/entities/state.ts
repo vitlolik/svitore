@@ -2,8 +2,11 @@ import { Event } from "./event";
 import { AbstractState } from "./services";
 
 class State<Data> extends AbstractState<Data> {
-	constructor(protected state: Data) {
+	private defaultState: Data;
+
+	constructor(state: Data) {
 		super(state);
+		this.defaultState = state;
 	}
 
 	changeOn<Payload extends Data>(event: Event<Payload>): this;
@@ -16,7 +19,7 @@ class State<Data> extends AbstractState<Data> {
 		selector?: (payload: any, state: Data) => Data
 	): this {
 		return this.trigger(event, (payload) => {
-			this.notify(selector ? selector(payload, this.state) : payload);
+			this.notify(selector ? selector(payload, this.get()) : payload);
 		});
 	}
 
