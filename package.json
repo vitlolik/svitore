@@ -1,7 +1,7 @@
 {
 	"name": "svitore",
 	"description": "State manager",
-	"version": "0.0.31",
+	"version": "0.0.32",
 	"author": "Vitaliy Berekchiyan",
 	"type": "module",
 	"files": [
