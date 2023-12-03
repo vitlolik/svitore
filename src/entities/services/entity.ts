@@ -12,7 +12,12 @@ abstract class Entity<T = void> {
 		return () => this.unsubscribe(subscriber);
 	}
 
-	unsubscribe(subscriber: Subscriber<T>): void {
+	unsubscribe(subscriber: Subscriber<T> | Entity<any>): void {
+		if (subscriber instanceof Entity) {
+			this.triggerMap.get(subscriber)?.();
+			return void this.triggerMap.delete(subscriber);
+		}
+
 		this.subscribers.delete(subscriber);
 	}
 

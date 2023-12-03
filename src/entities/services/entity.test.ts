@@ -95,6 +95,19 @@ describe("entity", () => {
 		expect(mockSubscriber).toHaveBeenCalledOnce();
 	});
 
+	test("should unsubscribe from trigger entity", () => {
+		const entity = new TestEntity();
+		const anotherEntity = new TestEntity();
+
+		const mockSubscriber = vi.fn();
+		entity.trigger(anotherEntity, mockSubscriber);
+
+		entity.unsubscribe(anotherEntity);
+		anotherEntity.notify();
+
+		expect(mockSubscriber).not.toHaveBeenCalled();
+	});
+
 	test("should unsubscribe all subscriber and remove them. Also unsubscribe an remove all triggers", () => {
 		const entity = new TestEntity<string>();
 		const secondEntity = new TestEntity();
