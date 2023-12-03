@@ -1,4 +1,4 @@
-import { SelectorCallback } from "../types";
+import { SelectorCallback } from "./types";
 import { AbstractState } from "./services";
 
 class ComputedState<

@@ -1,5 +1,5 @@
 import { AbstractState, Entity } from "./services";
-import { SelectorCallback } from "../types";
+import { SelectorCallback } from "./types";
 import { createBatchFunction } from "../utils";
 
 class Reaction<

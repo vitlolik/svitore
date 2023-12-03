@@ -1,4 +1,4 @@
-import { describe, expect, vi, test } from "vitest";
+import { describe, expect, vi, test, afterEach } from "vitest";
 import { SvitoreModule } from "./svitore-module";
 import {
 	ComputedState,
@@ -12,6 +12,9 @@ import {
 	ThrottledEvent,
 } from "./entities";
 import { ModuleExistsError } from "./utils/error";
+import { release } from "./tools";
+
+afterEach(release);
 
 describe("SvitoreModule", () => {
 	describe("Module", () => {

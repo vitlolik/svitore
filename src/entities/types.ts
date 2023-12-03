@@ -1,4 +1,4 @@
-import { AbstractState, Entity } from "./entities/services";
+import { AbstractState, Entity } from "./services";
 
 type ExtractEntitiesTypes<T extends ReadonlyArray<Entity<any>>> = {
 	[K in keyof T]: T[K] extends Entity<infer U> ? U : never;

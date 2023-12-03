@@ -3,14 +3,8 @@ import { logError } from "../../utils";
 type Subscriber<T = void> = (data: T) => void;
 
 abstract class Entity<T = void> {
-	static readonly ENTITIES: Entity<any>[] = [];
-
 	private subscribers: Set<Subscriber<T>> = new Set();
 	private triggerMap: Map<Entity<any>, () => void> = new Map();
-
-	constructor() {
-		Entity.ENTITIES.push(this);
-	}
 
 	subscribe(subscriber: Subscriber<T>): () => void {
 		this.subscribers.add(subscriber);

@@ -13,11 +13,21 @@ import { Entity } from "./entities/services";
 import { ModuleExistsError } from "./utils/error";
 
 class SvitoreModule<T extends string = any> {
+	static MODULES: Map<string, SvitoreModule> = new Map();
+
 	private resetEvent = new Event();
 	readonly modules: Map<string, SvitoreModule> = new Map();
 	readonly entities: Entity[] = [];
 
-	constructor(public name: T) {}
+	constructor(public name: T) {
+		const { MODULES } = SvitoreModule;
+
+		if (MODULES.has(name)) {
+			throw new ModuleExistsError(name);
+		}
+
+		SvitoreModule.MODULES.set(name, this);
+	}
 
 	private newEntity<T extends Entity<any>>(entity: T): T {
 		this.entities.push(entity);
@@ -25,16 +35,11 @@ class SvitoreModule<T extends string = any> {
 		return entity;
 	}
 
-	Module<TNew extends string = any>(
-		newName: TNew
-	): SvitoreModule<`${T}:${TNew}`> {
-		const moduleName: `${T}:${TNew}` = `${this.name}:${newName}`;
+	Module<Name extends string = any>(name: Name): SvitoreModule<`${T}:${Name}`> {
+		type ModuleType = `${T}:${Name}`;
+		const moduleName: ModuleType = `${this.name}:${name}`;
 
-		if (this.modules.has(moduleName)) {
-			throw new ModuleExistsError(moduleName);
-		}
-
-		const newModule = new SvitoreModule<`${T}:${TNew}`>(moduleName);
+		const newModule = new SvitoreModule<ModuleType>(`${this.name}:${name}`);
 		this.modules.set(moduleName, newModule);
 
 		return newModule;

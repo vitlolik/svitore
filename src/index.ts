@@ -1,5 +1,10 @@
-export { Svitore } from "./svitore";
-export { AbstractEvent, AbstractState, Entity } from "./entities/services";
+export { SvitoreModule } from "./svitore-module";
+export { reset, release, allSettled } from "./tools";
 
-export type { Middleware } from "./entities/services";
+export type {
+	Middleware,
+	AbstractEvent,
+	AbstractState,
+	Entity,
+} from "./entities/services";
 export type { EffectFunction } from "./entities";

@@ -14,14 +14,6 @@ describe("entity", () => {
 		}
 	}
 
-	test("should add entity instance to static variable", () => {
-		const entity1 = new TestEntity();
-		const entity2 = new TestEntity();
-		const entity3 = new TestEntity();
-
-		expect(Entity.ENTITIES).toEqual([entity1, entity2, entity3]);
-	});
-
 	test("should subscribe on entity and entity should notify subscribers", () => {
 		const mockSubscriber = vi.fn();
 		const secondMockSubscriber = vi.fn();

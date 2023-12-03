@@ -1,4 +1,9 @@
-import { AbstractEvent, Middleware, Svitore, AbstractState } from "../src";
+import {
+	AbstractEvent,
+	Middleware,
+	AbstractState,
+	SvitoreModule,
+} from "../src";
 
 type Store = {
 	changeFirstName: AbstractEvent<string>;
@@ -20,7 +25,7 @@ const logMiddleware: Middleware<any> = (context, next) => {
 
 const createStore = (): Store => {
 	// define
-	const demoFormModule = Svitore.Module("demo form");
+	const demoFormModule = new SvitoreModule("demo form");
 
 	const changeFirstName = demoFormModule.Event<string>();
 	const changeSecondName = demoFormModule.Event<string>();
