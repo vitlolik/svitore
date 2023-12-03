@@ -26,7 +26,7 @@ class EffectRunner<
 	private rejected = 0;
 	private fulfilled = 0;
 	private timer: number | NodeJS.Timeout = NaN;
-	private unsubscribe = (): void => {};
+	private unsubscribeFromEffect = (): void => {};
 	private changed = new Event<boolean>();
 
 	readonly pending = new State<boolean>(false).changeOn(this.changed);
@@ -39,7 +39,7 @@ class EffectRunner<
 	}
 
 	private reset(): void {
-		this.unsubscribe();
+		this.unsubscribeFromEffect();
 		this.rejected = 0;
 		this.fulfilled = 0;
 		globalThis.clearTimeout(this.timer);
@@ -54,7 +54,7 @@ class EffectRunner<
 		this.reset();
 		this.changed.dispatch(true);
 
-		this.unsubscribe = this.effect.subscribe((payload) => {
+		this.unsubscribeFromEffect = this.effect.subscribe((payload) => {
 			let result: Result | null = null;
 			let error: ErrorType | null = null;
 
@@ -88,7 +88,9 @@ class EffectRunner<
 
 	stop(): void {
 		this.reset();
-		if (!this.pending.get()) return;
+		if (!this.pending.get()) {
+			return;
+		}
 
 		this.effect.cancel();
 		this.end("stopped");

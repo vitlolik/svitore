@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 
 import { Entity } from "./services";
 import { Reaction } from "./reaction";
@@ -6,7 +6,7 @@ import { State } from "./state";
 import { Event } from "./event";
 
 describe("reaction", () => {
-	it("type", () => {
+	test("type", () => {
 		const state = new State("test");
 		const reaction = new Reaction(state, () => null);
 
@@ -15,7 +15,7 @@ describe("reaction", () => {
 		reaction.release();
 	});
 
-	it("should call reaction-callback with state payload, when states changed", async () => {
+	test("should call reaction-callback with state payload, when states changed", async () => {
 		const change1 = new Event<string>();
 		const change2 = new Event<number>();
 		const stat1 = new State("test").changeOn(change1);
@@ -41,7 +41,7 @@ describe("reaction", () => {
 		reaction.release();
 	});
 
-	it("should call reaction-callback once even states change synchronously many times", async () => {
+	test("should call reaction-callback once even states change synchronously many times", async () => {
 		const change1 = new Event<string>();
 		const change2 = new Event<number>();
 		const stat1 = new State("test").changeOn(change1);
@@ -61,7 +61,7 @@ describe("reaction", () => {
 		reaction.release();
 	});
 
-	it("release - should unsubscribe from states", async () => {
+	test("release - should unsubscribe from states", async () => {
 		const change1 = new Event<string>();
 		const change2 = new Event<number>();
 		const stat1 = new State("test").changeOn(change1);

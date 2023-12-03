@@ -107,4 +107,4 @@ class Effect<
 }
 
 export { Effect };
-export type { EffectFunction, EffectOptions };
+export type { EffectFunction, EffectOptions, NotifyPayload };

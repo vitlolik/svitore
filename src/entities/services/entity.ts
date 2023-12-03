@@ -1,16 +1,35 @@
-import { Observable, Observer } from "./observable";
+import { logError } from "../../utils";
 
-abstract class Entity<T = void> extends Observable<T> {
-	private triggerMap: Map<Entity<any>, () => void> = new Map();
+type Subscriber<T = void> = (data: T) => void;
+
+abstract class Entity<T = void> {
 	static readonly ENTITIES: Entity<any>[] = [];
 
+	private subscribers: Set<Subscriber<T>> = new Set();
+	private triggerMap: Map<Entity<any>, () => void> = new Map();
+
 	constructor() {
-		super();
 		Entity.ENTITIES.push(this);
 	}
 
-	subscribe(subscriber: Observer<T>): () => void {
-		return this.observe(subscriber);
+	subscribe(subscriber: Subscriber<T>): () => void {
+		this.subscribers.add(subscriber);
+
+		return () => this.unsubscribe(subscriber);
+	}
+
+	unsubscribe(subscriber: Subscriber<T>): void {
+		this.subscribers.delete(subscriber);
+	}
+
+	protected notify(params: T): void {
+		for (const subscriber of this.subscribers) {
+			try {
+				subscriber(params);
+			} catch (error) {
+				logError("Entity", "Some subscriber have an error", error);
+			}
+		}
 	}
 
 	protected trigger<EntityPayload>(
@@ -30,7 +49,7 @@ abstract class Entity<T = void> extends Observable<T> {
 		}
 
 		this.triggerMap.clear();
-		super.release();
+		this.subscribers.clear();
 	}
 }
 

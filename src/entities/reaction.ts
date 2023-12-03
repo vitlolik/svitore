@@ -20,7 +20,10 @@ class Reaction<
 	}
 
 	release(): void {
-		this.unsubscribes.forEach((unsubscribe) => unsubscribe());
+		for (const unsubscribe of this.unsubscribes) {
+			unsubscribe();
+		}
+
 		super.release();
 	}
 }

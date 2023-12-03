@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { Entity } from "./entity";
 import { AbstractState } from "./abstract-state";
@@ -10,13 +10,13 @@ describe("state", () => {
 		}
 	}
 
-	it("type", () => {
+	test("type", () => {
 		const state = new State(0);
 
 		expect(state).instanceOf(Entity);
 	});
 
-	it("initial state", () => {
+	test("initial state", () => {
 		const state = new State("test");
 
 		expect(state.getPrev()).toBe("test");
@@ -24,7 +24,7 @@ describe("state", () => {
 	});
 
 	describe("set new state", () => {
-		it("should do nothing if state is equal", () => {
+		test("should do nothing if state is equal", () => {
 			const subscriber = vi.fn();
 			const state = new State("test");
 			state.subscribe(subscriber);
@@ -34,7 +34,7 @@ describe("state", () => {
 			expect(subscriber).not.toHaveBeenCalled();
 		});
 
-		it("should update current and prev state", () => {
+		test("should update current and prev state", () => {
 			const state = new State("test");
 
 			state.set("new value");
@@ -43,7 +43,7 @@ describe("state", () => {
 			expect(state.getPrev()).toBe("test");
 		});
 
-		it("should notify subscribers with new state and state instance", () => {
+		test("should notify subscribers with new state and state instance", () => {
 			const subscriber = vi.fn();
 			const state = new State("test");
 			state.subscribe(subscriber);

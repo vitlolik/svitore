@@ -1,4 +1,4 @@
-import { vi, it, expect, describe, afterEach } from "vitest";
+import { vi, test, expect, describe, afterEach } from "vitest";
 
 import { PERSIST_STORAGE_KEY, PersistState } from "./persist-state";
 import { State } from "./state";
@@ -16,19 +16,19 @@ describe("persist state", () => {
 		localStorage.clear();
 	});
 
-	it("type", () => {
+	test("type", () => {
 		const persistState = new PersistState("test state", "test-key");
 
 		expect(persistState).instanceOf(State);
 	});
 
-	it("should init state", () => {
+	test("should init state", () => {
 		const persistState = new PersistState("test state", "test-key");
 
 		expect(persistState.get()).toBe("test state");
 	});
 
-	it("should set state from storage if storage has value", async () => {
+	test("should set state from storage if storage has value", async () => {
 		localStorage.setItem(
 			PERSIST_STORAGE_KEY,
 			JSON.stringify({ "test-key": "value in storage" })
@@ -41,7 +41,7 @@ describe("persist state", () => {
 		expect(persistState.get()).toBe("value in storage");
 	});
 
-	it("should subscribe to state and update storage", async () => {
+	test("should subscribe to state and update storage", async () => {
 		localStorage.setItem(
 			PERSIST_STORAGE_KEY,
 			JSON.stringify({ "test-key": "value in storage" })
@@ -59,7 +59,7 @@ describe("persist state", () => {
 		);
 	});
 
-	it("clear - should remove item from storage", () => {
+	test("clear - should remove item from storage", () => {
 		const persistState = new PersistState("test state", "test-key");
 
 		persistState.clear();
@@ -68,7 +68,7 @@ describe("persist state", () => {
 		expect(removeItemSpy).toHaveBeenCalledWith(PERSIST_STORAGE_KEY);
 	});
 
-	it("should log error if value invalid in storage", () => {
+	test("should log error if value invalid in storage", () => {
 		localStorage.setItem(PERSIST_STORAGE_KEY, "");
 
 		new PersistState("test state", "test-key");

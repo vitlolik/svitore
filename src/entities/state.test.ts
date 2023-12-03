@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 
 import { State } from "./state";
 import { Event } from "./event";
 
 describe("state", () => {
-	it("reset state to default value", () => {
+	test("reset state to default value", () => {
 		const event = new Event<string>();
 		const resetEvent = new Event();
 		const state = new State("test").changeOn(event).resetOn(resetEvent);
@@ -17,7 +17,7 @@ describe("state", () => {
 	});
 
 	describe("changeOn", () => {
-		it("should subscribe on event", () => {
+		test("should subscribe on event", () => {
 			const event = new Event<string>();
 			const state = new State("test").changeOn(event);
 
@@ -27,7 +27,7 @@ describe("state", () => {
 			expect(state.getPrev()).toBe("test");
 		});
 
-		it("should unsubscribe from event, if release has been called", () => {
+		test("should unsubscribe from event, if release has been called", () => {
 			const event1 = new Event<string>();
 			const event2 = new Event<string>();
 			const state = new State("test").changeOn(event1).changeOn(event2);
@@ -41,7 +41,7 @@ describe("state", () => {
 			expect(state.get()).toBe("test");
 		});
 
-		it("should skip subscriber if it already exist", () => {
+		test("should skip subscriber if it already exist", () => {
 			const event1 = new Event<string>();
 			const mockSelector = vi.fn<[string], string>();
 
