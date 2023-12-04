@@ -1,6 +1,7 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
+	ignoreDeadLinks: true,
 	base: "/svitore/",
 	title: "Svitore",
 	description: "State manager",
