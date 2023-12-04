@@ -31,7 +31,7 @@ You don't need to know what a module or other entities we will create in this le
 As I see it, all the code we write will be understandable without knowledge of the svitore API.
 
 ```ts
-const $module = Svitore.Module("githubSearchModule");
+const $module = new SvitoreModule("githubSearchModule");
 ```
 
 Not bad already!
@@ -153,7 +153,7 @@ searchChanged.dispatch("a");
 This is all the code we have right now.
 
 ```ts
-import { Svitore } from "svitore";
+import { SvitoreModule } from "svitore";
 import { fetchGitHubUsers } from "./api";
 
 type GitHubUser = {
@@ -163,7 +163,7 @@ type GitHubUser = {
   html_url: string;
 };
 
-const $module = Svitore.Module("githubSearchModule");
+const $module = new SvitoreModule("githubSearchModule");
 
 const gitHubUsers = $module.State<GitHubUser[]>([]);
 const search = $module.State("");
@@ -256,7 +256,7 @@ The entire code:
 ::: code-group
 
 ```ts [github-search-module.ts]
-import { Svitore } from "svitore";
+import { SvitoreModule } from "svitore";
 import { fetchGitHubUsers } from "./api";
 
 type GitHubUser = {
@@ -266,7 +266,7 @@ type GitHubUser = {
   html_url: string;
 };
 
-const $module = Svitore.Module("gitHubSearchModule");
+const $module = new SvitoreModule("gitHubSearchModule");
 
 const gitHubUsers = $module.State<GitHubUser[]>([]);
 const searchState = $module.State("");
