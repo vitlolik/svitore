@@ -111,10 +111,10 @@ class EffectRunner<
 	}
 
 	release(): void {
+		this.stop();
 		this.pending.release();
 		this.changed.release();
 		super.release();
-		this.stop();
 	}
 }
 

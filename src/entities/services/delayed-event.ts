@@ -13,6 +13,7 @@ abstract class DelayedEvent<Payload = void> extends AbstractEvent<Payload> {
 	}
 
 	release(): void {
+		this.pending = false;
 		this.clearTimer();
 		super.release();
 	}

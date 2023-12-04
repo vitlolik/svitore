@@ -66,6 +66,11 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 			this.dispatch(selector ? selector(payload) : payload);
 		});
 	}
+
+	release(): void {
+		this.middlewares = [];
+		super.release();
+	}
 }
 
 export { AbstractEvent };
