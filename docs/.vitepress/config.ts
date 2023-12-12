@@ -14,8 +14,20 @@ export default defineConfig({
 				text: "Entities",
 				items: [
 					{
+						text: "AbstractEntity",
+						link: "/entities/abstract-entity",
+					},
+					{
 						text: "State",
 						link: "/entities/state",
+					},
+					{
+						text: "PersistState",
+						link: "/entities/persist-state",
+					},
+					{
+						text: "ComputedState",
+						link: "/entities/computed-state",
 					},
 				],
 			},

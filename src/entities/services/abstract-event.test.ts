@@ -142,13 +142,13 @@ describe("abstract-event", () => {
 		});
 	});
 
-	describe("trigger", () => {
+	describe("on", () => {
 		test("should subscribe on another entity", () => {
 			const event = new Event<string>();
 			const triggerEvent = new Event<string>();
 			const mockDispatch = vi.fn();
 
-			event.trigger(triggerEvent);
+			event.on(triggerEvent);
 			event.dispatch = mockDispatch;
 
 			triggerEvent.dispatch("test");
@@ -162,7 +162,7 @@ describe("abstract-event", () => {
 			const triggerEvent = new Event<number>();
 			const mockDispatch = vi.fn();
 
-			event.trigger(triggerEvent, (numericValue) => numericValue + "_test");
+			event.on(triggerEvent, (numericValue) => numericValue + "_test");
 			event.dispatch = mockDispatch;
 
 			triggerEvent.dispatch(10);

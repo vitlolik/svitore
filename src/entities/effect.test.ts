@@ -142,13 +142,13 @@ describe("effect", () => {
 		expect(subscriber).toHaveBeenCalledTimes(0);
 	});
 
-	describe("trigger", () => {
+	describe("on", () => {
 		test("should subscribe on another entity", async () => {
 			const effect = new Effect((value: string) => Promise.resolve(value));
 			const triggerEvent = new Event<string>();
 			const mockRun = vi.fn();
 
-			effect.trigger(triggerEvent);
+			effect.on(triggerEvent);
 			effect.run = mockRun;
 
 			triggerEvent.dispatch("test");
@@ -162,7 +162,7 @@ describe("effect", () => {
 			const triggerEvent = new Event<number>();
 			const mockRun = vi.fn();
 
-			effect.trigger(triggerEvent, (numericValue) => numericValue + "_test");
+			effect.on(triggerEvent, (numericValue) => numericValue + "_test");
 			effect.run = mockRun;
 
 			triggerEvent.dispatch(10);

@@ -18,7 +18,7 @@ class State<Data> extends AbstractState<Data> {
 		event: Event<any>,
 		selector?: (payload: any, state: Data, prevState: Data) => Data
 	): this {
-		return this.trigger(event, (payload) => {
+		return this.on(event, (payload) => {
 			this.notify(
 				selector ? selector(payload, this.get(), this.getPrev()) : payload
 			);

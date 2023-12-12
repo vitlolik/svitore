@@ -3,11 +3,11 @@ import { Entity } from "./entity";
 
 describe("entity", () => {
 	class TestEntity<T = void> extends Entity<T> {
-		trigger<EntityPayload>(
+		on<EntityPayload>(
 			entity: Entity<EntityPayload>,
 			subscriber: (payload: EntityPayload) => void
 		): this {
-			return super.trigger(entity, subscriber);
+			return super.on(entity, subscriber);
 		}
 		notify(params: T): void {
 			return super.notify(params);
@@ -88,19 +88,19 @@ describe("entity", () => {
 		const anotherEntity = new TestEntity();
 
 		const mockSubscriber = vi.fn();
-		entity.trigger(anotherEntity, mockSubscriber);
+		entity.on(anotherEntity, mockSubscriber);
 
 		anotherEntity.notify();
 
 		expect(mockSubscriber).toHaveBeenCalledOnce();
 	});
 
-	test("should unsubscribe from trigger entity", () => {
+	test("should unsubscribe to entity", () => {
 		const entity = new TestEntity();
 		const anotherEntity = new TestEntity();
 
 		const mockSubscriber = vi.fn();
-		entity.trigger(anotherEntity, mockSubscriber);
+		entity.on(anotherEntity, mockSubscriber);
 
 		entity.unsubscribe(anotherEntity);
 		anotherEntity.notify();
@@ -120,7 +120,7 @@ describe("entity", () => {
 		entity.subscribe(firstSubscriber);
 		entity.subscribe(secondSubscriber);
 		entity.subscribe(thirdSubscriber);
-		entity.trigger(secondEntity, triggerSubscriber);
+		entity.on(secondEntity, triggerSubscriber);
 
 		entity.release();
 

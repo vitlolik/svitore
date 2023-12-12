@@ -11,13 +11,13 @@ class ComputedState<
 		const selector = args.pop() as SelectorCallback<States, T>;
 		const states = args as unknown as States;
 
-		const getStateData = (): T =>
+		const getState = (): T =>
 			selector(...(states.map((state) => state.get()) as any));
 
-		super(getStateData());
+		super(getState());
 
 		this.unsubscribes = states.map((state) =>
-			state.subscribe(() => this.notify(getStateData()))
+			state.subscribe(() => this.notify(getState()))
 		);
 	}
 

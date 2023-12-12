@@ -1,0 +1,3 @@
+# ComputedState
+
+Derived state entity

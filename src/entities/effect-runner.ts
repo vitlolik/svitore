@@ -96,16 +96,16 @@ class EffectRunner<
 		this.end("stopped");
 	}
 
-	trigger<EntityPayload extends Params>(entity: Entity<EntityPayload>): this;
-	trigger<EntityPayload>(
+	on<EntityPayload extends Params>(entity: Entity<EntityPayload>): this;
+	on<EntityPayload>(
 		entity: Entity<EntityPayload>,
 		selector: (payload: EntityPayload) => Params
 	): this;
-	trigger(
+	on(
 		entity: Entity<any>,
 		selector?: ((payload: any) => Params) | undefined
 	): this {
-		return super.trigger(entity, (payload) => {
+		return super.on(entity, (payload) => {
 			this.start(selector ? selector(payload) : payload);
 		});
 	}

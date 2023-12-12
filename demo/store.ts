@@ -84,9 +84,9 @@ const createStore = (): Store => {
 		console.log("throttledSubmitEvent called");
 	});
 
-	debouncedSubmitEvent.trigger(submitted);
-	throttledSubmitEvent.trigger(submitted);
-	logEffectRunner.trigger(submitted);
+	debouncedSubmitEvent.on(submitted);
+	throttledSubmitEvent.on(submitted);
+	logEffectRunner.on(submitted);
 
 	resetEvent.subscribe(() => {
 		demoFormModule.reset();

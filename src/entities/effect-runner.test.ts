@@ -216,7 +216,7 @@ describe("EffectRunner", () => {
 		});
 	});
 
-	describe("trigger", () => {
+	describe("on", () => {
 		test("should subscribe on another entity", async () => {
 			const effect = new Effect((value: string) => Promise.resolve(value));
 			const triggerEvent = new Event<string>();
@@ -226,7 +226,7 @@ describe("EffectRunner", () => {
 				while: ({ fulfilled }) => fulfilled < 1,
 			});
 			effectRunner.start = mockStart;
-			effectRunner.trigger(triggerEvent);
+			effectRunner.on(triggerEvent);
 
 			triggerEvent.dispatch("test");
 
@@ -243,10 +243,7 @@ describe("EffectRunner", () => {
 				while: ({ fulfilled }) => fulfilled < 1,
 			});
 			effectRunner.start = mockStart;
-			effectRunner.trigger(
-				triggerEvent,
-				(numericValue) => numericValue + "_test"
-			);
+			effectRunner.on(triggerEvent, (numericValue) => numericValue + "_test");
 
 			triggerEvent.dispatch(10);
 

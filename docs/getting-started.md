@@ -135,12 +135,9 @@ This code means:
 Let's connect our entities.
 
 ```ts
-fetchGitHubUsersEffect.trigger(searchChanged);
+fetchGitHubUsersEffect.on(searchChanged);
 
-githubUsersUpdated.trigger(
-  fetchGitHubUsersEffect.fulfilled,
-  ({ result }) => result
-);
+githubUsersUpdated.on(fetchGitHubUsersEffect.fulfilled, ({ result }) => result);
 ```
 
 Our application is already functioning.
@@ -180,12 +177,9 @@ gitHubUsers.subscribe(console.log);
 gitHubUsers.changeOn(githubUsersUpdated);
 search.changeOn(searchChanged);
 
-fetchGitHubUsersEffect.trigger(searchChanged);
+fetchGitHubUsersEffect.on(searchChanged);
 
-githubUsersUpdated.trigger(
-  fetchGitHubUsersEffect.fulfilled,
-  ({ result }) => result
-);
+githubUsersUpdated.on(fetchGitHubUsersEffect.fulfilled, ({ result }) => result);
 ```
 
 The application works, but there are a few problems
@@ -211,13 +205,10 @@ const fetchGitHubUsersEffect = $module.Effect<string, GitHubUser[]>(
 gitHubUsers.changeOn(githubUsersUpdated);
 searchState.changeOn(searchChanged);
 
-requestSent.trigger(searchChanged); // [!code ++]
-fetchGitHubUsersEffect.trigger(requestSent); // [!code ++]
-fetchGitHubUsersEffect.trigger(searchChanged); // [!code --]
-githubUsersUpdated.trigger(
-  fetchGitHubUsersEffect.fulfilled,
-  ({ result }) => result
-);
+requestSent.on(searchChanged); // [!code ++]
+fetchGitHubUsersEffect.on(requestSent); // [!code ++]
+fetchGitHubUsersEffect.on(searchChanged); // [!code --]
+githubUsersUpdated.on(fetchGitHubUsersEffect.fulfilled, ({ result }) => result);
 ```
 
 Effect support auto-cancellation, which will help us cancel previous requests.
@@ -290,12 +281,9 @@ requestSent.applyMiddleware((context, next) => {
 gitHubUsers.changeOn(githubUsersUpdated);
 searchState.changeOn(searchChanged);
 
-requestSent.trigger(searchChanged);
-fetchGitHubUsersEffect.trigger(requestSent);
-githubUsersUpdated.trigger(
-  fetchGitHubUsersEffect.fulfilled,
-  ({ result }) => result
-);
+requestSent.on(searchChanged);
+fetchGitHubUsersEffect.on(requestSent);
+githubUsersUpdated.on(fetchGitHubUsersEffect.fulfilled, ({ result }) => result);
 
 searchChanged.dispatch("a");
 ```
