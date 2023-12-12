@@ -17,7 +17,7 @@ class SvitoreModule<T extends string = any> {
 
 	private resetEvent = new Event();
 	readonly modules: Map<string, SvitoreModule> = new Map();
-	readonly entities: Entity[] = [];
+	readonly entities: Set<Entity> = new Set();
 
 	constructor(public name: T) {
 		const { MODULES } = SvitoreModule;
@@ -30,7 +30,7 @@ class SvitoreModule<T extends string = any> {
 	}
 
 	private newEntity<T extends Entity<any>>(entity: T): T {
-		this.entities.push(entity);
+		this.entities.add(entity);
 
 		return entity;
 	}
@@ -114,6 +114,7 @@ class SvitoreModule<T extends string = any> {
 		for (const entity of this.entities) {
 			entity.release();
 		}
+		this.entities.clear();
 	}
 }
 

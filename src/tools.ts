@@ -12,7 +12,7 @@ const getAllEntities = (): Entity[] => {
 
 	while (modules.length) {
 		const module = modules.pop() as SvitoreModule;
-		result = result.concat(module.entities);
+		result = result.concat(...module.entities.values());
 		modules = modules.concat(...module.modules.values());
 	}
 
