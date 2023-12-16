@@ -3,13 +3,13 @@ import { Entity } from "./entity";
 
 describe("entity", () => {
 	class TestEntity<T = void> extends Entity<T> {
-		on<EntityPayload>(
+		override on<EntityPayload>(
 			entity: Entity<EntityPayload>,
 			subscriber: (payload: EntityPayload) => void
 		): this {
 			return super.on(entity, subscriber);
 		}
-		notify(params: T): void {
+		override notify(params: T): void {
 			return super.notify(params);
 		}
 	}

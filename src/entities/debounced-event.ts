@@ -5,7 +5,7 @@ class DebouncedEvent<Payload = void> extends DelayedEvent<Payload> {
 		super(timeout);
 	}
 
-	dispatch(payload: Payload): void {
+	override dispatch(payload: Payload): void {
 		this.pending = true;
 
 		this.clearTimer();

@@ -56,18 +56,20 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 		return this;
 	}
 
-	on<EntityPayload extends Payload>(entity: Entity<EntityPayload>): this;
-	on<EntityPayload>(
+	override on<EntityPayload extends Payload>(
+		entity: Entity<EntityPayload>
+	): this;
+	override on<EntityPayload>(
 		entity: Entity<EntityPayload>,
 		selector: (payload: EntityPayload) => Payload
 	): this;
-	on(entity: Entity<any>, selector?: (payload: any) => Payload): this {
+	override on(entity: Entity<any>, selector?: (payload: any) => Payload): this {
 		return super.on(entity, (payload) => {
 			this.dispatch(selector ? selector(payload) : payload);
 		});
 	}
 
-	release(): void {
+	override release(): void {
 		this.middlewares = [];
 		super.release();
 	}

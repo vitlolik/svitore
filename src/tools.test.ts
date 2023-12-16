@@ -94,7 +94,7 @@ describe("tools", () => {
 			const effectRunnerSubscriber = vi.fn();
 			const effectRunner = testModule.EffectRunner(effect, {
 				delay: () => 10,
-				while: ({ fulfilled }) => fulfilled <= 3,
+				until: ({ fulfilled }) => fulfilled <= 3,
 			});
 			effectRunner.subscribe(effectRunnerSubscriber);
 

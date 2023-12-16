@@ -11,8 +11,7 @@ describe("computeState", () => {
 		const state2 = new State(5);
 
 		const mergedState = new ComputedState(
-			state1,
-			state2,
+			[state1, state2],
 			(value1, value2) => value1 + value2
 		);
 
@@ -23,8 +22,7 @@ describe("computeState", () => {
 		const state1 = new State("hello");
 		const state2 = new State("!");
 		const mergedState = new ComputedState(
-			state1,
-			state2,
+			[state1, state2],
 			(value1, value2) => value1 + " world" + value2
 		);
 
@@ -38,8 +36,7 @@ describe("computeState", () => {
 		const state1 = new State("hello").changeOn(event1);
 		const state2 = new State("world").changeOn(event2);
 		const computed = new ComputedState(
-			state1,
-			state2,
+			[state1, state2],
 			(state1, state2) => `${state1} ${state2}`
 		);
 		expect(computed.get()).toBe("hello world");
@@ -58,7 +55,7 @@ describe("computeState", () => {
 		const state1 = new State("hello").changeOn(event1);
 		const state2 = new State("world").changeOn(event2);
 
-		const computed = new ComputedState(state1, state2, (value1, value2) =>
+		const computed = new ComputedState([state1, state2], (value1, value2) =>
 			`${value1} ${value2}`.toUpperCase()
 		);
 

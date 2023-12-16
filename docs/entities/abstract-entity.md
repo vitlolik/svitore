@@ -3,32 +3,32 @@
 The base entity.
 You cannot create an instance of it, but every entity in `svitore` inherits its behavior
 
-## subscribe
+## subscribe (method)
 
 Subscribe to entity
 
 **Interface:**
 
 ```ts
-subscribe(subscriber: (data: T) => void): () => void
+function subscribe(subscriber: (data: T) => void): () => void;
 ```
 
-## unsubscribe
+## unsubscribe (method)
 
 Unsubscribe from entity
 
 **Interface:**
 
 ```ts
-unsubscribe(subscriber: ((data: T) => void) | Entity<any>): void
+function unsubscribe(subscriber: ((data: T) => void) | Entity<any>): void;
 ```
 
-## release
+## release (method)
 
 Remove all subscribers
 
 **Interface:**
 
 ```ts
-release(): void
+function release(): void;
 ```

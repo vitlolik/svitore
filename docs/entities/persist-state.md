@@ -7,11 +7,11 @@ _Has the same api as [State](/entities/state)_
 ## constructor
 
 ```ts
-constructor(
+function constructor(
   state: T,
   storageKey: string,
-  storage?: Storage, // globalThis.Storage
-): PersistState<T>
+  storage?: Storage // globalThis.Storage
+): PersistState<T>;
 ```
 
 **Example:**
@@ -32,12 +32,12 @@ This code means to create a state with a default value of `"Alex"` and store the
 By default `localStorage` is used, but you can use any storage, including your own custom storage by implementing the `Storage` interface
 :::
 
-## clear
+## clear (method)
 
 Delete state from storage
 
 **Interface:**
 
 ```ts
-clear(): void
+function clear(): void;
 ```

@@ -16,7 +16,7 @@ abstract class AbstractState<T> extends Entity<T> {
 		return this.prevState;
 	}
 
-	protected notify(newState: T): void {
+	protected override notify(newState: T): void {
 		if (this.state === newState) return;
 
 		this.prevState = this.state;

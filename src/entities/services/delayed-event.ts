@@ -12,7 +12,7 @@ abstract class DelayedEvent<Payload = void> extends AbstractEvent<Payload> {
 		globalThis.clearTimeout(this.timer);
 	}
 
-	release(): void {
+	override release(): void {
 		this.pending = false;
 		this.clearTimer();
 		super.release();

@@ -62,7 +62,7 @@ const createStore = (): Store => {
 
 	const logEffectRunner = demoFormModule.EffectRunner(logEffect, {
 		delay: ({ fulfilled }) => fulfilled * 1500,
-		while: ({ fulfilled }) => fulfilled < 3,
+		until: ({ fulfilled }) => fulfilled < 3,
 	});
 
 	logEffectRunner.pending.subscribe(console.log);

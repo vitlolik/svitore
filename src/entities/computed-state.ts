@@ -1,16 +1,12 @@
 import { SelectorCallback } from "./types";
 import { AbstractState } from "./services";
-
 class ComputedState<
 	States extends ReadonlyArray<AbstractState<any>>,
 	T
 > extends AbstractState<T> {
 	private unsubscribes: (() => void)[] = [];
 
-	constructor(...args: [...States, SelectorCallback<States, T>]) {
-		const selector = args.pop() as SelectorCallback<States, T>;
-		const states = args as unknown as States;
-
+	constructor(states: States, selector: SelectorCallback<States, T>) {
 		const getState = (): T =>
 			selector(...(states.map((state) => state.get()) as any));
 
@@ -21,7 +17,7 @@ class ComputedState<
 		);
 	}
 
-	release(): void {
+	override release(): void {
 		for (const unsubscribe of this.unsubscribes) {
 			unsubscribe();
 		}

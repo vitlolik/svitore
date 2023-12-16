@@ -8,7 +8,7 @@ import { Event } from "./event";
 describe("reaction", () => {
 	test("type", () => {
 		const state = new State("test");
-		const reaction = new Reaction(state, () => null);
+		const reaction = new Reaction([state]);
 
 		expect(reaction).instanceOf(Entity);
 
@@ -22,21 +22,22 @@ describe("reaction", () => {
 		const state2 = new State(0).changeOn(change2);
 		const reactionCallback = vi.fn();
 
-		const reaction = new Reaction(stat1, state2, reactionCallback);
+		const reaction = new Reaction([stat1, state2]);
+		reaction.subscribe(reactionCallback);
 
 		change1.dispatch("new test");
 		// because callback invoked as microtask
 		await Promise.resolve();
 
 		expect(reactionCallback).toHaveBeenCalledTimes(1);
-		expect(reactionCallback).toHaveBeenCalledWith("new test", 0);
+		expect(reactionCallback).toHaveBeenCalledWith(["new test", 0]);
 
 		change2.dispatch(1);
 		// because callback invoked as microtask
 		await Promise.resolve();
 
 		expect(reactionCallback).toHaveBeenCalledTimes(2);
-		expect(reactionCallback).toHaveBeenCalledWith("new test", 1);
+		expect(reactionCallback).toHaveBeenCalledWith(["new test", 1]);
 
 		reaction.release();
 	});
@@ -48,7 +49,8 @@ describe("reaction", () => {
 		const state2 = new State(0).changeOn(change2);
 		const reactionCallback = vi.fn();
 
-		const reaction = new Reaction(stat1, state2, reactionCallback);
+		const reaction = new Reaction([stat1, state2]);
+		reaction.subscribe(reactionCallback);
 
 		change1.dispatch("new test");
 		change2.dispatch(1);
@@ -56,7 +58,7 @@ describe("reaction", () => {
 		await Promise.resolve();
 
 		expect(reactionCallback).toHaveBeenCalledTimes(1);
-		expect(reactionCallback).toHaveBeenCalledWith("new test", 1);
+		expect(reactionCallback).toHaveBeenCalledWith(["new test", 1]);
 
 		reaction.release();
 	});
@@ -68,7 +70,8 @@ describe("reaction", () => {
 		const state2 = new State(0).changeOn(change2);
 		const reactionCallback = vi.fn();
 
-		const reaction = new Reaction(stat1, state2, reactionCallback);
+		const reaction = new Reaction([stat1, state2]);
+		reaction.subscribe(reactionCallback);
 		reaction.release();
 
 		change1.dispatch("new test");

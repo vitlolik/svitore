@@ -17,6 +17,7 @@
 		"moduleResolution": "Node",
 		"resolveJsonModule": true,
 		"isolatedModules": false,
-		"strictPropertyInitialization": false
+		"strictPropertyInitialization": false,
+		"noImplicitOverride": true
 	}
 }

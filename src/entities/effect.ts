@@ -76,12 +76,14 @@ class Effect<
 		}
 	}
 
-	on<EntityPayload extends Params>(entity: Entity<EntityPayload>): this;
-	on<EntityPayload>(
+	override on<EntityPayload extends Params>(
+		entity: Entity<EntityPayload>
+	): this;
+	override on<EntityPayload>(
 		entity: Entity<EntityPayload>,
 		selector: (payload: EntityPayload) => Params
 	): this;
-	on(
+	override on(
 		entity: Entity<any>,
 		selector?: ((payload: any) => Params) | undefined
 	): this {
@@ -96,7 +98,7 @@ class Effect<
 		this.abortController = null;
 	}
 
-	release(): void {
+	override release(): void {
 		this.cancel();
 		this.pending.release();
 		this.pendingChanged.release();

@@ -12,7 +12,7 @@ describe("EffectRunner", () => {
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 3,
+				until: ({ fulfilled }) => fulfilled < 3,
 			});
 
 			effectRunner.start();
@@ -29,7 +29,7 @@ describe("EffectRunner", () => {
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ rejected }) => rejected < 5,
+				until: ({ rejected }) => rejected < 5,
 			});
 
 			effectRunner.start();
@@ -60,7 +60,7 @@ describe("EffectRunner", () => {
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled, rejected }) => fulfilled < 10 && rejected < 5,
+				until: ({ fulfilled, rejected }) => fulfilled < 10 && rejected < 5,
 			});
 
 			effectRunner.start();
@@ -79,7 +79,7 @@ describe("EffectRunner", () => {
 			const effectRunnerSubscriber = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ rejected }) => rejected < 1,
+				until: ({ rejected }) => rejected < 1,
 			});
 			effectRunner.subscribe(effectRunnerSubscriber);
 
@@ -105,7 +105,7 @@ describe("EffectRunner", () => {
 
 					return 1;
 				},
-				while: ({ fulfilled }) => fulfilled < 2,
+				until: ({ fulfilled }) => fulfilled < 2,
 			});
 
 			effectRunner.start();
@@ -118,7 +118,7 @@ describe("EffectRunner", () => {
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled <= 1,
+				until: ({ fulfilled }) => fulfilled <= 1,
 			});
 
 			expect(effectRunner.pending.get()).toBe(false);
@@ -138,7 +138,7 @@ describe("EffectRunner", () => {
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 1,
+				until: ({ fulfilled }) => fulfilled < 1,
 			});
 
 			effectRunner.start();
@@ -152,7 +152,7 @@ describe("EffectRunner", () => {
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 1,
+				until: ({ fulfilled }) => fulfilled < 1,
 			});
 
 			effectRunner.start();
@@ -167,7 +167,7 @@ describe("EffectRunner", () => {
 			const effectRunnerSubscriber = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 3,
+				until: ({ fulfilled }) => fulfilled < 3,
 			});
 			effectRunner.subscribe(effectRunnerSubscriber);
 
@@ -189,7 +189,7 @@ describe("EffectRunner", () => {
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 1,
+				until: ({ fulfilled }) => fulfilled < 1,
 			});
 
 			effectRunner.stop();
@@ -204,7 +204,7 @@ describe("EffectRunner", () => {
 			const effectRunnerSubscriber = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 1,
+				until: ({ fulfilled }) => fulfilled < 1,
 			});
 			effectRunner.subscribe(effectRunnerSubscriber);
 
@@ -223,7 +223,7 @@ describe("EffectRunner", () => {
 			const mockStart = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 1,
+				until: ({ fulfilled }) => fulfilled < 1,
 			});
 			effectRunner.start = mockStart;
 			effectRunner.on(triggerEvent);
@@ -240,7 +240,7 @@ describe("EffectRunner", () => {
 			const mockStart = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 1,
+				until: ({ fulfilled }) => fulfilled < 1,
 			});
 			effectRunner.start = mockStart;
 			effectRunner.on(triggerEvent, (numericValue) => numericValue + "_test");
@@ -261,7 +261,7 @@ describe("EffectRunner", () => {
 
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 3,
+				until: ({ fulfilled }) => fulfilled < 3,
 			});
 
 			effectRunner.subscribe(effectRunnerSubscriber);
@@ -285,7 +285,7 @@ describe("EffectRunner", () => {
 			const stopMock = vi.fn();
 			const effectRunner = new EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled < 3,
+				until: ({ fulfilled }) => fulfilled < 3,
 			});
 			effectRunner.stop = stopMock;
 

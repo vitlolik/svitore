@@ -1,7 +1,7 @@
 import { AbstractState, Entity } from "./services";
 
 type ExtractEntitiesTypes<T extends ReadonlyArray<Entity<any>>> = {
-	[K in keyof T]: T[K] extends Entity<infer U> ? U : never;
+	[K in keyof T]: T[K] extends AbstractState<infer U> ? U : never;
 };
 
 type SelectorCallback<
@@ -9,4 +9,4 @@ type SelectorCallback<
 	Result = void
 > = (...args: ExtractEntitiesTypes<StateList>) => Result;
 
-export { SelectorCallback };
+export { SelectorCallback, ExtractEntitiesTypes };

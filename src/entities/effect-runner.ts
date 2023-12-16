@@ -13,7 +13,7 @@ type CallbackParams<Params, Result, ErrorType> = {
 
 type EffectRunnerOptions<Params, Result, ErrorType> = {
 	delay: (params: CallbackParams<Params, Result, ErrorType>) => number;
-	while: (params: CallbackParams<Params, Result, ErrorType>) => boolean;
+	until: (params: CallbackParams<Params, Result, ErrorType>) => boolean;
 };
 
 type NotifyType = "stopped" | "finished";
@@ -74,7 +74,7 @@ class EffectRunner<
 				error,
 			};
 
-			if (!this.options.while(callbackParams)) {
+			if (!this.options.until(callbackParams)) {
 				return this.end("finished");
 			}
 
@@ -96,12 +96,14 @@ class EffectRunner<
 		this.end("stopped");
 	}
 
-	on<EntityPayload extends Params>(entity: Entity<EntityPayload>): this;
-	on<EntityPayload>(
+	override on<EntityPayload extends Params>(
+		entity: Entity<EntityPayload>
+	): this;
+	override on<EntityPayload>(
 		entity: Entity<EntityPayload>,
 		selector: (payload: EntityPayload) => Params
 	): this;
-	on(
+	override on(
 		entity: Entity<any>,
 		selector?: ((payload: any) => Params) | undefined
 	): this {
@@ -110,7 +112,7 @@ class EffectRunner<
 		});
 	}
 
-	release(): void {
+	override release(): void {
 		this.stop();
 		this.pending.release();
 		this.changed.release();

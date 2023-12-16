@@ -7,7 +7,7 @@ describe("DebouncedEvent", () => {
 			return this.timer;
 		}
 
-		clearTimer = vi.fn();
+		override clearTimer = vi.fn();
 	}
 
 	class MockTimeout implements NodeJS.Timeout {

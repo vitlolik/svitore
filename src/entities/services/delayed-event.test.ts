@@ -3,7 +3,7 @@ import { DelayedEvent } from "./delayed-event";
 
 describe("DelayedEvent", () => {
 	class TestDelayedEvent extends DelayedEvent {
-		clearTimer(): void {
+		override clearTimer(): void {
 			super.clearTimer();
 		}
 	}

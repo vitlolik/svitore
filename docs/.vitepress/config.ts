@@ -14,10 +14,6 @@ export default defineConfig({
 				text: "Entities",
 				items: [
 					{
-						text: "AbstractEntity",
-						link: "/entities/abstract-entity",
-					},
-					{
 						text: "State",
 						link: "/entities/state",
 					},
@@ -29,11 +25,39 @@ export default defineConfig({
 						text: "ComputedState",
 						link: "/entities/computed-state",
 					},
+					{
+						text: "Event",
+						link: "/entities/event",
+					},
+					{
+						text: "DebouncedEvent",
+						link: "/entities/debounced-event",
+					},
+					{
+						text: "ThrottledEvent",
+						link: "/entities/throttled-event",
+					},
+					{
+						text: "Effect",
+						link: "/entities/effect",
+					},
+					{
+						text: "EffectRunner",
+						link: "/entities/effect-runner",
+					},
+					{
+						text: "Reaction",
+						link: "/entities/reaction",
+					},
 				],
 			},
 			{
 				text: "React",
 				items: [{ text: "Get Started", link: "/react/getting-started" }],
+			},
+			{
+				text: "Examples",
+				link: "/examples",
 			},
 		],
 

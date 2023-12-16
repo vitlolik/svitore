@@ -2,46 +2,26 @@
 
 Entity to store the state
 
-_Has the same api as [AbstractEntity](/entities/abstract-entity)_
+_Has the same api as [AbstractState](/entities/abstract-state)_
 
 ## constructor
 
 ```ts
-constructor(state: T): State<T>
+function constructor(state: T): State<T>;
 ```
 
-## get
-
-Return current state
-
-**Interface:**
-
-```ts
-get(): T
-```
-
-**Example:**
-
-```ts
-const $m = new SvitoreModule();
-
-const counter = $m.State(0);
-
-counter.get(); // 0
-```
-
-## changeOn
+## changeOn (method)
 
 Method to change the state using an event
 
 **Interface:**
 
 ```ts
-changeOn<Payload extends T>(event: Event<Payload>): this;
+function changeOn<Payload extends T>(event: Event<Payload>): this;
 ```
 
 ```ts
-changeOn<Payload>(
+function changeOn<Payload>(
   event: Event<Payload>,
   selector: (payload: Payload, state: T, prevState: T) => T
 ): this;
@@ -78,14 +58,14 @@ if you want to calculate a value based on the state
 counter.changeOn(counterChanged, (payload, state) => state + payload);
 ```
 
-## resetOn
+## resetOn (method)
 
 Reset state to default value
 
 **Interface:**
 
 ```ts
-resetOn(event: Event<any>): this
+function resetOn(event: Event<any>): this;
 ```
 
 **Example:**
@@ -104,30 +84,4 @@ counterChanged.dispatch(10);
 reset.dispatch();
 
 counter.get(); // 5
-```
-
-## getPrev
-
-Return prev state
-
-**Interface:**
-
-```ts
-getPrev(): T
-```
-
-**Example:**
-
-```ts
-const $m = new SvitoreModule();
-
-const counter = $m.State(0);
-const counterChanged = $m.Event<number>();
-
-counter.changeOn(counterChanged);
-
-counterChanged.dispatch(10);
-
-counter.getPrev(); // 0
-counter.get(); // 10
 ```

@@ -10,7 +10,7 @@ class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 		super(timeout);
 	}
 
-	dispatch(payload: Payload): void {
+	override dispatch(payload: Payload): void {
 		if (this.isThrottled) {
 			this.pending = true;
 			this.savedParams = payload;

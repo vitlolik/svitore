@@ -56,7 +56,7 @@ describe("SvitoreModule", () => {
 		test("should create computed state and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const state = testModule.State("test state");
-			const computedState = testModule.ComputedState(state, (value) =>
+			const computedState = testModule.ComputedState([state], (value) =>
 				value.toUpperCase()
 			);
 
@@ -124,7 +124,7 @@ describe("SvitoreModule", () => {
 			const effect = testModule.Effect(() => Promise.resolve());
 			const effectRunner = testModule.EffectRunner(effect, {
 				delay: () => 0,
-				while: ({ fulfilled }) => fulfilled <= 1,
+				until: ({ fulfilled }) => fulfilled <= 1,
 			});
 
 			expect(effectRunner).instanceOf(EffectRunner);
@@ -136,7 +136,7 @@ describe("SvitoreModule", () => {
 		test("should create reaction and save instance to module", () => {
 			const testModule = new SvitoreModule("test");
 			const state = testModule.State("test state");
-			const reaction = testModule.Reaction(state, () => {});
+			const reaction = testModule.Reaction([state]);
 
 			expect(reaction).instanceOf(Reaction);
 			expect(testModule.entities).toHaveLength(2);
@@ -184,7 +184,7 @@ describe("SvitoreModule", () => {
 			const state = testModule.State("state");
 			const event = testModule.Event();
 			const effect = testModule.Effect(() => Promise.resolve());
-			const reaction = testModule.Reaction(state, () => {});
+			const reaction = testModule.Reaction([state]);
 
 			state.release = vi.fn();
 			event.release = vi.fn();
