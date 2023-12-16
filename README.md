@@ -5,4 +5,4 @@
 
 State manager
 
-[Documentation](https://vitlolik.github.io/svitore/)
+<a href="https://vitlolik.github.io/svitore/" target="_blank">Documentation</a>
