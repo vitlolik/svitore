@@ -52,7 +52,7 @@ export default defineConfig({
 				],
 			},
 			{
-				text: "React",
+				text: "With React",
 				items: [{ text: "Get Started", link: "/react/getting-started" }],
 			},
 			{

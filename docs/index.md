@@ -16,6 +16,8 @@ hero:
 features:
   - title: Entities
     link: /entities/state
+  - title: Examples
+    link: /examples
   - title: With React
     link: /react/getting-started
 ---
