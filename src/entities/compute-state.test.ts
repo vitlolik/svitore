@@ -88,7 +88,37 @@ describe("computeState", () => {
 		expect(result).toBe("HELLO WORLD");
 	});
 
-	test("release - should unsubscribe from the state list", () => {
+	test("should notify subscribers", () => {
+		const event1 = new Event<string>();
+		const event2 = new Event<string>();
+
+		const state1 = new State("hello").changeOn(event1);
+		const state2 = new State("world").changeOn(event2);
+		const subscriber1 = vi.fn();
+		const subscriber2 = vi.fn();
+		const computed = new ComputedState(
+			[state1, state2],
+			(state1, state2) => `${state1} ${state2}`
+		);
+		computed.subscribe(subscriber1);
+		computed.subscribe(subscriber2);
+
+		event1.dispatch("HELLO");
+		expect(subscriber1).toHaveBeenCalledOnce();
+		expect(subscriber1).toHaveBeenCalledWith("HELLO world");
+
+		expect(subscriber2).toHaveBeenCalledOnce();
+		expect(subscriber2).toHaveBeenCalledWith("HELLO world");
+
+		event2.dispatch("WORLD");
+		expect(subscriber1).toHaveBeenCalledTimes(2);
+		expect(subscriber1).toHaveBeenCalledWith("HELLO WORLD");
+
+		expect(subscriber2).toHaveBeenCalledTimes(2);
+		expect(subscriber2).toHaveBeenCalledWith("HELLO WORLD");
+	});
+
+	test("should unsubscribe from the state list", () => {
 		const event1 = new Event<string>();
 		const event2 = new Event<string>();
 
