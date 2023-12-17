@@ -3,7 +3,7 @@ import { logError } from "../../utils";
 type Subscriber<T = void> = (data: T) => void;
 
 abstract class Entity<T = void> {
-	private subscribers: Set<Subscriber<T>> = new Set();
+	protected subscribers: Set<Subscriber<T>> = new Set();
 	private onMap: Map<Entity<any>, () => void> = new Map();
 
 	subscribe(subscriber: Subscriber<T>): () => void {
