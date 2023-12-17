@@ -30,10 +30,7 @@ class ComputedState<
 	override get(): T {
 		if (this.isChanged) {
 			this.isChanged = false;
-			const newState = this.getComputed();
-			this.notify(newState);
-
-			return newState;
+			this.notify(this.getComputed());
 		}
 
 		return super.get();
