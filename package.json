@@ -19,7 +19,7 @@
 		"check-size": "size-limit",
 		"test": "vitest",
 		"test:coverage": "vitest run --coverage",
-		"preversion": "npm run test:coverage && npm run build && npm run check-size",
+		"preversion": "npm run lint && npm run test:coverage && npm run build && npm run check-size",
 		"docs:dev": "vitepress dev docs",
 		"docs:build": "vitepress build docs",
 		"docs:preview": "vitepress preview docs"
