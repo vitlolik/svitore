@@ -3,7 +3,7 @@ import type { SelectorCallback } from "./types";
 
 class ComputedState<
 	States extends ReadonlyArray<AbstractState<any>>,
-	T
+	T,
 > extends AbstractState<T> {
 	private isInvalidated = false;
 	private getComputed: () => T;

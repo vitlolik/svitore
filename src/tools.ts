@@ -39,13 +39,13 @@ const allSettled = async (): Promise<void> => {
 
 	const waitIfNeeded = async (): Promise<void> => {
 		const pendingEffects = entities.filter(
-			(entity) => entity instanceof Effect && entity.pending.get()
+			(entity) => entity instanceof Effect && entity.pending.get(),
 		);
 		const pendingEffectRunners = entities.filter(
-			(entity) => entity instanceof EffectRunner && entity.pending.get()
+			(entity) => entity instanceof EffectRunner && entity.pending.get(),
 		);
 		const pendingEvents = entities.filter(
-			(entity) => entity instanceof DelayedEvent && entity.pending
+			(entity) => entity instanceof DelayedEvent && entity.pending,
 		);
 
 		const pendingEntities = [
@@ -64,8 +64,10 @@ const allSettled = async (): Promise<void> => {
 		await Promise.all(
 			pendingEntities.map(
 				(entity) =>
-					new Promise((resolve) => unsubscribes.push(entity.subscribe(resolve)))
-			)
+					new Promise((resolve) =>
+						unsubscribes.push(entity.subscribe(resolve)),
+					),
+			),
 		);
 
 		return waitIfNeeded();

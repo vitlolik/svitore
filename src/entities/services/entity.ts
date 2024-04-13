@@ -34,7 +34,7 @@ abstract class Entity<T = void> {
 
 	protected on<EntityPayload>(
 		entity: Entity<EntityPayload>,
-		subscriber: (payload: EntityPayload) => void
+		subscriber: (payload: EntityPayload) => void,
 	): this {
 		if (this.onMap.has(entity)) return this;
 

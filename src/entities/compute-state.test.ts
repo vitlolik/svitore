@@ -12,7 +12,7 @@ describe("computeState", () => {
 
 		const mergedState = new ComputedState(
 			[state1, state2],
-			(value1, value2) => value1 + value2
+			(value1, value2) => value1 + value2,
 		);
 
 		expect(mergedState).instanceOf(AbstractState);
@@ -23,7 +23,7 @@ describe("computeState", () => {
 		const state2 = new State("!");
 		const mergedState = new ComputedState(
 			[state1, state2],
-			(value1, value2) => `${value1} world${value2}`
+			(value1, value2) => `${value1} world${value2}`,
 		);
 
 		expect(mergedState.get()).toBe("hello world!");
@@ -37,7 +37,7 @@ describe("computeState", () => {
 		const state2 = new State("world").changeOn(event2);
 		const computed = new ComputedState(
 			[state1, state2],
-			(state1, state2) => `${state1} ${state2}`
+			(state1, state2) => `${state1} ${state2}`,
 		);
 		expect(computed.get()).toBe("hello world");
 
@@ -98,7 +98,7 @@ describe("computeState", () => {
 		const subscriber2 = vi.fn();
 		const computed = new ComputedState(
 			[state1, state2],
-			(state1, state2) => `${state1} ${state2}`
+			(state1, state2) => `${state1} ${state2}`,
 		);
 		computed.subscribe(subscriber1);
 		computed.subscribe(subscriber2);
@@ -126,7 +126,7 @@ describe("computeState", () => {
 		const state2 = new State("world").changeOn(event2);
 
 		const computed = new ComputedState([state1, state2], (value1, value2) =>
-			`${value1} ${value2}`.toUpperCase()
+			`${value1} ${value2}`.toUpperCase(),
 		);
 
 		expect(computed.get()).toBe("HELLO WORLD");

@@ -8,7 +8,7 @@ class PersistState<Data> extends State<Data> {
 	constructor(
 		state: Data,
 		storageKey: string,
-		private readonly storage: Storage = globalThis.localStorage
+		private readonly storage: Storage = globalThis.localStorage,
 	) {
 		super(state);
 
@@ -24,7 +24,7 @@ class PersistState<Data> extends State<Data> {
 		const writeToStorage = createBatchFunction((newState: Data) => {
 			storage.setItem(
 				PERSIST_STORAGE_KEY,
-				JSON.stringify({ ...getPersistData(), [storageKey]: newState })
+				JSON.stringify({ ...getPersistData(), [storageKey]: newState }),
 			);
 		});
 

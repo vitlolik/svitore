@@ -37,7 +37,7 @@ describe("abstract-event", () => {
 	describe("applyMiddleware", () => {
 		test("should setup middlewares", () => {
 			const event = new Event<string>().applyMiddleware((_context, next) =>
-				next()
+				next(),
 			);
 
 			const subscriber = vi.fn();
@@ -63,7 +63,7 @@ describe("abstract-event", () => {
 
 		test("tou can stop event, if next function doesn't call", () => {
 			const event = new Event<string>().applyMiddleware(
-				(_context, _next) => {}
+				(_context, _next) => {},
 			);
 
 			const subscriber = vi.fn();
@@ -115,7 +115,7 @@ describe("abstract-event", () => {
 			event.dispatch("Hi");
 			expect(mockErrorEventSubscriber).toHaveBeenCalledOnce();
 			expect(mockErrorEventSubscriber).toHaveBeenCalledWith(
-				new Error("To short string")
+				new Error("To short string"),
 			);
 			expect(mockTargetEventSubscriber).toHaveBeenCalledTimes(1);
 		});

@@ -38,19 +38,19 @@ const createStore = (): Store => {
 	const firstNameState = demoFormModule.PersistState(
 		"",
 		"firstName",
-		window.sessionStorage
+		window.sessionStorage,
 	);
 	const secondNameState = demoFormModule.PersistState(
 		"",
 		"lastName",
-		window.sessionStorage
+		window.sessionStorage,
 	);
 	const ageState = demoFormModule.PersistState(1, "age", window.sessionStorage);
 
 	const symbolsCountState = demoFormModule.ComputedState(
 		[firstNameState, secondNameState],
 		(firstName, secondName) =>
-			firstName.trim().length + secondName.trim().length
+			firstName.trim().length + secondName.trim().length,
 	);
 
 	const logEffect = demoFormModule.Effect(() => {

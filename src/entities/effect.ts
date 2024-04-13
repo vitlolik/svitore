@@ -8,7 +8,7 @@ type EffectOptions = {
 
 type EffectFunction<Params, Result> = (
 	params: Params,
-	signal: AbortSignal
+	signal: AbortSignal,
 ) => Promise<Result>;
 
 type NotifyPayload<Params, Result, ErrorType> =
@@ -26,7 +26,7 @@ type NotifyPayload<Params, Result, ErrorType> =
 class Effect<
 	Params = void,
 	Result = void,
-	ErrorType extends Error = Error
+	ErrorType extends Error = Error,
 > extends Entity<NotifyPayload<Params, Result, ErrorType>> {
 	private abortController: AbortController | null = null;
 	private pendingChanged = new Event<boolean>();
@@ -37,7 +37,7 @@ class Effect<
 
 	constructor(
 		public fn: EffectFunction<Params, Result>,
-		private options: EffectOptions = {}
+		private options: EffectOptions = {},
 	) {
 		super();
 	}
@@ -77,15 +77,15 @@ class Effect<
 	}
 
 	override on<EntityPayload extends Params>(
-		entity: Entity<EntityPayload>
+		entity: Entity<EntityPayload>,
 	): this;
 	override on<EntityPayload>(
 		entity: Entity<EntityPayload>,
-		selector: (payload: EntityPayload) => Params
+		selector: (payload: EntityPayload) => Params,
 	): this;
 	override on(
 		entity: Entity<any>,
-		selector?: ((payload: any) => Params) | undefined
+		selector?: ((payload: any) => Params) | undefined,
 	): this {
 		return super.on(entity, (payload) => {
 			this.run(selector ? selector(payload) : payload);

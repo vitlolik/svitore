@@ -31,7 +31,7 @@ describe("persist state", () => {
 	test("should set state from storage if storage has value", async () => {
 		localStorage.setItem(
 			PERSIST_STORAGE_KEY,
-			JSON.stringify({ "test-key": "value in storage" })
+			JSON.stringify({ "test-key": "value in storage" }),
 		);
 
 		const persistState = new PersistState("test state", "test-key");
@@ -44,7 +44,7 @@ describe("persist state", () => {
 	test("should subscribe to state and update storage", async () => {
 		localStorage.setItem(
 			PERSIST_STORAGE_KEY,
-			JSON.stringify({ "test-key": "value in storage" })
+			JSON.stringify({ "test-key": "value in storage" }),
 		);
 		const event = new Event<string>();
 		new PersistState("test state", "test-key").changeOn(event);
@@ -55,7 +55,7 @@ describe("persist state", () => {
 		await Promise.resolve();
 
 		expect(localStorage.getItem(PERSIST_STORAGE_KEY)).toBe(
-			`{"test-key":"new test value"}`
+			`{"test-key":"new test value"}`,
 		);
 	});
 

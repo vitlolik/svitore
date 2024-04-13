@@ -6,7 +6,7 @@ type ExtractEntitiesTypes<T extends ReadonlyArray<Entity<any>>> = {
 
 type SelectorCallback<
 	StateList extends ReadonlyArray<AbstractState<any>>,
-	Result = void
+	Result = void,
 > = (...args: ExtractEntitiesTypes<StateList>) => Result;
 
 export type { SelectorCallback, ExtractEntitiesTypes };

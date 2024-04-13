@@ -5,7 +5,7 @@ describe("entity", () => {
 	class TestEntity<T = void> extends Entity<T> {
 		override on<EntityPayload>(
 			entity: Entity<EntityPayload>,
-			subscriber: (payload: EntityPayload) => void
+			subscriber: (payload: EntityPayload) => void,
 		): this {
 			return super.on(entity, subscriber);
 		}
@@ -77,7 +77,7 @@ describe("entity", () => {
 			"[svitore]",
 			"Entity",
 			"Some subscriber have an error",
-			new Error("error inside secondSubscriber")
+			new Error("error inside secondSubscriber"),
 		);
 
 		vi.clearAllMocks();

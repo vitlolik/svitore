@@ -3,14 +3,14 @@ import { createStore } from "./store";
 const main = (): void => {
 	const form = document.getElementById("app") as HTMLFormElement;
 	const fistNameInput = document.getElementById(
-		"firstName"
+		"firstName",
 	) as HTMLInputElement;
 	const secondNameInput = document.getElementById(
-		"secondName"
+		"secondName",
 	) as HTMLInputElement;
 	const ageInput = document.getElementById("age") as HTMLInputElement;
 	const symbolsCount = document.getElementById(
-		"symbolsCount"
+		"symbolsCount",
 	) as HTMLSpanElement;
 	const resetButton = document.getElementById("reset") as HTMLButtonElement;
 

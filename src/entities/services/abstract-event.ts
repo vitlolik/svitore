@@ -14,7 +14,7 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 
 	private callMiddlewares(
 		value: Payload,
-		dispatch: (context: MiddlewareContext<Payload>) => void
+		dispatch: (context: MiddlewareContext<Payload>) => void,
 	): void {
 		const context: MiddlewareContext<Payload> = { value };
 
@@ -49,7 +49,7 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 
 	applyMiddleware<ErrorType extends Error>(
 		middleware: Middleware<Payload>,
-		errorEvent?: AbstractEvent<ErrorType>
+		errorEvent?: AbstractEvent<ErrorType>,
 	): this {
 		this.middlewares.push({ fn: middleware, errorEvent });
 
@@ -57,11 +57,11 @@ abstract class AbstractEvent<Payload = void> extends Entity<Payload> {
 	}
 
 	override on<EntityPayload extends Payload>(
-		entity: Entity<EntityPayload>
+		entity: Entity<EntityPayload>,
 	): this;
 	override on<EntityPayload>(
 		entity: Entity<EntityPayload>,
-		selector: (payload: EntityPayload) => Payload
+		selector: (payload: EntityPayload) => Payload,
 	): this;
 	override on(entity: Entity<any>, selector?: (payload: any) => Payload): this {
 		return super.on(entity, (payload) => {

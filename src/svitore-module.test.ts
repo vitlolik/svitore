@@ -36,7 +36,7 @@ describe("SvitoreModule", () => {
 			} catch (error) {
 				expect(error).instanceOf(ModuleExistsError);
 				expect((error as any).message).toBe(
-					'Module with name "parent:child" already exists'
+					'Module with name "parent:child" already exists',
 				);
 			}
 		});
@@ -57,7 +57,7 @@ describe("SvitoreModule", () => {
 			const testModule = new SvitoreModule("test");
 			const state = testModule.State("test state");
 			const computedState = testModule.ComputedState([state], (value) =>
-				value.toUpperCase()
+				value.toUpperCase(),
 			);
 
 			expect(computedState).instanceOf(ComputedState);
@@ -70,7 +70,7 @@ describe("SvitoreModule", () => {
 			const testModule = new SvitoreModule("test");
 			const persistState = testModule.PersistState(
 				"test persist state",
-				"test-key"
+				"test-key",
 			);
 
 			expect(persistState).instanceOf(PersistState);

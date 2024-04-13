@@ -1,7 +1,7 @@
 type Callback<Args extends unknown[]> = (...args: Args) => void;
 
 const createBatchFunction = <Args extends unknown[]>(
-	callback: Callback<Args>
+	callback: Callback<Args>,
 ): Callback<Args> => {
 	let isPending = false;
 

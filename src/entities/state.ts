@@ -12,15 +12,15 @@ class State<Data> extends AbstractState<Data> {
 	changeOn<Payload extends Data>(event: Event<Payload>): this;
 	changeOn<Payload>(
 		event: Event<Payload>,
-		selector: (payload: Payload, state: Data, prevState: Data) => Data
+		selector: (payload: Payload, state: Data, prevState: Data) => Data,
 	): this;
 	changeOn(
 		event: Event<any>,
-		selector?: (payload: any, state: Data, prevState: Data) => Data
+		selector?: (payload: any, state: Data, prevState: Data) => Data,
 	): this {
 		return this.on(event, (payload) => {
 			this.notify(
-				selector ? selector(payload, this.get(), this.getPrev()) : payload
+				selector ? selector(payload, this.get(), this.getPrev()) : payload,
 			);
 		});
 	}

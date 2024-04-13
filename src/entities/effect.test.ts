@@ -42,7 +42,7 @@ describe("effect", () => {
 					signal.addEventListener("abort", abortListener);
 					await Promise.resolve("hello");
 				},
-				{ isAutoCancelable: true }
+				{ isAutoCancelable: true },
 			);
 
 			effect.run();
@@ -133,7 +133,7 @@ describe("effect", () => {
 				abortError.name = "AbortError";
 				return Promise.reject(abortError);
 			},
-			{ isAutoCancelable: true }
+			{ isAutoCancelable: true },
 		);
 		autoAbortEmulateEffect.subscribe(subscriber);
 

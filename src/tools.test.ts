@@ -54,13 +54,13 @@ describe("tools", () => {
 			const testModule = new SvitoreModule("test");
 
 			const effect1 = testModule.Effect(
-				() => new Promise((resolve) => setTimeout(resolve, 3))
+				() => new Promise((resolve) => setTimeout(resolve, 3)),
 			);
 			const effect2 = testModule.Effect(
-				() => new Promise((resolve) => setTimeout(resolve, 2))
+				() => new Promise((resolve) => setTimeout(resolve, 2)),
 			);
 			const effect3 = testModule.Effect(
-				() => new Promise((resolve) => setTimeout(resolve, 1))
+				() => new Promise((resolve) => setTimeout(resolve, 1)),
 			);
 
 			const testSubscribe1 = vi.fn();
