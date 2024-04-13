@@ -1,8 +1,8 @@
-import { vi, test, expect, describe, afterEach } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
+import { Event } from "./event";
 import { PERSIST_STORAGE_KEY, PersistState } from "./persist-state";
 import { State } from "./state";
-import { Event } from "./event";
 
 describe("persist state", () => {
 	const getItemSpy = vi.spyOn(Storage.prototype, "getItem");

@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { Entity } from "./entity";
 import { AbstractState } from "./abstract-state";
+import { Entity } from "./entity";
 
 describe("state", () => {
 	class State<T> extends AbstractState<T> {

@@ -1,9 +1,9 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { Entity } from "./services";
-import { Reaction } from "./reaction";
-import { State } from "./state";
 import { Event } from "./event";
+import { Reaction } from "./reaction";
+import { Entity } from "./services";
+import { State } from "./state";
 
 describe("reaction", () => {
 	test("type", () => {

@@ -1,7 +1,7 @@
-import { describe, test, expect, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { State } from "./state";
 import { Event } from "./event";
+import { State } from "./state";
 
 describe("state", () => {
 	test("reset state to default value", () => {
