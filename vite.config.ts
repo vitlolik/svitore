@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
-import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
 	plugins: [
@@ -20,8 +20,10 @@ export default defineConfig({
 	test: {
 		environment: "jsdom",
 		coverage: {
+			include: ["**/src/**"],
+			exclude: ["**/src/index.ts"],
 			provider: "v8",
-			"100": true,
+			thresholds: { "100": true },
 		},
 	},
 });
