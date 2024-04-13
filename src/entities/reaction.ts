@@ -11,7 +11,9 @@ class Reaction<States extends ReadonlyArray<AbstractState<any>>> extends Entity<
 		super();
 
 		const reactionHandler = createBatchFunction(() => {
-			this.notify(states.map((state) => state.get()) as any);
+			if (this.subscribers.size) {
+				this.notify(states.map((state) => state.get()) as any);
+			}
 		});
 
 		this.unsubscribes = states.map((state) => state.subscribe(reactionHandler));

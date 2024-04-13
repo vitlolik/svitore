@@ -5,7 +5,7 @@ class ComputedState<
 	States extends ReadonlyArray<AbstractState<any>>,
 	T
 > extends AbstractState<T> {
-	private isChanged = false;
+	private isInvalidated = false;
 	private getComputed: () => T;
 	private unsubscribes: (() => void)[] = [];
 
@@ -21,15 +21,15 @@ class ComputedState<
 				return this.notify(getComputed());
 			}
 
-			this.isChanged = true;
+			this.isInvalidated = true;
 		};
 
 		this.unsubscribes = states.map((state) => state.subscribe(subscriber));
 	}
 
 	override get(): T {
-		if (this.isChanged) {
-			this.isChanged = false;
+		if (this.isInvalidated) {
+			this.isInvalidated = false;
 			this.notify(this.getComputed());
 		}
 
