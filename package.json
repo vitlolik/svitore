@@ -15,7 +15,7 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"lint": "npx @biomejs/biome lint ./src ./demo",
-		"format": "npx @biomejs/biome format --write ./src ./demo && npx @biomejs/biome check --apply ./src ./demo",
+		"format": "npx @biomejs/biome check --apply ./src ./demo",
 		"check-size": "size-limit",
 		"test": "vitest",
 		"test:coverage": "vitest run --coverage",
