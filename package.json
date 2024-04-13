@@ -35,7 +35,7 @@
 		"typescript": "^5.4.5",
 		"vite": "^5.2.8",
 		"vite-plugin-dts": "^3.8.2",
-		"vitepress": "^1.0.0-rc.31",
+		"vitepress": "^1.1.0",
 		"vitest": "^1.5.0"
 	},
 	"size-limit": [
