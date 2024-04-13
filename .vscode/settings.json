@@ -11,5 +11,8 @@
 		"preversion",
 		"Vitaliy",
 		"Berekchiyan"
-	]
+	],
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
 }
