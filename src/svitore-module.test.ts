@@ -1,5 +1,4 @@
-import { describe, expect, vi, test, afterEach } from "vitest";
-import { SvitoreModule } from "./svitore-module";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
 	ComputedState,
 	DebouncedEvent,
@@ -11,8 +10,9 @@ import {
 	State,
 	ThrottledEvent,
 } from "./entities";
-import { ModuleExistsError } from "./utils/error";
+import { SvitoreModule } from "./svitore-module";
 import { release } from "./tools";
+import { ModuleExistsError } from "./utils/error";
 
 afterEach(release);
 

@@ -1,4 +1,4 @@
-import { Effect, EffectRunner, Entity } from "./entities";
+import { Effect, EffectRunner, type Entity } from "./entities";
 import { DelayedEvent } from "./entities/services";
 import { SvitoreModule } from "./svitore-module";
 

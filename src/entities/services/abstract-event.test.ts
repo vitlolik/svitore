@@ -1,7 +1,7 @@
-import { describe, expect, vi, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
-import { Entity } from "./entity";
 import { AbstractEvent } from "./abstract-event";
+import { Entity } from "./entity";
 
 describe("abstract-event", () => {
 	class Event<Payload = void> extends AbstractEvent<Payload> {}
@@ -162,7 +162,7 @@ describe("abstract-event", () => {
 			const triggerEvent = new Event<number>();
 			const mockDispatch = vi.fn();
 
-			event.on(triggerEvent, (numericValue) => numericValue + "_test");
+			event.on(triggerEvent, (numericValue) => `${numericValue}_test`);
 			event.dispatch = mockDispatch;
 
 			triggerEvent.dispatch(10);

@@ -1,5 +1,5 @@
-import { SelectorCallback } from "./types";
 import { AbstractState } from "./services";
+import type { SelectorCallback } from "./types";
 
 class ComputedState<
 	States extends ReadonlyArray<AbstractState<any>>,
@@ -18,7 +18,8 @@ class ComputedState<
 
 		const subscriber = (): void => {
 			if (this.subscribers.size) {
-				return this.notify(getComputed());
+				this.notify(getComputed());
+				return;
 			}
 
 			this.isInvalidated = true;

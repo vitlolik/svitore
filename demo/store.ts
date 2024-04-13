@@ -1,7 +1,7 @@
 import {
-	AbstractEvent,
-	Middleware,
-	AbstractState,
+	type AbstractEvent,
+	type AbstractState,
+	type Middleware,
 	SvitoreModule,
 } from "../src";
 

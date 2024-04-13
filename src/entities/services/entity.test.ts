@@ -1,4 +1,4 @@
-import { describe, expect, vi, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { Entity } from "./entity";
 
 describe("entity", () => {
@@ -10,7 +10,7 @@ describe("entity", () => {
 			return super.on(entity, subscriber);
 		}
 		override notify(params: T): void {
-			return super.notify(params);
+			super.notify(params);
 		}
 	}
 

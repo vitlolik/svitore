@@ -14,7 +14,8 @@
 		"start": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
-		"lint": "eslint 'src/**/*.ts' 'demo/**/*.ts'",
+		"lint": "npx @biomejs/biome lint ./src ./demo",
+		"format": "npx @biomejs/biome format --write ./src ./demo",
 		"check-size": "size-limit",
 		"test": "vitest",
 		"test:coverage": "vitest run --coverage",
@@ -24,12 +25,10 @@
 		"docs:preview": "vitepress preview docs"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^1.6.4",
 		"@size-limit/preset-small-lib": "^11.1.2",
 		"@types/node": "^20.12.7",
-		"@typescript-eslint/eslint-plugin": "^6.11.0",
-		"@typescript-eslint/parser": "^6.11.0",
 		"@vitest/coverage-v8": "^1.5.0",
-		"eslint": "^8.54.0",
 		"jsdom": "^24.0.0",
 		"size-limit": "^11.1.2",
 		"typescript": "^5.4.5",

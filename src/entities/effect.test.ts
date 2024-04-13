@@ -1,8 +1,8 @@
-import { describe, expect, vi, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { Effect } from "./effect";
-import { Entity } from "./services";
 import { Event } from "./event";
+import { Entity } from "./services";
 
 describe("effect", () => {
 	test("type", () => {
@@ -162,7 +162,7 @@ describe("effect", () => {
 			const triggerEvent = new Event<number>();
 			const mockRun = vi.fn();
 
-			effect.on(triggerEvent, (numericValue) => numericValue + "_test");
+			effect.on(triggerEvent, (numericValue) => `${numericValue}_test`);
 			effect.run = mockRun;
 
 			triggerEvent.dispatch(10);

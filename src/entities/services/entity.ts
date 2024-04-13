@@ -15,7 +15,8 @@ abstract class Entity<T = void> {
 	unsubscribe(subscriber: Subscriber<T> | Entity<T>): void {
 		if (subscriber instanceof Entity) {
 			this.onMap.get(subscriber)?.();
-			return void this.onMap.delete(subscriber);
+			this.onMap.delete(subscriber);
+			return;
 		}
 
 		this.subscribers.delete(subscriber);

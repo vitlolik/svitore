@@ -30,13 +30,12 @@ class PersistState<Data> extends State<Data> {
 
 		const stateFromStorage = getPersistData()[storageKey];
 
-		if (stateFromStorage === undefined) {
+		if (stateFromStorage !== undefined) {
+			this.notify(stateFromStorage);
 			this.subscribe(writeToStorage);
-			return this;
+		} else {
+			this.subscribe(writeToStorage);
 		}
-
-		this.notify(stateFromStorage);
-		this.subscribe(writeToStorage);
 	}
 
 	clear(): void {

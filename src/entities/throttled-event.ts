@@ -6,10 +6,6 @@ class ThrottledEvent<Payload = void> extends DelayedEvent<Payload> {
 	private isThrottled = false;
 	private savedParams: Payload | typeof noValue = noValue;
 
-	constructor(timeout: number) {
-		super(timeout);
-	}
-
 	override dispatch(payload: Payload): void {
 		if (this.isThrottled) {
 			this.pending = true;

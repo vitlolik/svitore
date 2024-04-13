@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
-import { EffectRunner } from "./effect-runner";
 import { Effect } from "./effect";
+import { EffectRunner } from "./effect-runner";
 import { Event } from "./event";
 
 describe("EffectRunner", () => {
@@ -243,7 +243,7 @@ describe("EffectRunner", () => {
 				until: ({ fulfilled }) => fulfilled < 1,
 			});
 			effectRunner.start = mockStart;
-			effectRunner.on(triggerEvent, (numericValue) => numericValue + "_test");
+			effectRunner.on(triggerEvent, (numericValue) => `${numericValue}_test`);
 
 			triggerEvent.dispatch(10);
 

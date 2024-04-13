@@ -1,15 +1,16 @@
 import {
+	ComputedState,
+	DebouncedEvent,
+	Effect,
+	EffectRunner,
 	Event,
 	PersistState,
-	State,
-	DebouncedEvent,
-	ThrottledEvent,
-	ComputedState,
-	Effect,
 	Reaction,
-	EffectRunner,
+	State,
+	ThrottledEvent,
 } from "./entities";
-import { Entity } from "./entities/services";
+import type { Entity } from "./entities/services";
+
 import { ModuleExistsError } from "./utils/error";
 
 class SvitoreModule<T extends string = any> {

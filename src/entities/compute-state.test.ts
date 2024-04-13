@@ -1,9 +1,9 @@
 import { describe, expect, test, vi } from "vitest";
 
 import { ComputedState } from "./computed-state";
-import { State } from "./state";
-import { AbstractState } from "./services";
 import { Event } from "./event";
+import { AbstractState } from "./services";
+import { State } from "./state";
 
 describe("computeState", () => {
 	test("type", () => {
@@ -23,7 +23,7 @@ describe("computeState", () => {
 		const state2 = new State("!");
 		const mergedState = new ComputedState(
 			[state1, state2],
-			(value1, value2) => value1 + " world" + value2
+			(value1, value2) => `${value1} world${value2}`
 		);
 
 		expect(mergedState.get()).toBe("hello world!");

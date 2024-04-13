@@ -1,4 +1,4 @@
-import { Event } from "./event";
+import type { Event } from "./event";
 import { AbstractState } from "./services";
 
 class State<Data> extends AbstractState<Data> {

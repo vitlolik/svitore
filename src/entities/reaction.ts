@@ -1,6 +1,6 @@
-import { AbstractState, Entity } from "./services";
-import { ExtractEntitiesTypes } from "./types";
 import { createBatchFunction } from "../utils";
+import { type AbstractState, Entity } from "./services";
+import type { ExtractEntitiesTypes } from "./types";
 
 class Reaction<States extends ReadonlyArray<AbstractState<any>>> extends Entity<
 	ExtractEntitiesTypes<States>

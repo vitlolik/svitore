@@ -1,4 +1,4 @@
-import { Effect } from "./effect";
+import type { Effect } from "./effect";
 import { Event } from "./event";
 import { Entity } from "./services";
 import { State } from "./state";
@@ -25,7 +25,7 @@ class EffectRunner<
 > extends Entity<NotifyType> {
 	private rejected = 0;
 	private fulfilled = 0;
-	private timer: number | NodeJS.Timeout = NaN;
+	private timer: number | NodeJS.Timeout = Number.NaN;
 	private unsubscribeFromEffect = (): void => {};
 	private changed = new Event<boolean>();
 
